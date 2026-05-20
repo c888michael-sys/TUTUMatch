@@ -29,6 +29,9 @@ export default async function MessagesPage() {
     lastBody: string | null;
     lastAt: string;
     isDev: boolean;
+    awaitingTutorReply: boolean;
+    daysLeft: number;
+    status: string;
   };
 
   const threads: ThreadRow[] = await Promise.all(
@@ -41,6 +44,7 @@ export default async function MessagesPage() {
       const messages = await listMessages(u.id);
       const last = messages[messages.length - 1];
       const tutorDisplay = app ? `${app.firstName} ${app.lastInitial}.` : "(tutor)";
+      const msLeft = Date.parse(u.refundEligibleAt) - Date.now();
       return {
         unlockId: u.id,
         viewerRole: isParent ? "PARENT" : "TUTOR",
@@ -48,11 +52,20 @@ export default async function MessagesPage() {
         lastBody: last?.body ?? null,
         lastAt: last?.createdAt ?? u.paidAt,
         isDev: u.isDev === true,
+        awaitingTutorReply: u.status === "PAID" && !u.tutorFirstReplyAt,
+        daysLeft: Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24))),
+        status: u.status,
       };
     })
   );
 
-  threads.sort((a, b) => b.lastAt.localeCompare(a.lastAt));
+  // Sort so threads needing the viewer's attention bubble to the top.
+  threads.sort((a, b) => {
+    const aNeeds = a.viewerRole === "TUTOR" && a.awaitingTutorReply ? 1 : 0;
+    const bNeeds = b.viewerRole === "TUTOR" && b.awaitingTutorReply ? 1 : 0;
+    if (aNeeds !== bNeeds) return bNeeds - aNeeds;
+    return b.lastAt.localeCompare(a.lastAt);
+  });
 
   return (
     <>
@@ -72,23 +85,39 @@ export default async function MessagesPage() {
           </div>
         ) : (
           <ul className="thread-list">
-            {threads.map((t) => (
-              <li key={t.unlockId}>
-                <Link className="thread-row" href={`/messages/${t.unlockId}`}>
-                  <div className="thread-row-head">
-                    <span className="thread-other">{t.otherName}</span>
-                    <span className="thread-meta">
-                      {t.viewerRole === "PARENT" ? "Tutor" : "Parent"}
-                      {t.isDev && <span className="dev-tag">DEV</span>}
-                    </span>
-                  </div>
-                  <div className="thread-preview">
-                    {t.lastBody ?? <em>No messages yet — say hi 👋</em>}
-                  </div>
-                  <div className="thread-time">{new Date(t.lastAt).toLocaleString("en-AU")}</div>
-                </Link>
-              </li>
-            ))}
+            {threads.map((t) => {
+              const needsTutorReply = t.viewerRole === "TUTOR" && t.awaitingTutorReply;
+              return (
+                <li key={t.unlockId}>
+                  <Link
+                    className={`thread-row ${needsTutorReply ? "needs-reply" : ""}`}
+                    href={`/messages/${t.unlockId}`}
+                  >
+                    <div className="thread-row-head">
+                      <span className="thread-other">{t.otherName}</span>
+                      <span className="thread-meta">
+                        {t.viewerRole === "PARENT" ? "Tutor" : "Parent"}
+                        {t.isDev && <span className="dev-tag">DEV</span>}
+                        {t.status === "REFUNDED" && <span className="auto-tag">REFUNDED</span>}
+                        {needsTutorReply && <span className="urgent-tag">REPLY ASAP</span>}
+                      </span>
+                    </div>
+                    <div className="thread-preview">
+                      {t.lastBody ?? <em>No messages yet — say hi 👋</em>}
+                    </div>
+                    <div className="thread-time">
+                      {new Date(t.lastAt).toLocaleString("en-AU")}
+                      {needsTutorReply && (
+                        <span className="thread-countdown">
+                          {" · "}
+                          {t.daysLeft} day{t.daysLeft === 1 ? "" : "s"} left before auto-refund + suspension
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </main>

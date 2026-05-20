@@ -90,6 +90,23 @@ export default async function ThreadPage({ params }: { params: { unlockId: strin
           </section>
         )}
 
+        {!isParent && unlock.status === "PAID" && !unlock.tutorFirstReplyAt && (
+          <section className="urgent-banner inline">
+            <div className="urgent-banner-head">
+              ⚠ Reply ASAP — {(() => {
+                const ms = Date.parse(unlock.refundEligibleAt) - Date.now();
+                const d = Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+                return `${d} day${d === 1 ? "" : "s"} left`;
+              })()}
+            </div>
+            <p className="urgent-banner-note">
+              {parentUser?.email ?? "This parent"} paid <strong>$20</strong> to message you and expects a fast
+              response. If you don&apos;t reply within 5 days of their unlock, they&apos;re automatically refunded{" "}
+              <strong>and your account is suspended</strong> until you appeal. Even a one-line reply stops the clock.
+            </p>
+          </section>
+        )}
+
         {!isParent && (
           <section className="contact-card contact-card-tutor">
             <div className="contact-card-head">Reminder for you (tutor)</div>
@@ -97,10 +114,6 @@ export default async function ThreadPage({ params }: { params: { unlockId: strin
               Apply a <strong>$20 discount</strong> to {parentUser?.email ?? "this parent"}&apos;s first lesson
               invoice. That covers the unlock fee they paid TUTUMatch — keep them happy and you keep 100% of every
               lesson after that.
-            </p>
-            <p className="contact-card-note">
-              <strong>Reply within 5 days.</strong> If you don&apos;t, the parent is automatically refunded and your
-              account is suspended.
             </p>
             <p className="contact-card-note">
               <strong>Pick a safe meeting place.</strong> Public libraries are recommended. Whatever you pick,

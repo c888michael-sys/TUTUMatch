@@ -1772,6 +1772,45 @@ footer {
   line-height: 1.55;
   max-width: 760px;
 }
+.urgent-banner {
+  margin: 18px 0;
+  padding: 16px 20px;
+  background: #FEF2F2;
+  border-left: 4px solid #DC2626;
+  border-radius: var(--radius-btn);
+  color: #7F1D1D;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.08);
+}
+.urgent-banner.inline { margin: 16px 0 12px; }
+.urgent-banner-head {
+  font-family: var(--sans); font-weight: 700;
+  font-size: 15px;
+  color: #991B1B;
+  margin-bottom: 10px;
+}
+.urgent-banner-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex; flex-direction: column; gap: 6px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.urgent-banner-list li.urgent {
+  font-weight: 600;
+  color: #991B1B;
+}
+.urgent-banner-list a {
+  color: #B91C1C;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.urgent-banner-note {
+  margin: 0;
+  font-size: 13.5px;
+  color: #7F1D1D;
+  line-height: 1.55;
+}
 
 /* ────────── Admin ────────── */
 .admin-shell, .admin-detail { max-width: 1280px; }
@@ -2187,6 +2226,50 @@ footer {
   font-family: var(--mono); font-weight: 700;
   font-size: 9.5px;
   letter-spacing: 0.06em;
+}
+.urgent-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: #DC2626;
+  color: #FFFFFF;
+  font-family: var(--mono); font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  animation: urgentPulse 1.8s ease-in-out infinite;
+}
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+.topnav-badge {
+  display: inline-block;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: #DC2626;
+  color: #FFFFFF;
+  font-family: var(--mono); font-weight: 700;
+  font-size: 10.5px;
+  line-height: 18px;
+  text-align: center;
+  vertical-align: middle;
+}
+.topnav-btn.has-urgent {
+  border-color: #DC2626;
+  color: #B91C1C;
+}
+
+.thread-row.needs-reply {
+  background: linear-gradient(90deg, #FEF2F2, transparent 80%);
+  border-left: 3px solid #DC2626;
+  padding-left: 17px;
+}
+.thread-countdown {
+  color: #B91C1C;
+  font-weight: 600;
 }
 .auto-tag {
   display: inline-block;

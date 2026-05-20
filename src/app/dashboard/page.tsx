@@ -72,6 +72,13 @@ export default async function DashboardPage({
   const tutorUnlocks = unlocks.filter((u) => u.tutorUserId === session.userId);
   const parentUnlocks = unlocks.filter((u) => u.parentUserId === session.userId);
 
+  // Parents who unlocked this tutor but the tutor hasn't replied to yet.
+  // We need to push this aggressively — the tutor's account gets suspended
+  // if they ignore it for 5 days.
+  const awaitingReply = tutorUnlocks.filter(
+    (u) => u.status === "PAID" && !u.tutorFirstReplyAt
+  );
+
   const isLiveTutor = !!app && app.status === "APPROVED";
   const visibility = app?.visibility ?? true;
 
@@ -106,6 +113,35 @@ export default async function DashboardPage({
             ✓ The system processed {processedRefundIds.length} overdue unlock
             {processedRefundIds.length === 1 ? "" : "s"}: the $20 was refunded to the parent and the unresponsive
             tutor was suspended.
+          </div>
+        )}
+
+        {awaitingReply.length > 0 && (
+          <div className="urgent-banner">
+            <div className="urgent-banner-head">
+              ⚠ Reply to {awaitingReply.length} parent{awaitingReply.length === 1 ? "" : "s"} ASAP
+            </div>
+            <ul className="urgent-banner-list">
+              {awaitingReply.map((u) => {
+                const msLeft = Date.parse(u.refundEligibleAt) - Date.now();
+                const daysLeft = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+                const urgent = daysLeft <= 2;
+                return (
+                  <li key={u.id} className={urgent ? "urgent" : ""}>
+                    <Link href={`/messages/${u.id}`}>Open thread</Link> · paid{" "}
+                    {new Date(u.paidAt).toLocaleString("en-AU")} ·{" "}
+                    <strong>
+                      {daysLeft} day{daysLeft === 1 ? "" : "s"} left before auto-refund + suspension
+                    </strong>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="urgent-banner-note">
+              Parents paid $20 expecting a fast response. If you don&apos;t reply within 5 days of their unlock,
+              they&apos;re automatically refunded <strong>and your account is suspended</strong> until you appeal.
+              Even a one-line reply stops the clock.
+            </p>
           </div>
         )}
 

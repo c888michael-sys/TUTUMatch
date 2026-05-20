@@ -1,9 +1,22 @@
 import Link from "next/link";
 import { getSession } from "@/lib/session";
+import { listUnlocksForUser } from "@/lib/db";
 import { LogoutButton } from "./LogoutButton";
 
-export function TopNav() {
+export async function TopNav() {
   const session = getSession();
+
+  // Count unlocks where the current user is the tutor and hasn't replied yet.
+  // We surface this as a red badge on the Messages link so a tutor logging in
+  // anywhere on the site sees the urgency immediately.
+  let unrepliedCount = 0;
+  if (session) {
+    const unlocks = await listUnlocksForUser(session.userId);
+    unrepliedCount = unlocks.filter(
+      (u) => u.tutorUserId === session.userId && u.status === "PAID" && !u.tutorFirstReplyAt
+    ).length;
+  }
+
   return (
     <header className="topnav">
       <div className="topnav-inner">
@@ -18,8 +31,16 @@ export function TopNav() {
         <div className="topnav-actions">
           {session ? (
             <>
-              <Link className="btn ghost topnav-btn" href="/messages">
+              <Link
+                className={`btn ghost topnav-btn ${unrepliedCount > 0 ? "has-urgent" : ""}`}
+                href="/messages"
+              >
                 Messages
+                {unrepliedCount > 0 && (
+                  <span className="topnav-badge" aria-label={`${unrepliedCount} unread`}>
+                    {unrepliedCount}
+                  </span>
+                )}
               </Link>
               {session.role === "ADMIN" && (
                 <Link className="btn ghost topnav-btn" href="/admin">
