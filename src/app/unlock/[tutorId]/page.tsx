@@ -3,24 +3,40 @@ import { notFound } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { ConfirmUnlockButton } from "@/components/unlock/ConfirmUnlockButton";
 import { findSampleTutor } from "@/lib/sample-tutors";
+import { findApplicationById } from "@/lib/db";
 
 export const metadata = { title: "Confirm contact · TUTUMatch" };
+export const dynamic = "force-dynamic";
 
-export default function UnlockPage({ params }: { params: { tutorId: string } }) {
-  const sample = findSampleTutor(params.tutorId);
-  if (!sample) notFound();
+export default async function UnlockPage({ params }: { params: { tutorId: string } }) {
+  // tutorId can be either:
+  //   - "sample-<schoolSlug>-<idx>"  → demo tutor, no real unlock possible
+  //   - "app_…"                      → real approved tutor application
+  let firstName = "";
+  let applicationId: string | null = null;
+
+  if (params.tutorId.startsWith("sample-")) {
+    const sample = findSampleTutor(params.tutorId);
+    if (!sample) notFound();
+    firstName = sample.name.split(" ")[0];
+  } else {
+    const app = await findApplicationById(params.tutorId);
+    if (!app) notFound();
+    firstName = app.firstName;
+    applicationId = app.id;
+  }
 
   return (
     <>
       <TopNav />
       <main className="page-shell unlock-shell">
         <div className="back-row">
-          <Link className="link-like" href={`/tutors/${params.tutorId}`}>← Back to {sample.name}&apos;s profile</Link>
+          <Link className="link-like" href={`/tutors/${params.tutorId}`}>← Back to {firstName}&apos;s profile</Link>
         </div>
 
         <h1>One last thing before we connect you</h1>
         <p className="unlock-lede">
-          Contacting <strong>{sample.name}</strong> costs a one-time <strong>$20</strong>. Here&apos;s exactly what
+          Contacting <strong>{firstName}</strong> costs a one-time <strong>$20</strong>. Here&apos;s exactly what
           that means, so there are no surprises.
         </p>
 
@@ -28,8 +44,8 @@ export default function UnlockPage({ params }: { params: { tutorId: string } }) 
           <h2>How the $20 works</h2>
           <ol className="unlock-steps">
             <li>
-              <strong>You pay $20 now.</strong> That unlocks {sample.name.split(" ")[0]}&apos;s full name, phone, and
-              email, and opens an in-platform message thread with them.
+              <strong>You pay $20 now.</strong> That unlocks {firstName}&apos;s full name, phone, and email, and
+              opens an in-platform message thread with them.
             </li>
             <li>
               <strong>If you book a first lesson</strong>, the tutor discounts it by $20 — applied to their first
@@ -40,8 +56,8 @@ export default function UnlockPage({ params }: { params: { tutorId: string } }) 
               <strong>fully refunded</strong> to the card you paid with. No phone calls, no admin chasing.
             </li>
             <li>
-              <strong>If the tutor doesn&apos;t reply within 5 days</strong>, the refund happens automatically. You
-              don&apos;t have to do anything.
+              <strong>If the tutor doesn&apos;t reply within 5 days</strong>, the refund happens automatically.
+              You don&apos;t have to do anything.
             </li>
           </ol>
         </section>
@@ -56,16 +72,16 @@ export default function UnlockPage({ params }: { params: { tutorId: string } }) 
         </section>
 
         <section className="unlock-confirm">
-          <ConfirmUnlockButton tutorId={params.tutorId} tutorFirstName={sample.name.split(" ")[0]} />
+          <ConfirmUnlockButton applicationId={applicationId} tutorFirstName={firstName} />
           <Link className="btn ghost" href={`/tutors/${params.tutorId}`}>
             Not yet — go back to the profile
           </Link>
         </section>
 
         <p className="unlock-disclaimer">
-          By continuing you agree to TUTUMatch&apos;s <Link href="/legal/terms">Terms of Service</Link>, including the
-          refund policy described above and on the Terms page. Payments are handled by Stripe — we never see your
-          full card details.
+          By continuing you agree to TUTUMatch&apos;s <Link href="/legal/terms">Terms of Service</Link>, including
+          the refund policy described above and on the Terms page. Payments are handled by Stripe — we never see
+          your full card details.
         </p>
       </main>
     </>

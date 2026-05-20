@@ -18,6 +18,9 @@ export function TopNav() {
         <div className="topnav-actions">
           {session ? (
             <>
+              <Link className="btn ghost topnav-btn" href="/messages">
+                Messages
+              </Link>
               {session.role === "ADMIN" && (
                 <Link className="btn ghost topnav-btn" href="/admin">
                   Admin

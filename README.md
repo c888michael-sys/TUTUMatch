@@ -21,7 +21,8 @@ What's working end-to-end right now:
   - Multi-slot weekly availability in 15-min increments
   - Tutoring-area dropdown (`Near Killara` / `Near Masada` / `Other location`) that drives which school tab the profile appears under
   - Bio scanned server-side for contact-info bypass (phone/email/social handles)
-- **Admin** — list of applications with status pills and bio-scanner flags. Detail page with side-by-side fields, reviewer notes, approve / pause / reject / pending-back actions.
+- **Admin** — list of applications with status pills and bio-scanner flags. Detail page with side-by-side fields, reviewer notes, approve / pause / reject / pending-back actions, and "Test unlock + chat" / "View public profile" shortcuts.
+- **Platform chat** — `/messages` lists threads, `/messages/[unlockId]` is the chat. Post-unlock contact info is revealed inside the thread. Tutor reminder to apply the $20 first-lesson discount is surfaced on their side. First tutor reply records `tutorFirstReplyAt` (used by the 5-day refund auto-flag once Stripe is wired). Local-dev unlock shortcut at `POST /api/unlocks/dev-create` lets us exercise the full sign-up → approve → unlock → chat loop without Stripe.
 - **Legal stubs** — Terms, Privacy (APP-aligned), Child Safety drafts at `/legal/*`.
 - **Prisma schema** — full data model (users, tutor profiles, schools, HSC results, subjects, availability, verifications, unlocks, payments, refunds, messages, reports). Not yet connected to a real DB.
 
@@ -72,10 +73,11 @@ Tick items off here as they ship. This list is the canonical source of truth for
   - [ ] View profile status, edit profile/availability, toggle visibility
   - [ ] Inbox of messages from parents who have unlocked
   - [ ] Lifetime unlock count + informational earnings
-- [ ] **In-platform messaging** (post-unlock)
-  - [ ] Chat UI between the parent and the unlocked tutor
-  - [ ] Pre-unlock messages scrubbed for contact info (the scanner already exists in `src/lib/tutor-form.ts`)
-  - [ ] Email notification on each new message
+- [x] **In-platform messaging** (post-unlock)
+  - [x] Chat UI between the parent and the unlocked tutor (`/messages`, `/messages/[unlockId]`)
+  - [x] Stores threads + messages in the JSON store; first tutor reply stops the 5-day refund clock (`tutorFirstReplyAt`)
+  - [x] Dev shortcut: `POST /api/unlocks/dev-create` creates a PAID Unlock without Stripe so the flow can be demoed end-to-end. Disabled when `NODE_ENV=production`.
+  - [ ] Email notification on each new message (waiting on Resend wiring)
 - [ ] **Tutor's own profile management** — `/tutor/me` route (or extend dashboard) so they can edit after approval
 
 ### Hosting recommendation
@@ -166,8 +168,10 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `/unlock/[tutorId]`                 | $20 confirm page with refund policy                                       | ✅ UI done, payment stub |
 | `/tutor/signup`                     | Multi-section tutor application form with all checks                      | ✅ Done      |
 | `/dashboard`                        | Tutor / parent dashboard                                                  | 🚧 Minimal   |
+| `/messages`                         | List of chat threads (parent ↔ tutor) for the current user                | ✅ Done      |
+| `/messages/[unlockId]`              | Chat thread (post-unlock, with contact info revealed)                     | ✅ Done      |
 | `/admin`                            | Admin: applications queue + approve/reject                                | ✅ Done      |
-| `/admin/applications/[id]`          | Application detail + review actions                                       | ✅ Done      |
+| `/admin/applications/[id]`          | Application detail + review actions + test-unlock shortcut                | ✅ Done      |
 | `/login`                            | Email + password auth (signup tab on same page)                           | ✅ Done      |
 | `/legal/terms`                      | Terms of Service                                                          | 📝 Draft     |
 | `/legal/privacy`                    | Privacy Policy                                                            | 📝 Draft     |
@@ -175,6 +179,9 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `POST /api/auth/{signup,login,logout,me}` | Cookie-based auth                                                  | ✅ Done      |
 | `POST /api/tutor/applications`      | Submit a tutor application                                                | ✅ Done      |
 | `GET/PATCH /api/admin/applications` | List + approve/reject                                                     | ✅ Done      |
+| `POST /api/unlocks/dev-create`      | Dev-only: create a PAID Unlock without Stripe                             | ✅ Done (dev) |
+| `GET /api/threads`                  | Current user's chat threads                                               | ✅ Done      |
+| `GET/POST /api/threads/[unlockId]/messages` | Fetch + send messages in a thread                                 | ✅ Done      |
 | `POST /api/unlock`                  | Create unlock + Stripe PaymentIntent                                      | 🚧 Stub      |
 | `POST /api/stripe/webhook`          | Stripe webhook                                                            | 🚧 Stub      |
 | `POST /api/refund`                  | Parent or admin refund                                                    | 🚧 Stub      |

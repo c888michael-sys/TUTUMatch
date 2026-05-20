@@ -106,6 +106,93 @@ export type TutorApplication = {
 
 const USERS_FILE = "users.json";
 const APPS_FILE = "applications.json";
+const UNLOCKS_FILE = "unlocks.json";
+const MESSAGES_FILE = "messages.json";
+
+// ───────────────────────────── Unlocks + messages ─────────────────────────────
+
+export type UnlockStatus = "PAID" | "REFUNDED";
+
+export type Unlock = {
+  id: string;
+  parentUserId: string;
+  tutorApplicationId: string;
+  tutorUserId: string;
+  amountCents: number;
+  status: UnlockStatus;
+  paidAt: string;          // ISO
+  refundEligibleAt: string; // paidAt + 5 days
+  tutorFirstReplyAt?: string;
+  refundedAt?: string;
+  refundReason?: string;
+  // Dev-only: created via the local 'mark as paid' shortcut so we can demo
+  // chat without Stripe. Will be filtered out once Stripe is live.
+  isDev?: boolean;
+};
+
+export type Message = {
+  id: string;
+  unlockId: string;
+  senderId: string;
+  senderRole: "PARENT" | "TUTOR";
+  body: string;
+  createdAt: string;
+};
+
+export async function listUnlocks(): Promise<Unlock[]> {
+  return readJson<Unlock[]>(UNLOCKS_FILE, []);
+}
+
+export async function listUnlocksForUser(userId: string): Promise<Unlock[]> {
+  const all = await listUnlocks();
+  return all.filter((u) => u.parentUserId === userId || u.tutorUserId === userId);
+}
+
+export async function findUnlockById(id: string): Promise<Unlock | undefined> {
+  const all = await listUnlocks();
+  return all.find((u) => u.id === id);
+}
+
+export async function findExistingUnlock(
+  parentUserId: string,
+  tutorApplicationId: string
+): Promise<Unlock | undefined> {
+  const all = await listUnlocks();
+  return all.find(
+    (u) =>
+      u.parentUserId === parentUserId &&
+      u.tutorApplicationId === tutorApplicationId &&
+      u.status !== "REFUNDED"
+  );
+}
+
+export async function createUnlock(unlock: Unlock): Promise<void> {
+  const all = await listUnlocks();
+  all.push(unlock);
+  await writeJson(UNLOCKS_FILE, all);
+}
+
+export async function patchUnlock(id: string, patch: Partial<Unlock>): Promise<Unlock | undefined> {
+  const all = await listUnlocks();
+  const i = all.findIndex((u) => u.id === id);
+  if (i < 0) return undefined;
+  all[i] = { ...all[i], ...patch };
+  await writeJson(UNLOCKS_FILE, all);
+  return all[i];
+}
+
+export async function listMessages(unlockId: string): Promise<Message[]> {
+  const all = await readJson<Message[]>(MESSAGES_FILE, []);
+  return all
+    .filter((m) => m.unlockId === unlockId)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+export async function createMessage(msg: Message): Promise<void> {
+  const all = await readJson<Message[]>(MESSAGES_FILE, []);
+  all.push(msg);
+  await writeJson(MESSAGES_FILE, all);
+}
 
 export async function listUsers(): Promise<StoredUser[]> {
   return readJson<StoredUser[]>(USERS_FILE, []);

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
-import { findApplicationByUserId } from "@/lib/db";
+import { findApplicationByUserId, listUnlocksForUser } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
 export const metadata = { title: "Dashboard · TUTUMatch" };
@@ -23,6 +23,7 @@ export default async function DashboardPage({
   if (!session) redirect("/login?next=/dashboard");
 
   const app = await findApplicationByUserId(session.userId);
+  const unlocks = await listUnlocksForUser(session.userId);
 
   return (
     <>
@@ -78,6 +79,19 @@ export default async function DashboardPage({
               </div>
             )}
           </div>
+        )}
+
+        <h2>Conversations</h2>
+        {unlocks.length === 0 ? (
+          <p>
+            No conversations yet. Once you unlock a tutor (or a parent unlocks you), the thread shows up at{" "}
+            <Link href="/messages">/messages</Link>.
+          </p>
+        ) : (
+          <p>
+            You have <strong>{unlocks.length}</strong> conversation{unlocks.length === 1 ? "" : "s"}.{" "}
+            <Link href="/messages">Go to messages →</Link>
+          </p>
         )}
 
         <h2>Browse / unlock</h2>

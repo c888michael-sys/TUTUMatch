@@ -4,17 +4,56 @@ import { TopNav } from "@/components/nav/TopNav";
 import { ArrowIcon, LockIcon } from "@/components/landing/icons";
 import { findSampleTutor } from "@/lib/sample-tutors";
 import { findSchool, OTHER_AREA_SCHOOL } from "@/lib/schools";
+import { findApplicationById } from "@/lib/db";
 
 export const metadata = { title: "Tutor profile · TUTUMatch" };
+export const dynamic = "force-dynamic";
 
-export default function TutorProfilePage({ params }: { params: { id: string } }) {
-  // Sample-tutor preview path. Real approved profiles will use the same
-  // shape but route by their DB id.
-  const sample = findSampleTutor(params.id);
-  if (!sample) notFound();
+// Display shape that both samples and real applications normalise to.
+type DisplayTutor = {
+  initials: string;
+  name: string;                 // "Lachlan H."
+  suburb: string;
+  atar: string;
+  mode: string;
+  rate: number;
+  subjects: { s: string; b: string }[];
+  tutoringAreaSchoolId: string;
+  attendedSchoolId?: string;
+  attendedOther?: string;
+  bio?: string;
+};
 
-  const area = findSchool(sample.tutoringAreaSchoolId) ?? OTHER_AREA_SCHOOL;
-  const attended = sample.attendedSchoolId ? findSchool(sample.attendedSchoolId) : undefined;
+export default async function TutorProfilePage({ params }: { params: { id: string } }) {
+  let t: DisplayTutor | null = null;
+
+  if (params.id.startsWith("sample-")) {
+    const sample = findSampleTutor(params.id);
+    if (!sample) notFound();
+    t = sample;
+  } else {
+    const app = await findApplicationById(params.id);
+    if (!app) notFound();
+    t = {
+      initials: `${app.firstName[0] ?? ""}${app.lastInitial}`,
+      name: `${app.firstName} ${app.lastInitial}.`,
+      suburb: app.suburb ?? "—",
+      atar: app.atar.toFixed(2),
+      mode:
+        app.mode === "EITHER" ? "Online · In-person" :
+        app.mode === "ONLINE" ? "Online" : "In-person",
+      rate: Math.round(app.hourlyRateCents / 100),
+      subjects: app.offeredSubjects.map((o) => ({ s: o.subject, b: yearsLabel(o.yearLevels) })),
+      tutoringAreaSchoolId: app.tutoringAreaSchoolId,
+      attendedSchoolId: app.schoolId,
+      attendedOther: app.otherSchoolName,
+      bio: app.publicBio,
+    };
+  }
+
+  const area = findSchool(t.tutoringAreaSchoolId) ?? OTHER_AREA_SCHOOL;
+  const attended = t.attendedSchoolId ? findSchool(t.attendedSchoolId) : undefined;
+  const isSample = params.id.startsWith("sample-");
 
   return (
     <>
@@ -25,36 +64,36 @@ export default function TutorProfilePage({ params }: { params: { id: string } })
         </div>
 
         <div className="profile-head">
-          <div className="profile-ph">{sample.initials}</div>
+          <div className="profile-ph">{t.initials}</div>
           <div className="profile-head-text">
             <h1 className="profile-name">
-              {sample.name}
-              <span className="example inline">Example</span>
+              {t.name}
+              {isSample && <span className="example inline">Example</span>}
             </h1>
             <div className="profile-meta">
-              {sample.suburb}
+              {t.suburb}
               <span className="sep">·</span>
-              <span className="atar">ATAR {sample.atar}</span>
+              <span className="atar">ATAR {t.atar}</span>
               <span className="sep">·</span>
-              <span>{sample.mode}</span>
+              <span>{t.mode}</span>
             </div>
             <div className="profile-schools">
               <span><strong>Tutors near:</strong> {area.name}</span>
-              {(attended || sample.attendedOther) && (
-                <span><strong>High school:</strong> {attended?.name ?? sample.attendedOther}</span>
+              {(attended || t.attendedOther) && (
+                <span><strong>High school:</strong> {attended?.name ?? t.attendedOther}</span>
               )}
             </div>
           </div>
           <div className="profile-rate">
-            <div className="profile-rate-num">${sample.rate}<small>/hr</small></div>
+            <div className="profile-rate-num">${t.rate}<small>/hr</small></div>
             <div className="profile-rate-label">tutor sets the rate</div>
           </div>
         </div>
 
         <section className="profile-section">
-          <h2>HSC subjects &amp; results</h2>
+          <h2>HSC subjects &amp; year levels taught</h2>
           <div className="subs">
-            {sample.subjects.map((s, i) => (
+            {t.subjects.map((s, i) => (
               <span className="sub" key={i}>
                 {s.s} <b>{s.b}</b>
               </span>
@@ -64,28 +103,31 @@ export default function TutorProfilePage({ params }: { params: { id: string } })
 
         <section className="profile-section">
           <h2>About</h2>
-          <p className="profile-bio-stub">
-            (Bio shown here on real profiles. For sample tutors we don&apos;t include one — once you submit a tutor
-            application your written bio appears in this spot once approved.)
-          </p>
+          {t.bio ? (
+            <p className="profile-bio">{t.bio}</p>
+          ) : (
+            <p className="profile-bio-stub">
+              (Bio shown here on real profiles. Submit a tutor application to see your own bio land here.)
+            </p>
+          )}
         </section>
 
         <section className="profile-contact-card">
           <div className="profile-contact-card-head">
             <h2>Want to contact this tutor?</h2>
             <p className="profile-contact-sub">
-              Browsing is free. To message {sample.name.split(" ")[0]} and reveal their phone, email and full name,
+              Browsing is free. To message {t.name.split(" ")[0]} and reveal their phone, email and full name,
               there&apos;s a one-time <strong>$20</strong> match fee. Read this first:
             </p>
           </div>
           <ul className="refund-list">
             <li>
-              <strong>$20 off your first lesson.</strong> The tutor applies a $20 discount to your first invoice, so
-              the net cost to you ends up at $0.
+              <strong>$20 off your first lesson.</strong> The tutor applies a $20 discount to your first invoice,
+              so the net cost to you ends up at $0.
             </li>
             <li>
-              <strong>Full refund if no agreement.</strong> If you and the tutor can&apos;t agree on a first lesson —
-              for any reason at all — your $20 is refunded in full. No questions, no forms.
+              <strong>Full refund if no agreement.</strong> If you and the tutor can&apos;t agree on a first lesson
+              — for any reason at all — your $20 is refunded in full. No questions, no forms.
             </li>
             <li>
               <strong>5-day automatic refund.</strong> If the tutor doesn&apos;t reply to your first message within
@@ -108,4 +150,10 @@ export default function TutorProfilePage({ params }: { params: { id: string } })
       </main>
     </>
   );
+}
+
+function yearsLabel(years: number[]): string {
+  if (years.length === 0) return "—";
+  if (years.length === 6) return "Years 7–12";
+  return "Y" + [...years].sort((a, b) => a - b).join(", Y");
 }

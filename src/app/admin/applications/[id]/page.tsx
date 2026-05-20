@@ -58,6 +58,15 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
           initialNotes={app.reviewerNotes}
         />
 
+        <div className="admin-quick-actions">
+          <Link className="btn ghost sm" href={`/tutors/${app.id}`} target="_blank">
+            View public profile ↗
+          </Link>
+          <Link className="btn ghost sm" href={`/unlock/${app.id}`} target="_blank">
+            Test unlock + chat flow ↗
+          </Link>
+        </div>
+
         {app.bioFlags && app.bioFlags.length > 0 && (
           <div className="warning-banner">
             ⚠ Bio scanner flagged: {app.bioFlags.join(", ")}. Review the bio before approving.
