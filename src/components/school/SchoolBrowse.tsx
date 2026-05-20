@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { LockIcon } from "@/components/landing/icons";
+import { ArrowIcon } from "@/components/landing/icons";
 import { SAMPLE_TUTORS, type SampleTutor } from "@/lib/sample-tutors";
 import type { School } from "@/lib/schools";
 import { Footer } from "@/components/landing/Footer";
@@ -177,8 +177,8 @@ export function SchoolBrowse({ school }: { school: School }) {
                     ${t.rate}
                     <small>/hr</small>
                   </div>
-                  <span className="unlock">
-                    <LockIcon /> Unlock — $20
+                  <span className="view-profile">
+                    View profile <ArrowIcon s={14} />
                   </span>
                 </div>
               </Link>

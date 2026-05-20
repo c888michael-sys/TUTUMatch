@@ -791,6 +791,18 @@ section { position: relative; }
   text-decoration: none;
 }
 .tcard .unlock:hover { background: var(--brand-deep); }
+.tcard .view-profile {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  font-family: var(--mono); font-weight: 500;
+  font-size: 11.5px;
+  color: var(--brand);
+  letter-spacing: 0.02em;
+  transition: gap 0.2s var(--ease);
+}
+.tcard.tcard-link:hover .view-profile { gap: 9px; }
+.tcard.tcard-link:hover .view-profile svg { transform: translateX(2px); }
+.tcard .view-profile svg { transition: transform 0.2s var(--ease); }
 
 /* ────────── Earnings ────────── */
 .earn-grid {
