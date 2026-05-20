@@ -45,47 +45,6 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
       </div>
 
       <Link
-        className={`hero-half tutor ${engaged.tutor ? "engaged" : ""}`}
-        href="/tutor/signup"
-        onMouseEnter={() => startHold("tutor")}
-        onMouseLeave={() => endHold("tutor")}
-        aria-label="For tutors — list for free"
-      >
-        <div className="hero-content">
-          <div className="label">
-            <span className="dot" />
-            For tutors
-          </div>
-          <h1>Tutor without losing half your pay.</h1>
-          <p className="subhead">Pay us $20 once per student. Keep everything else, forever.</p>
-          <div className="hero-cta-row">
-            <span className="hero-cta">
-              List for free <ArrowIcon s={16} />
-            </span>
-            <span className="hero-data">
-              0% commission<span className="sep">·</span>You set the rate
-            </span>
-          </div>
-          {showFloats && (
-            <div className="hero-floats" aria-hidden="true">
-              <div className="float-line">
-                <span>$50/hr lesson →</span>
-                <span className="v">$50 in your pocket</span>
-              </div>
-              <div className="float-line">
-                <span>Per-lesson cut →</span>
-                <span className="v">0%</span>
-              </div>
-              <div className="float-line">
-                <span>Platform fee →</span>
-                <span className="v">$20, once, ever</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </Link>
-
-      <Link
         className={`hero-half parent ${engaged.parent ? "engaged" : ""}`}
         href="/browse"
         onMouseEnter={() => startHold("parent")}
@@ -122,6 +81,47 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
               <div className="float-line">
                 <span>You front $20 →</span>
                 <span className="v">Refunded on lesson 1</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </Link>
+
+      <Link
+        className={`hero-half tutor ${engaged.tutor ? "engaged" : ""}`}
+        href="/tutor/signup"
+        onMouseEnter={() => startHold("tutor")}
+        onMouseLeave={() => endHold("tutor")}
+        aria-label="For tutors — list for free"
+      >
+        <div className="hero-content">
+          <div className="label">
+            <span className="dot" />
+            For tutors
+          </div>
+          <h1>Tutor without losing half your pay.</h1>
+          <p className="subhead">Pay us $20 once per student. Keep everything else, forever.</p>
+          <div className="hero-cta-row">
+            <span className="hero-cta">
+              List for free <ArrowIcon s={16} />
+            </span>
+            <span className="hero-data">
+              0% commission<span className="sep">·</span>You set the rate
+            </span>
+          </div>
+          {showFloats && (
+            <div className="hero-floats" aria-hidden="true">
+              <div className="float-line">
+                <span>$50/hr lesson →</span>
+                <span className="v">$50 in your pocket</span>
+              </div>
+              <div className="float-line">
+                <span>Per-lesson cut →</span>
+                <span className="v">0%</span>
+              </div>
+              <div className="float-line">
+                <span>Platform fee →</span>
+                <span className="v">$20, once, ever</span>
               </div>
             </div>
           )}

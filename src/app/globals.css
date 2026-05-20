@@ -175,10 +175,10 @@ button { font: inherit; }
 }
 .hero-half:focus-visible { box-shadow: inset 0 0 0 3px var(--brand-soft); }
 
-.hero.lean-left .hero-half.tutor { flex-basis: 58%; }
-.hero.lean-left .hero-half.parent { flex-basis: 42%; opacity: 0.75; }
-.hero.lean-right .hero-half.parent { flex-basis: 58%; }
-.hero.lean-right .hero-half.tutor { flex-basis: 42%; opacity: 0.75; }
+.hero.lean-left .hero-half.parent { flex-basis: 58%; }
+.hero.lean-left .hero-half.tutor { flex-basis: 42%; opacity: 0.75; }
+.hero.lean-right .hero-half.tutor { flex-basis: 58%; }
+.hero.lean-right .hero-half.parent { flex-basis: 42%; opacity: 0.75; }
 
 .hero-half.tutor { background: var(--ink); color: var(--brand-ink); }
 .hero-half.parent { background: var(--brand); color: var(--brand-ink); }
@@ -190,10 +190,10 @@ button { font: inherit; }
   padding: 0 6vw;
   transition: transform 0.4s var(--ease);
 }
-.hero-half.tutor .hero-content { margin-left: auto; padding-left: 7vw; padding-right: 3vw; }
-.hero-half.parent .hero-content { margin-right: auto; padding-right: 7vw; padding-left: 3vw; }
-.hero.lean-left .hero-half.tutor .hero-content { transform: translateY(-8px); }
-.hero.lean-right .hero-half.parent .hero-content { transform: translateY(-8px); }
+.hero-half.parent .hero-content { margin-left: auto; padding-left: 7vw; padding-right: 3vw; }
+.hero-half.tutor .hero-content { margin-right: auto; padding-right: 7vw; padding-left: 3vw; }
+.hero.lean-left .hero-half.parent .hero-content { transform: translateY(-8px); }
+.hero.lean-right .hero-half.tutor .hero-content { transform: translateY(-8px); }
 
 .hero-half .label {
   font-family: var(--mono); font-weight: 500;
