@@ -463,7 +463,7 @@ export function SignupForm({
             {SCHOOLS.map((s) => (
               <option key={s.id} value={s.id}>Near {s.name}</option>
             ))}
-            <option value={OTHER_AREA_SCHOOL.id}>Other location (somewhere else in NSW)</option>
+            <option value={OTHER_AREA_SCHOOL.id}>Other location (somewhere else in Sydney)</option>
           </select>
         </Field>
         {tutoringAreaSchoolId === OTHER_AREA_SCHOOL.id && (
@@ -483,6 +483,21 @@ export function SignupForm({
             />
           </Field>
         )}
+
+        <div className="safety-callout full-row">
+          <div className="safety-callout-head">⚠ Where you actually meet matters</div>
+          <p>
+            Once a parent unlocks you, agree on a specific meeting place before the first lesson.{" "}
+            <strong>Public libraries are strongly recommended</strong> — safe, quiet, well-lit and free. Other
+            sensible options: school libraries, council community centres, or the student&apos;s home with a parent
+            present.
+          </p>
+          <p>
+            TUTUMatch verifies tutor identity, WWCC, and HSC results, but{" "}
+            <strong>we do not choose lesson locations</strong> and are not responsible for what happens at any
+            individual lesson. Choosing a safe meeting place is your responsibility. Pick somewhere public.
+          </p>
+        </div>
       </Section>
 
       <Section title="6 · Pricing & lesson mode">

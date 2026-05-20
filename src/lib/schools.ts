@@ -53,7 +53,7 @@ export const OTHER_AREA_SCHOOL: School = {
   id: "other",
   name: "Other Locations",
   short: "Other",
-  tagline: "Tutors based elsewhere across NSW",
+  tagline: "Tutors based elsewhere across Sydney",
   brand: "#0F4F4A",
   brandDeep: "#083633",
   brandSoft: "#E6F0EE",

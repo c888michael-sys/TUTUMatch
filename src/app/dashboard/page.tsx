@@ -2,8 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { VisibilityToggle } from "@/components/tutor/VisibilityToggle";
-import { findApplicationByUserId, listUnlocksForUser } from "@/lib/db";
-import { getSession } from "@/lib/session";
+import {
+  findApplicationByUserId,
+  findUserById,
+  listUnlocksForUser,
+  processOverdueRefunds,
+} from "@/lib/db";
+import { clearSession, getSession } from "@/lib/session";
 
 export const metadata = { title: "Dashboard · TUTUMatch" };
 export const dynamic = "force-dynamic";
@@ -22,6 +27,45 @@ export default async function DashboardPage({
 }) {
   const session = getSession();
   if (!session) redirect("/login?next=/dashboard");
+
+  // Lazy refund cron: every dashboard load gives the system a chance to
+  // process unlocks past their 5-day window. In production this also runs
+  // from a Vercel cron, but a passive trigger here keeps local dev honest.
+  const processedRefundIds = await processOverdueRefunds();
+
+  // Re-load the current user fresh from the store so a just-suspended
+  // tutor sees the banner immediately even though their cookie session is
+  // still valid.
+  const me = await findUserById(session.userId);
+  if (me?.suspended) {
+    clearSession();
+    return (
+      <>
+        <TopNav />
+        <main className="page-shell">
+          <div className="reject-banner">
+            <strong>Your account has been suspended.</strong>{" "}
+            {me.suspendedReason ?? "Suspension reason not recorded."}
+            <div style={{ marginTop: 12 }}>
+              To appeal, email{" "}
+              <a href="mailto:appeals@tutumatch.com.au?subject=Account suspension appeal">
+                appeals@tutumatch.com.au
+              </a>{" "}
+              with the details of your situation. Include your account email and any context about the conversation
+              that triggered this — admins review appeals manually.
+            </div>
+            <div className="muted small" style={{ marginTop: 12 }}>
+              You&apos;ve been signed out of this device. You won&apos;t be able to sign back in until the suspension
+              is lifted.
+            </div>
+          </div>
+          <p>
+            <Link className="btn ghost" href="/">Back to the home page</Link>
+          </p>
+        </main>
+      </>
+    );
+  }
 
   const app = await findApplicationByUserId(session.userId);
   const unlocks = await listUnlocksForUser(session.userId);
@@ -55,6 +99,13 @@ export default async function DashboardPage({
             <strong>Your application was automatically rejected.</strong> TUTUMatch requires all tutors to be 18 or
             older — the date of birth you submitted indicates you&apos;re under 18. This is an automated decision.
             See the reviewer notes below for the full explanation.
+          </div>
+        )}
+        {processedRefundIds.length > 0 && (
+          <div className="success-banner">
+            ✓ The system processed {processedRefundIds.length} overdue unlock
+            {processedRefundIds.length === 1 ? "" : "s"}: the $20 was refunded to the parent and the unresponsive
+            tutor was suspended.
           </div>
         )}
 

@@ -23,6 +23,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "invalid_credentials" }, { status: 401 });
   }
 
+  if (user.suspended) {
+    return NextResponse.json(
+      {
+        error: "account_suspended",
+        reason: user.suspendedReason ?? "Account suspended.",
+        appealEmail: "appeals@tutumatch.com.au",
+      },
+      { status: 403 }
+    );
+  }
+
   setSessionCookie(newSession({ userId: user.id, email: user.email, role: user.role }));
   return NextResponse.json({ ok: true, user: { id: user.id, email: user.email, role: user.role } });
 }

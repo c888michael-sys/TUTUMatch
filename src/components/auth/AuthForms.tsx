@@ -32,6 +32,12 @@ export function AuthForms({ defaultMode = "login" as Mode }) {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (data.error === "account_suspended") {
+          setErr(
+            `${data.reason ?? "Account suspended."} To appeal, email ${data.appealEmail ?? "appeals@tutumatch.com.au"}.`
+          );
+          return;
+        }
         setErr(humanError(data.error));
         return;
       }

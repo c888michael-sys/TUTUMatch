@@ -40,6 +40,12 @@ export type StoredUser = {
   passwordHash: string;
   role: Role;
   createdAt: string;
+  // Account suspension state. Set automatically when a tutor fails to reply
+  // to an unlocked parent within 5 days (the same trigger that auto-refunds
+  // the parent's $20). Suspended users can't log in; they appeal by email.
+  suspended?: boolean;
+  suspendedAt?: string;
+  suspendedReason?: string;
 };
 
 export type ApplicationStatus = "PENDING_REVIEW" | "APPROVED" | "PAUSED" | "REJECTED";
@@ -196,6 +202,57 @@ export async function createMessage(msg: Message): Promise<void> {
   const all = await readJson<Message[]>(MESSAGES_FILE, []);
   all.push(msg);
   await writeJson(MESSAGES_FILE, all);
+}
+
+// ───────────────────────────── Suspension + auto-refund ─────────────────────────────
+
+export async function suspendUser(userId: string, reason: string): Promise<void> {
+  const users = await listUsers();
+  const i = users.findIndex((u) => u.id === userId);
+  if (i < 0) return;
+  if (users[i].suspended) return; // already suspended; preserve first reason
+  users[i] = {
+    ...users[i],
+    suspended: true,
+    suspendedAt: new Date().toISOString(),
+    suspendedReason: reason,
+  };
+  await writeJson(USERS_FILE, users);
+}
+
+// Scans the unlocks store for unlocks past their 5-day refund window
+// that the tutor never replied to. For each match:
+//   - mark the unlock REFUNDED + record reason + refundedAt
+//   - suspend the tutor's user account
+//
+// Returns the IDs of unlocks processed (for logging / banners).
+//
+// In production this runs from a Vercel cron hitting /api/cron/refund-flag.
+// In local dev we ALSO call it lazily on dashboard / messages loads so the
+// founder can demo the flow without waiting for an external scheduler.
+export async function processOverdueRefunds(): Promise<string[]> {
+  const all = await listUnlocks();
+  const now = Date.now();
+  const processed: string[] = [];
+
+  for (const u of all) {
+    if (u.status !== "PAID") continue;
+    if (u.tutorFirstReplyAt) continue;
+    if (Date.parse(u.refundEligibleAt) > now) continue;
+
+    await patchUnlock(u.id, {
+      status: "REFUNDED",
+      refundedAt: new Date().toISOString(),
+      refundReason: "TUTOR_NO_REPLY_5_DAY",
+    });
+    await suspendUser(
+      u.tutorUserId,
+      "Account suspended after failing to reply to a parent within 5 days of being unlocked. Parents who paid the $20 unlock have been auto-refunded."
+    );
+    processed.push(u.id);
+  }
+
+  return processed;
 }
 
 export async function listUsers(): Promise<StoredUser[]> {

@@ -6,6 +6,7 @@ import {
   findUserById,
   listMessages,
   listUnlocksForUser,
+  processOverdueRefunds,
 } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
@@ -15,6 +16,9 @@ export const dynamic = "force-dynamic";
 export default async function MessagesPage() {
   const session = getSession();
   if (!session) redirect("/login?next=/messages");
+
+  // Lazy cron: clear out overdue unlocks before showing the list.
+  await processOverdueRefunds();
 
   const unlocks = await listUnlocksForUser(session.userId);
 

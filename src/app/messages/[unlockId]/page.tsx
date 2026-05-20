@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { Thread } from "@/components/messages/Thread";
+import { FastForwardRefund } from "@/components/messages/FastForwardRefund";
 import {
   findApplicationById,
   findUnlockById,
   findUserById,
   listMessages,
+  processOverdueRefunds,
 } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
@@ -16,6 +18,10 @@ export const dynamic = "force-dynamic";
 export default async function ThreadPage({ params }: { params: { unlockId: string } }) {
   const session = getSession();
   if (!session) redirect(`/login?next=/messages/${params.unlockId}`);
+
+  // Process any overdue unlocks first — if this one was overdue, the next
+  // findUnlockById will see it as REFUNDED.
+  await processOverdueRefunds();
 
   const unlock = await findUnlockById(params.unlockId);
   if (!unlock) notFound();
@@ -92,7 +98,29 @@ export default async function ThreadPage({ params }: { params: { unlockId: strin
               invoice. That covers the unlock fee they paid TUTUMatch — keep them happy and you keep 100% of every
               lesson after that.
             </p>
+            <p className="contact-card-note">
+              <strong>Reply within 5 days.</strong> If you don&apos;t, the parent is automatically refunded and your
+              account is suspended.
+            </p>
+            <p className="contact-card-note">
+              <strong>Pick a safe meeting place.</strong> Public libraries are recommended. Whatever you pick,
+              discuss it with the parent before the first lesson — TUTUMatch doesn&apos;t choose locations and
+              isn&apos;t responsible for what happens at any lesson.
+            </p>
           </section>
+        )}
+
+        {unlock.status === "REFUNDED" && (
+          <section className="reject-banner">
+            <strong>This unlock was refunded.</strong>{" "}
+            {unlock.refundReason === "TUTOR_NO_REPLY_5_DAY"
+              ? "The tutor didn't reply within 5 days, so the $20 was refunded automatically and the tutor's account was suspended."
+              : "A refund was processed for this unlock."}
+          </section>
+        )}
+
+        {isParent && unlock.status === "PAID" && !unlock.tutorFirstReplyAt && (
+          <FastForwardRefund unlockId={unlock.id} refundEligibleAt={unlock.refundEligibleAt} />
         )}
 
         <Thread unlockId={unlock.id} viewerRole={isParent ? "PARENT" : "TUTOR"} initialMessages={messages} />
