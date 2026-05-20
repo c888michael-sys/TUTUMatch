@@ -1,0 +1,359 @@
+// TutMatch data model — covers users, tutor profiles, schools, verifications,
+// unlocks (the $20 match fee), refunds, messaging, and payment audit trail.
+//
+// Notes:
+//  - Money is stored as integer cents (AUD) — never floats.
+//  - Verification documents (ID, WWCC, HSC) live in object storage; only the
+//    signed-URL key is persisted here. They are never publicly accessible.
+//  - The 5-day refund clock runs from Unlock.createdAt; the first tutor reply
+//    (Message where senderRole = TUTOR) stops it.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ───────────────────────────── Users ─────────────────────────────
+
+enum UserRole {
+  PARENT
+  TUTOR
+  ADMIN
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified DateTime?
+  hashedPassword String?
+  name          String?
+  role          UserRole @default(PARENT)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  suspended     Boolean  @default(false)
+  suspendedAt   DateTime?
+  suspendedReason String?
+
+  tutorProfile  TutorProfile?
+  unlocksAsParent Unlock[]  @relation("ParentUnlocks")
+  messagesSent  Message[]   @relation("MessagesSent")
+  payments      Payment[]
+  refunds       Refund[]    @relation("RefundsToUser")
+
+  @@index([role])
+}
+
+// ───────────────────────────── Schools ─────────────────────────────
+
+model School {
+  id          String   @id @default(cuid())
+  slug        String   @unique           // /schools/[slug]
+  name        String
+  shortName   String
+  tagline     String
+  logoUrl     String?
+  primaryColor String                    // --brand
+  brandDeep   String                     // --brand-deep
+  brandSoft   String                     // --brand-soft
+  active      Boolean  @default(false)   // unlisted until admin activates
+  permissionEvidenceUrl String?          // proof of school's permission to use name/logo
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tutorProfiles TutorProfile[]
+}
+
+// ───────────────────────────── Tutor profile ─────────────────────────────
+
+enum ProfileStatus {
+  PENDING_REVIEW
+  APPROVED
+  PAUSED
+  REJECTED
+}
+
+enum LessonMode {
+  IN_PERSON
+  ONLINE
+  EITHER
+}
+
+model TutorProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // public-facing
+  firstName     String
+  lastInitial   String                 // single letter; full name only revealed post-unlock
+  publicBio     String                 // scanned for contact info before publishing
+  photoUrl      String?                // admin-moderated
+
+  // private contact info — revealed only to parents who have unlocked
+  fullLastName  String
+  phone         String
+  contactEmail  String
+  socials       Json?
+
+  // identity / age
+  dateOfBirth   DateTime               // age-gate: must be 18+ at signup
+
+  // academic
+  schoolId      String?
+  school        School?  @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  otherSchoolName String?              // when alma mater isn't in the schools table
+  atar          Decimal? @db.Decimal(4, 2) // 0.00 – 99.95
+
+  // pricing & location
+  hourlyRateCents Int                  // AUD cents
+  suburb        String
+  postcode      String
+  mode          LessonMode  @default(EITHER)
+
+  // year levels offered
+  yearLevels    Int[]                  // [7, 8, 9, 10, 11, 12]
+
+  status        ProfileStatus  @default(PENDING_REVIEW)
+  visibility    Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  hscResults    TutorHscResult[]
+  offeredSubjects TutorSubject[]
+  availability  AvailabilitySlot[]
+  verifications Verification[]
+  unlocks       Unlock[]               @relation("TutorUnlocks")
+  messages      Message[]              @relation("ProfileMessages")
+
+  @@index([schoolId])
+  @@index([status])
+}
+
+model TutorHscResult {
+  id            String   @id @default(cuid())
+  tutorProfileId String
+  tutorProfile  TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  subject       String    // canonical NESA HSC subject string
+  bandOrMark    String    // "Band 6", "E4", "93", etc.
+  createdAt     DateTime  @default(now())
+
+  @@index([tutorProfileId])
+}
+
+model TutorSubject {
+  // Subjects the tutor offers to teach. Form logic enforces this is a subset
+  // of TutorHscResult.subject for that tutor (cannot teach what you haven't sat).
+  id            String   @id @default(cuid())
+  tutorProfileId String
+  tutorProfile  TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  subject       String
+
+  @@unique([tutorProfileId, subject])
+}
+
+enum Weekday {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+model AvailabilitySlot {
+  id            String   @id @default(cuid())
+  tutorProfileId String
+  tutorProfile  TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  day           Weekday
+  startMinutes  Int      // minutes from midnight, 15-min increments → 0..1440
+  endMinutes    Int
+
+  @@index([tutorProfileId])
+  @@index([day])
+}
+
+// ───────────────────────────── Verification ─────────────────────────────
+
+enum VerificationKind {
+  GOVERNMENT_ID
+  WWCC
+  HSC_RESULTS
+  PHOTO_MODERATION
+  PROFILE_CONTENT_SCAN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  MORE_INFO_REQUESTED
+}
+
+model Verification {
+  id            String   @id @default(cuid())
+  tutorProfileId String
+  tutorProfile  TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  kind          VerificationKind
+  status        VerificationStatus  @default(PENDING)
+
+  // signed storage key — never publicly accessible
+  documentKey   String?
+
+  // WWCC-specific
+  wwccNumber    String?
+  wwccFullName  String?
+  wwccDob       DateTime?
+
+  reviewerId    String?  // admin User.id
+  reviewerNotes String?
+  submittedAt   DateTime @default(now())
+  reviewedAt    DateTime?
+
+  @@index([status])
+  @@index([tutorProfileId])
+}
+
+// ───────────────────────────── Unlocks + payments ─────────────────────────────
+
+enum UnlockStatus {
+  PENDING_PAYMENT
+  PAID
+  REFUNDED
+  REFUND_PENDING
+  EXPIRED
+}
+
+model Unlock {
+  id            String   @id @default(cuid())
+  parentUserId  String
+  parent        User     @relation("ParentUnlocks", fields: [parentUserId], references: [id])
+  tutorProfileId String
+  tutorProfile  TutorProfile @relation("TutorUnlocks", fields: [tutorProfileId], references: [id])
+  amountCents   Int      @default(2000)
+  status        UnlockStatus @default(PENDING_PAYMENT)
+  stripePaymentIntentId String? @unique
+
+  createdAt     DateTime @default(now())
+  paidAt        DateTime?
+  refundEligibleAt DateTime?   // createdAt + 5 days (set when status -> PAID)
+  refundedAt    DateTime?
+
+  // First tutor reply stops the refund clock. Set by the message webhook.
+  tutorFirstReplyAt DateTime?
+
+  messages      Message[]
+  payment       Payment?
+  refund        Refund?
+
+  @@unique([parentUserId, tutorProfileId])
+  @@index([status])
+  @@index([refundEligibleAt])
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  unlockId      String?  @unique
+  unlock        Unlock?  @relation(fields: [unlockId], references: [id])
+  stripePaymentIntentId String @unique
+  amountCents   Int
+  currency      String   @default("aud")
+  status        String   // mirror of Stripe PI status
+  receiptUrl    String?
+  createdAt     DateTime @default(now())
+  rawEvent      Json?    // full webhook payload for audit
+}
+
+enum RefundReason {
+  TUTOR_NO_REPLY_5_DAY
+  ADMIN_DISCRETION
+  PARENT_REPORTED_DISCOUNT_NOT_APPLIED
+  OTHER
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+model Refund {
+  id            String   @id @default(cuid())
+  unlockId      String   @unique
+  unlock        Unlock   @relation(fields: [unlockId], references: [id])
+  toUserId      String
+  toUser        User     @relation("RefundsToUser", fields: [toUserId], references: [id])
+  amountCents   Int
+  reason        RefundReason
+  status        RefundStatus  @default(PENDING)
+  stripeRefundId String?  @unique
+  notes         String?
+  createdAt     DateTime @default(now())
+  processedAt   DateTime?
+
+  @@index([status])
+}
+
+// ───────────────────────────── Messaging ─────────────────────────────
+
+enum SenderRole {
+  PARENT
+  TUTOR
+  SYSTEM
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  unlockId      String
+  unlock        Unlock   @relation(fields: [unlockId], references: [id], onDelete: Cascade)
+  tutorProfileId String                                // denormalised for indexing
+  tutorProfile  TutorProfile @relation("ProfileMessages", fields: [tutorProfileId], references: [id])
+  senderId      String
+  sender        User     @relation("MessagesSent", fields: [senderId], references: [id])
+  senderRole    SenderRole
+  body          String
+  // Pre-unlock messages are scrubbed for contact info; flagBypassed = true when
+  // the scrubber detected a bypass attempt (phone/email/social handle).
+  flagBypassed  Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([unlockId, createdAt])
+  @@index([tutorProfileId])
+}
+
+// ───────────────────────────── Moderation / reports ─────────────────────────────
+
+enum ReportKind {
+  CONTACT_INFO_BYPASS
+  INAPPROPRIATE_CONTENT
+  PROFILE_MISREPRESENTATION
+  CHILD_SAFETY_CONCERN
+  PAYMENT_DISPUTE
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+model Report {
+  id            String   @id @default(cuid())
+  reporterId    String
+  targetUserId  String?
+  targetMessageId String?
+  kind          ReportKind
+  status        ReportStatus  @default(OPEN)
+  body          String?
+  createdAt     DateTime @default(now())
+  resolvedAt    DateTime?
+  resolverId    String?
+}
