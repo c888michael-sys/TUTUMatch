@@ -106,7 +106,7 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
               Find a tutor <ArrowIcon s={16} />
             </span>
             <span className="hero-data" style={{ color: "rgba(255,255,255,0.6)" }}>
-              $20 to unlock<span className="sep">·</span>$20 off first lesson
+              Local tutors without markups
             </span>
           </div>
           {showFloats && (
