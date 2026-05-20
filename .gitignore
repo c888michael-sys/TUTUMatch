@@ -30,3 +30,6 @@ prisma/migrations/dev.db*
 *.swo
 
 .claude/
+
+# Local JSON-store data (users + applications). Never commit user data.
+data/

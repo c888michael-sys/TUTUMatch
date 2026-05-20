@@ -1,0 +1,10 @@
+import { NextResponse } from "next/server";
+import { getSession } from "@/lib/session";
+
+export const runtime = "nodejs";
+
+export async function GET() {
+  const s = getSession();
+  if (!s) return NextResponse.json({ user: null });
+  return NextResponse.json({ user: { id: s.userId, email: s.email, role: s.role } });
+}

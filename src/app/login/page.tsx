@@ -1,14 +1,20 @@
+import { Suspense } from "react";
+import { AuthForms } from "@/components/auth/AuthForms";
+import { TopNav } from "@/components/nav/TopNav";
+
 export const metadata = { title: "Log in · TutMatch" };
 
 export default function LoginPage() {
   return (
-    <main className="page-shell">
-      <h1>Log in</h1>
-      <div className="stub-note">
-        STUB · NextAuth (credentials + OAuth). Parents and tutors share this entry point — role is on the{" "}
-        <code>User</code> record.
-      </div>
-      <p>For under-18 students, the parent should be the account holder per the T&amp;Cs.</p>
-    </main>
+    <>
+      <TopNav />
+      <main className="page-shell auth-shell">
+        <h1>Welcome back</h1>
+        <p>Log in to manage your tutor profile or to unlock tutors. New here? Create an account in the same form.</p>
+        <Suspense fallback={null}>
+          <AuthForms defaultMode="login" />
+        </Suspense>
+      </main>
+    </>
   );
 }
