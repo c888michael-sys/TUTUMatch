@@ -211,10 +211,24 @@ export default async function DashboardPage({
 
             {tutorUnlocks.length > 0 && (
               <div className="dashboard-app-section">
-                <h3>Parents who&apos;ve unlocked you ({tutorUnlocks.length})</h3>
-                <p>
-                  Open your <Link href="/messages">messages</Link> to chat. Remember to apply the $20 first-lesson
-                  discount on each parent&apos;s first invoice.
+                <h3>Lifetime unlocks ({tutorUnlocks.length})</h3>
+                <div className="dashboard-stats">
+                  <div className="stat">
+                    <div className="stat-num">{tutorUnlocks.length}</div>
+                    <div className="stat-label">parents unlocked you</div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-num">{tutorUnlocks.filter((u) => u.tutorFirstReplyAt).length}</div>
+                    <div className="stat-label">replied to</div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-num">{tutorUnlocks.filter((u) => u.status === "REFUNDED").length}</div>
+                    <div className="stat-label">refunded</div>
+                  </div>
+                </div>
+                <p style={{ marginTop: 12 }}>
+                  Open your <Link href="/messages">messages</Link> to chat. Apply the $20 first-lesson discount on
+                  each parent&apos;s first invoice — that&apos;s how the unlock fee gets paid back to them.
                 </p>
               </div>
             )}

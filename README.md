@@ -78,7 +78,8 @@ Tick items off here as they ship. This list is the canonical source of truth for
   - [x] Visibility toggle (`/api/tutor/applications/visibility`) — independent of status; tutor can pause their listing without re-review
   - [x] View public profile shortcut (so the tutor can see what parents see)
   - [x] Inbox surface (count of parents who unlocked) — full chat lives at `/messages`
-  - [ ] Lifetime earnings dashboard (waits on Stripe data + a few real unlocks to display)
+  - [x] Lifetime unlock stats (count of parents unlocked, replied-to, refunded) shown in a small stat row on the dashboard
+  - [ ] Actual dollar earnings (waits on Stripe — once we have real unlock payment records the dashboard can sum those)
 - [x] **In-platform messaging** (post-unlock)
   - [x] Chat UI between the parent and the unlocked tutor (`/messages`, `/messages/[unlockId]`)
   - [x] Stores threads + messages in the JSON store; first tutor reply stops the 5-day refund clock (`tutorFirstReplyAt`)
@@ -112,10 +113,11 @@ Pick Supabase over Neon because: same provider gives you Postgres + Storage (so 
 ### Nice-to-have (post first launch)
 
 - [ ] Sign in with Google (OAuth) on `/login`
-- [ ] Schools CRUD admin UI — the schema field is there, just needs the form
-- [ ] Refund queue UI in `/admin`
+- [x] **Schools CRUD admin UI** — `/admin/schools` lets you add/edit/deactivate schools (slug, name, tagline, three brand colours, active toggle). Stored in `data/schools.json`. New schools become tabs on the public site instantly; their brand colour drives the theming via CSS variables.
+- [x] **Refund queue UI** in `/admin/refunds` — buckets unlocks into auto-refunded (with tutor suspension status + one-click unsuspend), approaching the 5-day window, and active.
+- [x] **Manual unsuspend** — admin button on the refunds page; clears suspension fields so the user can log in again.
 - [ ] Reports / dispute resolution UI
-- [ ] Tutor photo upload with admin moderation
+- [ ] Tutor photo upload with admin moderation (needs file storage — pair with the WWCC/ID/HSC upload work)
 - [ ] Analytics (Plausible — privacy-friendly, cheap)
 - [ ] WCAG 2.1 AA accessibility audit
 - [ ] Mobile UI polish pass
@@ -188,6 +190,11 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `PUT  /api/tutor/applications`      | Update current user's application (sets status back to Pending review)    | ✅ Done      |
 | `PATCH /api/tutor/applications/visibility` | Toggle profile visibility (no re-review)                          | ✅ Done      |
 | `GET/PATCH /api/admin/applications` | List + approve/reject                                                     | ✅ Done      |
+| `/admin/schools`                    | Admin: add / edit / deactivate schools                                    | ✅ Done      |
+| `/admin/refunds`                    | Admin: refund queue + tutor suspension status + unsuspend                 | ✅ Done      |
+| `GET/POST /api/admin/schools`       | List + create school                                                      | ✅ Done      |
+| `PATCH/DELETE /api/admin/schools/[id]` | Update / delete school                                                 | ✅ Done      |
+| `POST /api/admin/users/[id]/unsuspend` | Admin: clear suspension                                                | ✅ Done      |
 | `POST /api/unlocks/dev-create`      | Dev-only: create a PAID Unlock without Stripe                             | ✅ Done (dev) |
 | `POST /api/unlocks/[id]/fast-forward` | Dev-only: skip the 5-day wait, trigger refund + tutor suspension          | ✅ Done (dev) |
 | `GET /api/threads`                  | Current user's chat threads                                               | ✅ Done      |

@@ -2570,6 +2570,28 @@ footer {
   white-space: pre-wrap;
 }
 
+.dashboard-stats {
+  display: flex; gap: 28px; flex-wrap: wrap;
+  margin-top: 4px;
+}
+.dashboard-stats .stat {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.stat-num {
+  font-family: var(--mono); font-weight: 600;
+  font-size: 28px;
+  color: var(--brand-deep);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  font-family: var(--mono); font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .dashboard-card {
   background: var(--surface);
   border: 1px solid var(--hairline);
