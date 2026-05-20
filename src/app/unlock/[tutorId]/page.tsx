@@ -2,29 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { ConfirmUnlockButton } from "@/components/unlock/ConfirmUnlockButton";
-import { findSampleTutor } from "@/lib/sample-tutors";
 import { findApplicationById } from "@/lib/db";
 
 export const metadata = { title: "Confirm contact · TUTUMatch" };
 export const dynamic = "force-dynamic";
 
 export default async function UnlockPage({ params }: { params: { tutorId: string } }) {
-  // tutorId can be either:
-  //   - "sample-<schoolSlug>-<idx>"  → demo tutor, no real unlock possible
-  //   - "app_…"                      → real approved tutor application
-  let firstName = "";
-  let applicationId: string | null = null;
-
-  if (params.tutorId.startsWith("sample-")) {
-    const sample = findSampleTutor(params.tutorId);
-    if (!sample) notFound();
-    firstName = sample.name.split(" ")[0];
-  } else {
-    const app = await findApplicationById(params.tutorId);
-    if (!app) notFound();
-    firstName = app.firstName;
-    applicationId = app.id;
-  }
+  const app = await findApplicationById(params.tutorId);
+  if (!app || app.status !== "APPROVED") notFound();
+  const firstName = app.firstName;
+  const applicationId = app.id;
 
   return (
     <>

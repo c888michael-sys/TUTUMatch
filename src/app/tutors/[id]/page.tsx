@@ -2,58 +2,41 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { ArrowIcon, LockIcon } from "@/components/landing/icons";
-import { findSampleTutor } from "@/lib/sample-tutors";
 import { findSchool, OTHER_AREA_SCHOOL } from "@/lib/schools";
 import { findApplicationById } from "@/lib/db";
 
 export const metadata = { title: "Tutor profile · TUTUMatch" };
 export const dynamic = "force-dynamic";
 
-// Display shape that both samples and real applications normalise to.
-type DisplayTutor = {
-  initials: string;
-  name: string;                 // "Lachlan H."
-  suburb: string;
-  atar: string;
-  mode: string;
-  rate: number;
-  subjects: { s: string; b: string }[];
-  tutoringAreaSchoolId: string;
-  attendedSchoolId?: string;
-  attendedOther?: string;
-  bio?: string;
-};
+function yearsLabel(years: number[]): string {
+  if (years.length === 0) return "—";
+  if (years.length === 6) return "Years 7–12";
+  return "Y" + [...years].sort((a, b) => a - b).join(", Y");
+}
 
 export default async function TutorProfilePage({ params }: { params: { id: string } }) {
-  let t: DisplayTutor | null = null;
+  const app = await findApplicationById(params.id);
+  if (!app) notFound();
 
-  if (params.id.startsWith("sample-")) {
-    const sample = findSampleTutor(params.id);
-    if (!sample) notFound();
-    t = sample;
-  } else {
-    const app = await findApplicationById(params.id);
-    if (!app) notFound();
-    t = {
-      initials: `${app.firstName[0] ?? ""}${app.lastInitial}`,
-      name: `${app.firstName} ${app.lastInitial}.`,
-      suburb: app.suburb ?? "—",
-      atar: app.atar.toFixed(2),
-      mode:
-        app.mode === "EITHER" ? "Online · In-person" :
-        app.mode === "ONLINE" ? "Online" : "In-person",
-      rate: Math.round(app.hourlyRateCents / 100),
-      subjects: app.offeredSubjects.map((o) => ({ s: o.subject, b: yearsLabel(o.yearLevels) })),
-      tutoringAreaSchoolId: app.tutoringAreaSchoolId,
-      attendedSchoolId: app.schoolId,
-      attendedOther: app.otherSchoolName,
-      bio: app.publicBio,
-    };
-  }
+  const t = {
+    initials: `${app.firstName[0] ?? ""}${app.lastInitial}`,
+    name: `${app.firstName} ${app.lastInitial}.`,
+    suburb: app.suburb ?? (app.tutoringAreaOther ?? "—"),
+    atar: app.atar.toFixed(2),
+    mode:
+      app.mode === "EITHER" ? "Online · In-person" :
+      app.mode === "ONLINE" ? "Online" : "In-person",
+    rate: Math.round(app.hourlyRateCents / 100),
+    subjects: app.offeredSubjects.map((o) => ({ s: o.subject, b: yearsLabel(o.yearLevels) })),
+    tutoringAreaSchoolId: app.tutoringAreaSchoolId,
+    attendedSchoolId: app.schoolId,
+    attendedOther: app.otherSchoolName,
+    bio: app.publicBio,
+  };
 
   const area = findSchool(t.tutoringAreaSchoolId) ?? OTHER_AREA_SCHOOL;
   const attended = t.attendedSchoolId ? findSchool(t.attendedSchoolId) : undefined;
-  const isSample = params.id.startsWith("sample-");
+  const isLive = app.status === "APPROVED";
 
   return (
     <>
@@ -68,7 +51,7 @@ export default async function TutorProfilePage({ params }: { params: { id: strin
           <div className="profile-head-text">
             <h1 className="profile-name">
               {t.name}
-              {isSample && <span className="example inline">Example</span>}
+              {!isLive && <span className="example inline">{app.status.replace("_", " ")}</span>}
             </h1>
             <div className="profile-meta">
               {t.suburb}
@@ -103,57 +86,54 @@ export default async function TutorProfilePage({ params }: { params: { id: strin
 
         <section className="profile-section">
           <h2>About</h2>
-          {t.bio ? (
-            <p className="profile-bio">{t.bio}</p>
-          ) : (
-            <p className="profile-bio-stub">
-              (Bio shown here on real profiles. Submit a tutor application to see your own bio land here.)
-            </p>
-          )}
+          <p className="profile-bio">{t.bio}</p>
         </section>
 
-        <section className="profile-contact-card">
-          <div className="profile-contact-card-head">
-            <h2>Want to contact this tutor?</h2>
-            <p className="profile-contact-sub">
-              Browsing is free. To message {t.name.split(" ")[0]} and reveal their phone, email and full name,
-              there&apos;s a one-time <strong>$20</strong> match fee. Read this first:
-            </p>
-          </div>
-          <ul className="refund-list">
-            <li>
-              <strong>$20 off your first lesson.</strong> The tutor applies a $20 discount to your first invoice,
-              so the net cost to you ends up at $0.
-            </li>
-            <li>
-              <strong>Full refund if no agreement.</strong> If you and the tutor can&apos;t agree on a first lesson
-              — for any reason at all — your $20 is refunded in full. No questions, no forms.
-            </li>
-            <li>
-              <strong>5-day automatic refund.</strong> If the tutor doesn&apos;t reply to your first message within
-              5 days, the $20 comes back to your card automatically.
-            </li>
-            <li>
-              <strong>Nothing is charged yet.</strong> You only pay on the next screen, after you&apos;ve read the
-              terms and confirmed.
-            </li>
-          </ul>
-          <div className="profile-contact-actions">
-            <Link className="btn brand lg" href={`/unlock/${params.id}`}>
-              <LockIcon /> Continue to contact details <ArrowIcon />
-            </Link>
-            <span className="profile-contact-fine">
-              You won&apos;t be charged until you confirm on the next page.
-            </span>
-          </div>
-        </section>
+        {isLive && (
+          <section className="profile-contact-card">
+            <div className="profile-contact-card-head">
+              <h2>Want to contact this tutor?</h2>
+              <p className="profile-contact-sub">
+                Browsing is free. To message {t.name.split(" ")[0]} and reveal their phone, email and full name,
+                there&apos;s a one-time <strong>$20</strong> match fee. Read this first:
+              </p>
+            </div>
+            <ul className="refund-list">
+              <li>
+                <strong>$20 off your first lesson.</strong> The tutor applies a $20 discount to your first invoice,
+                so the net cost to you ends up at $0.
+              </li>
+              <li>
+                <strong>Full refund if no agreement.</strong> If you and the tutor can&apos;t agree on a first
+                lesson — for any reason at all — your $20 is refunded in full. No questions, no forms.
+              </li>
+              <li>
+                <strong>5-day automatic refund.</strong> If the tutor doesn&apos;t reply to your first message
+                within 5 days, the $20 comes back to your card automatically.
+              </li>
+              <li>
+                <strong>Nothing is charged yet.</strong> You only pay on the next screen, after you&apos;ve read
+                the terms and confirmed.
+              </li>
+            </ul>
+            <div className="profile-contact-actions">
+              <Link className="btn brand lg" href={`/unlock/${params.id}`}>
+                <LockIcon /> Continue to contact details <ArrowIcon />
+              </Link>
+              <span className="profile-contact-fine">
+                You won&apos;t be charged until you confirm on the next page.
+              </span>
+            </div>
+          </section>
+        )}
+
+        {!isLive && (
+          <section className="stub-note">
+            This profile is <strong>{app.status.replace("_", " ").toLowerCase()}</strong> — not currently visible
+            to parents. It will be once an admin approves it.
+          </section>
+        )}
       </main>
     </>
   );
-}
-
-function yearsLabel(years: number[]): string {
-  if (years.length === 0) return "—";
-  if (years.length === 6) return "Years 7–12";
-  return "Y" + [...years].sort((a, b) => a - b).join(", Y");
 }

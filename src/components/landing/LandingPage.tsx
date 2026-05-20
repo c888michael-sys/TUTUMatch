@@ -11,7 +11,6 @@ import { Pitch } from "./Pitch";
 import { SchoolBar } from "./SchoolBar";
 import { StickyBar } from "./StickyBar";
 import { Trust } from "./Trust";
-import { TutorCards } from "./TutorCards";
 import type { School } from "@/lib/schools";
 
 export function LandingPage({ school }: { school: School }) {
@@ -31,7 +30,6 @@ export function LandingPage({ school }: { school: School }) {
       <Pitch />
       <Mechanic />
       <SchoolBar current={school} />
-      <TutorCards school={school} />
       <HowMirrored />
       <Comparison brand="TUTUMatch" />
       <Trust />
