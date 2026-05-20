@@ -253,7 +253,11 @@ export function SignupForm({
         setTopError("Submission failed — please try again.");
         return;
       }
-      router.replace(isEdit ? "/dashboard?updated=1" : "/dashboard?submitted=1");
+      if (data.autoRejected) {
+        router.replace("/dashboard?rejected=auto");
+      } else {
+        router.replace(isEdit ? "/dashboard?updated=1" : "/dashboard?submitted=1");
+      }
       router.refresh();
     } finally {
       setBusy(false);
@@ -277,7 +281,11 @@ export function SignupForm({
         <Field label="Full last name (private)" error={errors.fullLastName} hint="Not shown publicly. Used for verification only.">
           <input value={fullLastName} onChange={(e) => setFullLastName(e.target.value)} required maxLength={80} />
         </Field>
-        <Field label="Date of birth" error={errors.dateOfBirth} hint="Must be 18 or older.">
+        <Field
+          label="Date of birth"
+          error={errors.dateOfBirth}
+          hint="Tutors must be 18 or older. Applications from under-18s are automatically rejected on submission."
+        >
           <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required />
         </Field>
         <Field label="Profile photo URL (optional)" error={errors.photoUrl} hint="Paste a URL for now — file upload comes later.">

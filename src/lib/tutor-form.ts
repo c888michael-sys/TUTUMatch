@@ -54,10 +54,11 @@ export const tutorApplicationSchema = z
       .regex(/^[\d+\s()-]+$/, "Digits, spaces, +, -, ( ) only"),
     socials: z.string().trim().max(200).optional().or(z.literal("").transform(() => undefined)),
 
-    dateOfBirth: z
-      .string()
-      .regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD")
-      .refine((d) => ageInYears(d) >= 18, { message: "Must be 18 or older" }),
+    // We only enforce the date FORMAT in the schema. The 18+ age check is
+    // applied at the API layer so an under-18 submission still produces an
+    // application row — auto-rejected, with reviewer notes saying why.
+    // That gives us an audit trail of attempts instead of a silent 400.
+    dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
 
     schoolId: z.string().optional().or(z.literal("").transform(() => undefined)),
     otherSchoolName: z.string().trim().max(120).optional().or(z.literal("").transform(() => undefined)),

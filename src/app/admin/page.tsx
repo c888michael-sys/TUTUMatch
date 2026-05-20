@@ -80,6 +80,7 @@ export default async function AdminPage() {
                   <td className="mono-cell">${(a.hourlyRateCents / 100).toFixed(0)}/hr</td>
                   <td>
                     <span className={`status-pill ${a.status.toLowerCase()}`}>{STATUS_LABEL[a.status]}</span>
+                    {a.reviewerEmail === "auto" && <span className="auto-tag">AUTO</span>}
                   </td>
                   <td className="mono-cell">{a.bioFlags?.length ? a.bioFlags.join(", ") : "—"}</td>
                   <td>

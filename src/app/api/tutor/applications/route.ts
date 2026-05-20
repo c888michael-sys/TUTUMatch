@@ -6,7 +6,10 @@ import {
   upsertApplication,
   type TutorApplication,
 } from "@/lib/db";
-import { scanForContactInfo, tutorApplicationSchema } from "@/lib/tutor-form";
+import { ageInYears, scanForContactInfo, tutorApplicationSchema } from "@/lib/tutor-form";
+
+const UNDER_18_REJECTION_NOTE = (age: number, dob: string) =>
+  `Automatically rejected: tutors must be 18 or older. Applicant DOB ${dob} (age ${age}). This decision is enforced by the platform on submission — admin override is possible but should require additional ID verification.`;
 
 export const runtime = "nodejs";
 
@@ -45,12 +48,19 @@ export async function POST(req: Request) {
     );
   }
 
+  const age = ageInYears(v.dateOfBirth);
+  const autoRejected = age < 18;
+  const now = new Date().toISOString();
+
   const app: TutorApplication = {
     id: newId("app"),
     userId: session.userId,
-    status: "PENDING_REVIEW",
-    visibility: true,
-    submittedAt: new Date().toISOString(),
+    status: autoRejected ? "REJECTED" : "PENDING_REVIEW",
+    visibility: !autoRejected,
+    submittedAt: now,
+    reviewedAt: autoRejected ? now : undefined,
+    reviewerEmail: autoRejected ? "auto" : undefined,
+    reviewerNotes: autoRejected ? UNDER_18_REJECTION_NOTE(age, v.dateOfBirth) : undefined,
 
     firstName: v.firstName,
     lastInitial: v.lastInitial.toUpperCase(),
@@ -82,7 +92,12 @@ export async function POST(req: Request) {
   };
   await upsertApplication(app);
 
-  return NextResponse.json({ ok: true, applicationId: app.id });
+  return NextResponse.json({
+    ok: true,
+    applicationId: app.id,
+    status: app.status,
+    autoRejected,
+  });
 }
 
 // PUT — update the current user's existing application. Validates with the
@@ -122,13 +137,18 @@ export async function PUT(req: Request) {
     );
   }
 
+  const age = ageInYears(v.dateOfBirth);
+  const autoRejected = age < 18;
+  const now = new Date().toISOString();
+
   const updated: TutorApplication = {
     ...existing,
-    status: "PENDING_REVIEW",
-    // Clear previous review trail — the admin starts fresh on the new content.
-    reviewedAt: undefined,
-    reviewerEmail: undefined,
-    reviewerNotes: undefined,
+    status: autoRejected ? "REJECTED" : "PENDING_REVIEW",
+    visibility: autoRejected ? false : existing.visibility,
+    // Reset review trail. If auto-rejected, stamp the system as reviewer.
+    reviewedAt: autoRejected ? now : undefined,
+    reviewerEmail: autoRejected ? "auto" : undefined,
+    reviewerNotes: autoRejected ? UNDER_18_REJECTION_NOTE(age, v.dateOfBirth) : undefined,
 
     firstName: v.firstName,
     lastInitial: v.lastInitial.toUpperCase(),
@@ -160,5 +180,10 @@ export async function PUT(req: Request) {
   };
   await upsertApplication(updated);
 
-  return NextResponse.json({ ok: true, applicationId: updated.id, status: updated.status });
+  return NextResponse.json({
+    ok: true,
+    applicationId: updated.id,
+    status: updated.status,
+    autoRejected,
+  });
 }

@@ -18,7 +18,7 @@ const STATUS_LABEL: Record<string, string> = {
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { submitted?: string; updated?: string };
+  searchParams: { submitted?: string; updated?: string; rejected?: string };
 }) {
   const session = getSession();
   if (!session) redirect("/login?next=/dashboard");
@@ -48,6 +48,13 @@ export default async function DashboardPage({
         {searchParams.updated === "1" && (
           <div className="success-banner">
             ✓ Changes saved. Your listing is back in <strong>Pending review</strong> while admin re-approves.
+          </div>
+        )}
+        {searchParams.rejected === "auto" && (
+          <div className="reject-banner">
+            <strong>Your application was automatically rejected.</strong> TUTUMatch requires all tutors to be 18 or
+            older — the date of birth you submitted indicates you&apos;re under 18. This is an automated decision.
+            See the reviewer notes below for the full explanation.
           </div>
         )}
 

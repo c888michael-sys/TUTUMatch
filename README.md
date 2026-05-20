@@ -15,7 +15,8 @@ What's working end-to-end right now:
 - **Unlock confirm page** at `/unlock/[tutorId]` with the same refund explainer — the actual $20 charge is a stub until Stripe is wired.
 - **Auth** — sign up, log in, log out. HMAC-signed cookie sessions, `scrypt` password hashing, password show/hide toggle. Admin promotion via `ADMIN_EMAILS` env allowlist. Storage is a local JSON file (`data/users.json`).
 - **Tutor signup form** with full validation:
-  - 18+ age gate, WWCC details, ATAR, HSC results
+  - 18+ age gate — under-18 submissions are **auto-rejected** at the API layer with reviewer notes recording the date of birth and computed age. The application row is stored (not silently dropped) so there's an audit trail, and the tutor sees an explicit rejection banner in their dashboard. Same logic applies on profile edit.
+  - WWCC details, ATAR, HSC results
   - "High school attended" with conditional "Other school" free text
   - Per-subject year-level selection + "All years" toggle (subjects offered must be a subset of subjects sat)
   - Multi-slot weekly availability in 15-min increments
