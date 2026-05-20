@@ -1311,6 +1311,23 @@ footer {
   outline: 2px solid var(--brand-soft);
   border-color: var(--brand);
 }
+.password-wrap { position: relative; }
+.password-wrap input { padding-right: 64px; width: 100%; }
+.password-toggle {
+  position: absolute; right: 6px; top: 50%;
+  transform: translateY(-50%);
+  appearance: none; border: 0; background: var(--bg);
+  font-family: var(--mono); font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.password-toggle:hover { background: var(--brand-soft); color: var(--brand); }
 .auth-form .hint {
   font-family: var(--sans);
   font-size: 12px;
