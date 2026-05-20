@@ -13,14 +13,14 @@ export function Earnings({ brand }: { brand: string }) {
         <div className="earn-card reveal d1">
           <div className="label">At a centre</div>
           <div className="big">
-            $20–$30<span className="unit">/hr in pocket</span>
+            $30–$50<span className="unit">/hr in pocket</span>
           </div>
           <p className="copy">
-            A $50/hr lesson lands you somewhere between $20 and $30 in your pocket. Every lesson. For the entire
-            student relationship. Forever.
+            Centres typically pay tutors $30–$50/hr while charging parents more. The gap stays with the centre — every
+            lesson, for the entire student relationship, forever.
           </p>
           <div className="term">
-            10-week term @ 1hr/wk → net <span className="m">≈ $250</span>
+            10-week term @ 1hr/wk → net <span className="m">≈ $300–$500</span>
           </div>
         </div>
         <div className="earn-card us reveal d2">
