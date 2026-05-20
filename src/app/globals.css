@@ -1313,6 +1313,11 @@ footer {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.real-count {
+  margin-left: 8px;
+  color: var(--brand);
+}
+.real-count strong { color: var(--brand-deep); }
 
 .browse-grid-section {
   max-width: var(--maxw); margin: 0 auto;

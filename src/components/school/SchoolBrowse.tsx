@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/landing/icons";
-import { SAMPLE_TUTORS, type SampleTutor } from "@/lib/sample-tutors";
+import type { BrowseTutor } from "@/lib/browse-data";
 import { DEFAULT_SCHOOL, OTHER_AREA_SCHOOL, SCHOOLS, type School } from "@/lib/schools";
 import type { Weekday } from "@/lib/tutor-form";
 import { Footer } from "@/components/landing/Footer";
@@ -89,11 +89,19 @@ function parseScore(raw: string): number {
   return 0;
 }
 
-function maxScore(t: SampleTutor): number {
+function maxScore(t: BrowseTutor): number {
   return t.subjects.reduce((m, s) => Math.max(m, parseScore(s.b)), 0);
 }
 
-export function SchoolBrowse({ school }: { school: School }) {
+export function SchoolBrowse({
+  school,
+  tutors,
+  realCount,
+}: {
+  school: School;
+  tutors: BrowseTutor[];
+  realCount: number;
+}) {
   const themeStyle: React.CSSProperties = {
     ["--brand" as string]: school.brand,
     ["--brand-deep" as string]: school.brandDeep,
@@ -108,23 +116,6 @@ export function SchoolBrowse({ school }: { school: School }) {
   const [maxRate, setMaxRate] = useState<number | "">("");
   const [mode, setMode] = useState<Mode>("ANY");
   const [sortBy, setSortBy] = useState<SortBy>("OLDEST");
-
-  const tutors = useMemo<SampleTutor[]>(() => {
-    if (showingAll) {
-      const seen = new Set<string>();
-      const out: SampleTutor[] = [];
-      for (const [k, list] of Object.entries(SAMPLE_TUTORS)) {
-        if (k === "default") continue;
-        for (const t of list) {
-          if (seen.has(t.name)) continue;
-          seen.add(t.name);
-          out.push(t);
-        }
-      }
-      return out;
-    }
-    return SAMPLE_TUTORS[school.id] ?? [];
-  }, [showingAll, school.id]);
 
   function toggleSubject(id: string) {
     setSubjectCats((cs) => (cs.includes(id) ? cs.filter((x) => x !== id) : [...cs, id]));
@@ -310,6 +301,11 @@ export function SchoolBrowse({ school }: { school: School }) {
 
           <div className="browse-meta">
             {sorted.length} tutor{sorted.length === 1 ? "" : "s"} matching
+            {realCount > 0 && (
+              <span className="real-count">
+                · <strong>{realCount}</strong> verified tutor{realCount === 1 ? "" : "s"} live
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -333,11 +329,11 @@ export function SchoolBrowse({ school }: { school: School }) {
           <div className="tutor-grid">
             {sorted.map((t, i) => (
               <Link
-                href={`/tutors/sample-${t.tutoringAreaSchoolId}-${SAMPLE_TUTORS[t.tutoringAreaSchoolId]?.indexOf(t) ?? i}`}
-                key={`${t.name}-${i}`}
+                href={`/tutors/${t.routeId}`}
+                key={`${t.routeId}-${i}`}
                 className="tcard tcard-link"
               >
-                <span className="example">Example</span>
+                {!t.isReal && <span className="example">Example</span>}
                 <div className="top">
                   <div className="ph">{t.initials}</div>
                   <div>

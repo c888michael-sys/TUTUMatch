@@ -10,7 +10,7 @@ What's working end-to-end right now:
 
 - **Landing page** — full v3 design ported, all sections (Hero with For-parents/For-tutors split, Pitch, Mechanic, How, Comparison, Trust, Guarantee, sample tutor cards, Earnings, FAQ, Final CTA, Footer).
 - **School-branded landing pages** at `/schools/[slug]` and an `Other Locations` route at `/schools/other`. Browse tabs switch between areas. Same layout, only the brand colour + content change per area.
-- **Browse view** with filters (subject category chips: Math / English / Physics / Chemistry / Biology / Science K-10 — in that order; day-of-week availability chips with a "you might be limiting options" warning; min ATAR; max $/hr; mode) and sort (Oldest profiles first by default, Highest subject result alternative — bands map to marks: B6/E4 → 90, B5/E3 → 80, etc.). Currently powered by sample data; will switch to live approved profiles once the DB is wired.
+- **Browse view** with filters (subject category chips: Math / English / Physics / Chemistry / Biology / Science K-10 — in that order; day-of-week availability chips with a "you might be limiting options" warning; min ATAR; max $/hr; mode) and sort (Oldest profiles first by default, Highest subject result alternative — bands map to marks: B6/E4 → 90, B5/E3 → 80, etc.). Reads **real approved tutor applications** from the JSON store (with `status=APPROVED` and `visibility=true`) and merges them with the demo samples — real first, deduped by name. Real cards have no "Example" badge and link to their actual `/tutors/[applicationId]` profile.
 - **Tutor profile page** at `/tutors/[id]` with the refund policy laid out before any payment ask.
 - **Unlock confirm page** at `/unlock/[tutorId]` with the same refund explainer — the actual $20 charge is a stub until Stripe is wired.
 - **Auth** — sign up, log in, log out. HMAC-signed cookie sessions, `scrypt` password hashing, password show/hide toggle. Admin promotion via `ADMIN_EMAILS` env allowlist. Storage is a local JSON file (`data/users.json`).
@@ -69,10 +69,9 @@ Tick items off here as they ship. This list is the canonical source of truth for
   - [ ] 5-day auto-refund processed — to the parent
   - [ ] Manual refund processed — to the parent + admin audit copy
   - [ ] New in-platform message — to the recipient
-- [ ] **Live profiles in browse** — currently `/browse` and `/schools/[slug]` render sample tutors only
-  - [ ] Switch to reading approved `TutorProfile` rows from the DB
-  - [ ] Pagination + cursor-based loading
-  - [ ] Cards link to the real `/tutors/[id]` (not `sample-*`)
+- [x] **Live profiles in browse** — `/browse` and `/schools/[slug]` now read approved + visible applications from the JSON store, merge them with the demo samples (real first, deduped), and render them through the same filter/sort pipeline. Cards link to the real `/tutors/[id]` for live tutors; the "Example" badge only renders for samples. A "X verified tutors live" counter sits under the filters.
+  - [ ] Pagination + cursor-based loading (deferred — fine without it until a single school has 50+ tutors)
+  - [x] Cards link to the real `/tutors/[id]` (not `sample-*`)
 - [x] **Tutor dashboard**
   - [x] View profile status with status pill + reviewer notes
   - [x] Edit profile — reuses the same form. Any edit drops status back to PENDING_REVIEW for admin re-approval (child-safety policy).

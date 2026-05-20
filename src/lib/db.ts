@@ -292,6 +292,13 @@ export async function findApplicationByUserId(userId: string): Promise<TutorAppl
   return apps.find((a) => a.userId === userId);
 }
 
+// Approved + visible applications. This is what the public browse pages render.
+// Treats a missing `visibility` field as `true` (legacy records).
+export async function listApprovedTutors(): Promise<TutorApplication[]> {
+  const apps = await listApplications();
+  return apps.filter((a) => a.status === "APPROVED" && (a.visibility ?? true));
+}
+
 export async function upsertApplication(app: TutorApplication): Promise<void> {
   const apps = await listApplications();
   const i = apps.findIndex((a) => a.id === app.id);
