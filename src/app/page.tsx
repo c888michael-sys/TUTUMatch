@@ -1,6 +1,10 @@
 import { LandingPage } from "@/components/landing/LandingPage";
 import { DEFAULT_SCHOOL } from "@/lib/schools";
+import { loadActiveSchools } from "@/lib/schools-store";
 
-export default function HomePage() {
-  return <LandingPage school={DEFAULT_SCHOOL} />;
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const schools = await loadActiveSchools();
+  return <LandingPage school={DEFAULT_SCHOOL} schools={schools} />;
 }

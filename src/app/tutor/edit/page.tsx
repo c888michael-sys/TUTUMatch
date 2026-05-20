@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SignupForm } from "@/components/tutor/SignupForm";
 import { TopNav } from "@/components/nav/TopNav";
 import { findApplicationByUserId } from "@/lib/db";
+import { loadActiveSchools } from "@/lib/schools-store";
 import { getSession } from "@/lib/session";
 
 export const metadata = { title: "Edit your tutor profile · TUTUMatch" };
@@ -12,7 +13,10 @@ export default async function TutorEditPage() {
   const session = getSession();
   if (!session) redirect("/login?next=/tutor/edit");
 
-  const existing = await findApplicationByUserId(session.userId);
+  const [existing, schools] = await Promise.all([
+    findApplicationByUserId(session.userId),
+    loadActiveSchools(),
+  ]);
   if (!existing) {
     // Nothing to edit — bounce to the create flow.
     redirect("/tutor/signup");
@@ -31,7 +35,7 @@ export default async function TutorEditPage() {
           admin re-approves it — even a small change. This is intentional: child-safety claims need a fresh look.
         </p>
 
-        <SignupForm mode="edit" initial={existing} />
+        <SignupForm mode="edit" initial={existing} schools={schools} />
       </main>
     </>
   );

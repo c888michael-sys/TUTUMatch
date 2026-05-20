@@ -45,6 +45,9 @@ export default async function AdminPage() {
         <p>
           {apps.length} application{apps.length === 1 ? "" : "s"} total · {pending.length} pending review.
         </p>
+        <p className="admin-tools-row">
+          <Link className="btn ghost sm" href="/admin/schools">Manage schools</Link>
+        </p>
 
         {apps.length === 0 ? (
           <div className="stub-note">No applications yet. Have a tutor submit via <Link href="/tutor/signup">/tutor/signup</Link>.</div>

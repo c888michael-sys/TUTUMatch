@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { DEFAULT_SCHOOL, OTHER_AREA_SCHOOL, SCHOOLS, type School } from "@/lib/schools";
+import { DEFAULT_SCHOOL, OTHER_AREA_SCHOOL, type School } from "@/lib/schools";
 
-export function SchoolBar({ current }: { current: School }) {
-  const all = [DEFAULT_SCHOOL, ...SCHOOLS, OTHER_AREA_SCHOOL];
+export function SchoolBar({ current, schools }: { current: School; schools: School[] }) {
+  const all = [DEFAULT_SCHOOL, ...schools, OTHER_AREA_SCHOOL];
   return (
     <div className="schoolbar">
       <div className="schoolbar-inner reveal">

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { SignupForm } from "@/components/tutor/SignupForm";
 import { TopNav } from "@/components/nav/TopNav";
 import { findApplicationByUserId } from "@/lib/db";
+import { loadActiveSchools } from "@/lib/schools-store";
 import { getSession } from "@/lib/session";
 
 export const metadata = { title: "List as a tutor · TUTUMatch" };
@@ -13,7 +14,10 @@ export default async function TutorSignupPage() {
     redirect("/login?next=/tutor/signup");
   }
 
-  const existing = await findApplicationByUserId(session.userId);
+  const [existing, schools] = await Promise.all([
+    findApplicationByUserId(session.userId),
+    loadActiveSchools(),
+  ]);
 
   return (
     <>
@@ -35,7 +39,7 @@ export default async function TutorSignupPage() {
           </div>
         ) : null}
 
-        {(!existing || existing.status === "REJECTED") && <SignupForm />}
+        {(!existing || existing.status === "REJECTED") && <SignupForm schools={schools} />}
       </main>
     </>
   );

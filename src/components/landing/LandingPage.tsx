@@ -13,7 +13,7 @@ import { StickyBar } from "./StickyBar";
 import { Trust } from "./Trust";
 import type { School } from "@/lib/schools";
 
-export function LandingPage({ school }: { school: School }) {
+export function LandingPage({ school, schools }: { school: School; schools: School[] }) {
   // Each school's brand colour set inline overrides the defaults baked into
   // globals.css. Anything driven by --brand / --brand-deep / --brand-soft
   // re-themes automatically without a recompile.
@@ -29,7 +29,7 @@ export function LandingPage({ school }: { school: School }) {
       <Hero showFloats />
       <Pitch />
       <Mechanic />
-      <SchoolBar current={school} />
+      <SchoolBar current={school} schools={schools} />
       <HowMirrored />
       <Comparison brand="TUTUMatch" />
       <Trust />

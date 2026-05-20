@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { ArrowIcon, LockIcon } from "@/components/landing/icons";
-import { findSchool, OTHER_AREA_SCHOOL } from "@/lib/schools";
+import { OTHER_AREA_SCHOOL } from "@/lib/schools";
+import { findSchoolBySlug } from "@/lib/schools-store";
 import { findApplicationById } from "@/lib/db";
 
 export const metadata = { title: "Tutor profile · TUTUMatch" };
@@ -34,8 +35,10 @@ export default async function TutorProfilePage({ params }: { params: { id: strin
     bio: app.publicBio,
   };
 
-  const area = findSchool(t.tutoringAreaSchoolId) ?? OTHER_AREA_SCHOOL;
-  const attended = t.attendedSchoolId ? findSchool(t.attendedSchoolId) : undefined;
+  const [area, attended] = await Promise.all([
+    findSchoolBySlug(t.tutoringAreaSchoolId).then((s) => s ?? OTHER_AREA_SCHOOL),
+    t.attendedSchoolId ? findSchoolBySlug(t.attendedSchoolId) : Promise.resolve(undefined),
+  ]);
   const isLive = app.status === "APPROVED";
 
   return (

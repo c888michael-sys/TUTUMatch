@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HSC_SUBJECTS } from "@/lib/hsc-subjects";
-import { SCHOOLS, OTHER_AREA_SCHOOL } from "@/lib/schools";
+import { SCHOOLS, OTHER_AREA_SCHOOL, type School } from "@/lib/schools";
 import {
   OTHER_SCHOOL_SENTINEL,
   WEEKDAYS,
@@ -28,9 +28,13 @@ const TIME_OPTS = generateTimeOptions();
 export function SignupForm({
   mode: formMode = "create",
   initial,
+  schools = SCHOOLS,
 }: {
   mode?: FormMode;
   initial?: TutorApplication;
+  // Optional. Defaults to the seed list when callers haven't yet been
+  // updated to pass the live school list down.
+  schools?: School[];
 }) {
   const router = useRouter();
   const isEdit = formMode === "edit";
@@ -322,7 +326,7 @@ export function SignupForm({
         <Field label="High school attended" error={errors.schoolId}>
           <select value={schoolId} onChange={(e) => setSchoolId(e.target.value)} required>
             <option value="">— select —</option>
-            {SCHOOLS.map((s) => (
+            {schools.map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
             <option value={OTHER_SCHOOL_SENTINEL}>Other school…</option>

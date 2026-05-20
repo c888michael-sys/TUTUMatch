@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/landing/icons";
 import type { BrowseTutor } from "@/lib/browse-data";
-import { DEFAULT_SCHOOL, OTHER_AREA_SCHOOL, SCHOOLS, type School } from "@/lib/schools";
+import { DEFAULT_SCHOOL, OTHER_AREA_SCHOOL, type School } from "@/lib/schools";
 import type { Weekday } from "@/lib/tutor-form";
 import { Footer } from "@/components/landing/Footer";
 
@@ -97,10 +97,12 @@ export function SchoolBrowse({
   school,
   tutors,
   realCount,
+  schools,
 }: {
   school: School;
   tutors: BrowseTutor[];
   realCount: number;
+  schools: School[];
 }) {
   const themeStyle: React.CSSProperties = {
     ["--brand" as string]: school.brand,
@@ -158,11 +160,9 @@ export function SchoolBrowse({
 
   const tabs: { id: string; label: string; href: string }[] = [
     { id: DEFAULT_SCHOOL.id, label: "All tutors", href: "/browse" },
-    ...SCHOOLS.filter((s) => s.active).map((s) => ({
-      id: s.id,
-      label: s.short,
-      href: `/schools/${s.id}`,
-    })),
+    ...schools
+      .filter((s) => s.active)
+      .map((s) => ({ id: s.id, label: s.short, href: `/schools/${s.id}` })),
     { id: OTHER_AREA_SCHOOL.id, label: OTHER_AREA_SCHOOL.short, href: `/schools/${OTHER_AREA_SCHOOL.id}` },
   ];
 
