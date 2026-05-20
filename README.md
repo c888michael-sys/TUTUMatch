@@ -22,6 +22,7 @@ What's working end-to-end right now:
   - Tutoring-area dropdown (`Near Killara` / `Near Masada` / `Other location`) that drives which school tab the profile appears under
   - Bio scanned server-side for contact-info bypass (phone/email/social handles)
 - **Admin** — list of applications with status pills and bio-scanner flags. Detail page with side-by-side fields, reviewer notes, approve / pause / reject / pending-back actions, and "Test unlock + chat" / "View public profile" shortcuts.
+- **Tutor dashboard** — `/dashboard` shows status pill, reviewer notes, edit + view-public-profile buttons, visibility toggle, and conversation count. `/tutor/edit` reuses the signup form pre-filled with the existing submission; saving updates the application and resets status to Pending review (admin re-approves). Visibility toggle is a one-click switch independent of status.
 - **Platform chat** — `/messages` lists threads, `/messages/[unlockId]` is the chat. Post-unlock contact info is revealed inside the thread. Tutor reminder to apply the $20 first-lesson discount is surfaced on their side. First tutor reply records `tutorFirstReplyAt` (used by the 5-day refund auto-flag once Stripe is wired). Local-dev unlock shortcut at `POST /api/unlocks/dev-create` lets us exercise the full sign-up → approve → unlock → chat loop without Stripe.
 - **Legal stubs** — Terms, Privacy (APP-aligned), Child Safety drafts at `/legal/*`.
 - **Prisma schema** — full data model (users, tutor profiles, schools, HSC results, subjects, availability, verifications, unlocks, payments, refunds, messages, reports). Not yet connected to a real DB.
@@ -69,10 +70,13 @@ Tick items off here as they ship. This list is the canonical source of truth for
   - [ ] Switch to reading approved `TutorProfile` rows from the DB
   - [ ] Pagination + cursor-based loading
   - [ ] Cards link to the real `/tutors/[id]` (not `sample-*`)
-- [ ] **Tutor dashboard**
-  - [ ] View profile status, edit profile/availability, toggle visibility
-  - [ ] Inbox of messages from parents who have unlocked
-  - [ ] Lifetime unlock count + informational earnings
+- [x] **Tutor dashboard**
+  - [x] View profile status with status pill + reviewer notes
+  - [x] Edit profile — reuses the same form. Any edit drops status back to PENDING_REVIEW for admin re-approval (child-safety policy).
+  - [x] Visibility toggle (`/api/tutor/applications/visibility`) — independent of status; tutor can pause their listing without re-review
+  - [x] View public profile shortcut (so the tutor can see what parents see)
+  - [x] Inbox surface (count of parents who unlocked) — full chat lives at `/messages`
+  - [ ] Lifetime earnings dashboard (waits on Stripe data + a few real unlocks to display)
 - [x] **In-platform messaging** (post-unlock)
   - [x] Chat UI between the parent and the unlocked tutor (`/messages`, `/messages/[unlockId]`)
   - [x] Stores threads + messages in the JSON store; first tutor reply stops the 5-day refund clock (`tutorFirstReplyAt`)
@@ -167,7 +171,8 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `/tutors/[id]`                      | Tutor profile + refund explainer + contact CTA                            | ✅ Done (samples) |
 | `/unlock/[tutorId]`                 | $20 confirm page with refund policy                                       | ✅ UI done, payment stub |
 | `/tutor/signup`                     | Multi-section tutor application form with all checks                      | ✅ Done      |
-| `/dashboard`                        | Tutor / parent dashboard                                                  | 🚧 Minimal   |
+| `/dashboard`                        | Tutor + parent hub: status, edit, visibility toggle, conversations        | ✅ Done      |
+| `/tutor/edit`                       | Edit tutor profile (resets status to Pending review on save)              | ✅ Done      |
 | `/messages`                         | List of chat threads (parent ↔ tutor) for the current user                | ✅ Done      |
 | `/messages/[unlockId]`              | Chat thread (post-unlock, with contact info revealed)                     | ✅ Done      |
 | `/admin`                            | Admin: applications queue + approve/reject                                | ✅ Done      |
@@ -178,6 +183,8 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `/legal/child-safety`               | Child Safety Policy                                                       | 📝 Draft     |
 | `POST /api/auth/{signup,login,logout,me}` | Cookie-based auth                                                  | ✅ Done      |
 | `POST /api/tutor/applications`      | Submit a tutor application                                                | ✅ Done      |
+| `PUT  /api/tutor/applications`      | Update current user's application (sets status back to Pending review)    | ✅ Done      |
+| `PATCH /api/tutor/applications/visibility` | Toggle profile visibility (no re-review)                          | ✅ Done      |
 | `GET/PATCH /api/admin/applications` | List + approve/reject                                                     | ✅ Done      |
 | `POST /api/unlocks/dev-create`      | Dev-only: create a PAID Unlock without Stripe                             | ✅ Done (dev) |
 | `GET /api/threads`                  | Current user's chat threads                                               | ✅ Done      |

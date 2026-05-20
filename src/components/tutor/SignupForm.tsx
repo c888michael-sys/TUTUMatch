@@ -13,9 +13,11 @@ import {
   scanForContactInfo,
   type Weekday,
 } from "@/lib/tutor-form";
+import type { TutorApplication } from "@/lib/db";
 
 type Result = { subject: string; bandOrMark: string };
 type Slot = { startMinutes: number; endMinutes: number };
+type FormMode = "create" | "edit";
 
 const EMPTY_DAYS: Record<Weekday, Slot[]> = {
   MON: [], TUE: [], WED: [], THU: [], FRI: [], SAT: [], SUN: [],
@@ -23,53 +25,76 @@ const EMPTY_DAYS: Record<Weekday, Slot[]> = {
 
 const TIME_OPTS = generateTimeOptions();
 
-export function SignupForm() {
+export function SignupForm({
+  mode: formMode = "create",
+  initial,
+}: {
+  mode?: FormMode;
+  initial?: TutorApplication;
+}) {
   const router = useRouter();
+  const isEdit = formMode === "edit";
 
   // Personal
-  const [firstName, setFirstName] = useState("");
-  const [lastInitial, setLastInitial] = useState("");
-  const [fullLastName, setFullLastName] = useState("");
-  const [publicBio, setPublicBio] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
+  const [firstName, setFirstName] = useState(initial?.firstName ?? "");
+  const [lastInitial, setLastInitial] = useState(initial?.lastInitial ?? "");
+  const [fullLastName, setFullLastName] = useState(initial?.fullLastName ?? "");
+  const [publicBio, setPublicBio] = useState(initial?.publicBio ?? "");
+  const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl ?? "");
 
   // Contact
-  const [contactEmail, setContactEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [socials, setSocials] = useState("");
+  const [contactEmail, setContactEmail] = useState(initial?.contactEmail ?? "");
+  const [phone, setPhone] = useState(initial?.phone ?? "");
+  const [socials, setSocials] = useState(initial?.socials ?? "");
 
   // Identity
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState(initial?.dateOfBirth ?? "");
 
-  // School attended
-  const [schoolId, setSchoolId] = useState("");
-  const [otherSchoolName, setOtherSchoolName] = useState("");
+  // School attended — if otherSchoolName is set without schoolId, the form
+  // representation uses the OTHER_SCHOOL_SENTINEL value in the select.
+  const initialSchoolId =
+    initial?.schoolId ?? (initial?.otherSchoolName ? OTHER_SCHOOL_SENTINEL : "");
+  const [schoolId, setSchoolId] = useState(initialSchoolId);
+  const [otherSchoolName, setOtherSchoolName] = useState(initial?.otherSchoolName ?? "");
 
   // Tutoring area (drives the browse-view tabs)
-  const [tutoringAreaSchoolId, setTutoringAreaSchoolId] = useState("");
-  const [tutoringAreaOther, setTutoringAreaOther] = useState("");
+  const [tutoringAreaSchoolId, setTutoringAreaSchoolId] = useState(initial?.tutoringAreaSchoolId ?? "");
+  const [tutoringAreaOther, setTutoringAreaOther] = useState(initial?.tutoringAreaOther ?? "");
 
   // Academic
-  const [atar, setAtar] = useState<number | "">("");
-  const [hscResults, setHscResults] = useState<Result[]>([{ subject: "", bandOrMark: "" }]);
-  // Per-subject year selection. Key = subject. Subject is "offered" iff
-  // it's a key here; the value is which year levels the tutor will teach.
-  const [offers, setOffers] = useState<Record<string, number[]>>({});
+  const [atar, setAtar] = useState<number | "">(initial?.atar ?? "");
+  const [hscResults, setHscResults] = useState<Result[]>(
+    initial && initial.hscResults.length > 0 ? initial.hscResults : [{ subject: "", bandOrMark: "" }]
+  );
+  // Per-subject year selection.
+  const initialOffers: Record<string, number[]> = (initial?.offeredSubjects ?? []).reduce(
+    (acc, o) => {
+      acc[o.subject] = o.yearLevels;
+      return acc;
+    },
+    {} as Record<string, number[]>
+  );
+  const [offers, setOffers] = useState<Record<string, number[]>>(initialOffers);
 
   // Pricing + location
-  const [hourlyRate, setHourlyRate] = useState<number | "">("");
-  const [suburb, setSuburb] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [mode, setMode] = useState<"IN_PERSON" | "ONLINE" | "EITHER">("EITHER");
+  const [hourlyRate, setHourlyRate] = useState<number | "">(
+    initial ? Math.round(initial.hourlyRateCents / 100) : ""
+  );
+  const [suburb, setSuburb] = useState(initial?.suburb ?? "");
+  const [postcode, setPostcode] = useState(initial?.postcode ?? "");
+  const [mode, setMode] = useState<"IN_PERSON" | "ONLINE" | "EITHER">(initial?.mode ?? "EITHER");
 
   // Availability
-  const [availability, setAvailability] = useState<Record<Weekday, Slot[]>>(EMPTY_DAYS);
+  const [availability, setAvailability] = useState<Record<Weekday, Slot[]>>({
+    ...EMPTY_DAYS,
+    ...(initial?.availability ?? {}),
+  });
 
   // Verification
-  const [wwccNumber, setWwccNumber] = useState("");
-  const [wwccFullName, setWwccFullName] = useState("");
-  const [idDocumentNote, setIdDocumentNote] = useState("");
-  const [hscDocumentNote, setHscDocumentNote] = useState("");
+  const [wwccNumber, setWwccNumber] = useState(initial?.wwccNumber ?? "");
+  const [wwccFullName, setWwccFullName] = useState(initial?.wwccFullName ?? "");
+  const [idDocumentNote, setIdDocumentNote] = useState(initial?.idDocumentNote ?? "");
+  const [hscDocumentNote, setHscDocumentNote] = useState(initial?.hscDocumentNote ?? "");
 
   // UX
   const [busy, setBusy] = useState(false);
@@ -198,14 +223,14 @@ export function SignupForm() {
 
     try {
       const res = await fetch("/api/tutor/applications", {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) {
         if (data.error === "unauthenticated") {
-          router.replace("/login?next=/tutor/signup");
+          router.replace(`/login?next=${isEdit ? "/tutor/edit" : "/tutor/signup"}`);
           return;
         }
         if (data.error === "validation" && data.fieldErrors) {
@@ -221,10 +246,14 @@ export function SignupForm() {
           setTopError("You've already submitted an application. Check your dashboard for status.");
           return;
         }
+        if (data.error === "not_found") {
+          setTopError("Couldn't find your application to update. Go back to the dashboard.");
+          return;
+        }
         setTopError("Submission failed — please try again.");
         return;
       }
-      router.replace("/dashboard?submitted=1");
+      router.replace(isEdit ? "/dashboard?updated=1" : "/dashboard?submitted=1");
       router.refresh();
     } finally {
       setBusy(false);
@@ -573,11 +602,22 @@ export function SignupForm() {
 
       <div className="form-submit-row">
         <button className="btn brand lg" type="submit" disabled={busy}>
-          {busy ? "Submitting…" : "Submit for review"}
+          {busy
+            ? (isEdit ? "Saving…" : "Submitting…")
+            : (isEdit ? "Save changes (re-submits for review)" : "Submit for review")}
         </button>
         <p className="form-disclaimer">
-          By submitting, you agree to TUTUMatch&apos;s Terms of Service and Child Safety Policy. Your profile won&apos;t
-          be public until an admin reviews your ID, WWCC, and HSC documents.
+          {isEdit ? (
+            <>
+              Any change to a tutor profile drops the listing back to <strong>Pending review</strong> until an admin
+              re-approves it. This is intentional — child-safety information needs a fresh look on every change.
+            </>
+          ) : (
+            <>
+              By submitting, you agree to TUTUMatch&apos;s Terms of Service and Child Safety Policy. Your profile
+              won&apos;t be public until an admin reviews your ID, WWCC, and HSC documents.
+            </>
+          )}
         </p>
       </div>
     </form>

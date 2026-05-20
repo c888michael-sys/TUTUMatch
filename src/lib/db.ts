@@ -54,6 +54,10 @@ export type TutorApplication = {
   id: string;
   userId: string;
   status: ApplicationStatus;
+  // Tutor-controlled toggle. Independent of `status`. Even an APPROVED tutor
+  // can hide their profile without going through admin re-review.
+  // Older records may not have this field — treat undefined as `true`.
+  visibility?: boolean;
   submittedAt: string;
   reviewedAt?: string;
   reviewerEmail?: string;

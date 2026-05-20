@@ -10,6 +10,8 @@ import { scanForContactInfo, tutorApplicationSchema } from "@/lib/tutor-form";
 
 export const runtime = "nodejs";
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   const session = getSession();
   if (!session) {
@@ -47,6 +49,7 @@ export async function POST(req: Request) {
     id: newId("app"),
     userId: session.userId,
     status: "PENDING_REVIEW",
+    visibility: true,
     submittedAt: new Date().toISOString(),
 
     firstName: v.firstName,
@@ -80,4 +83,82 @@ export async function POST(req: Request) {
   await upsertApplication(app);
 
   return NextResponse.json({ ok: true, applicationId: app.id });
+}
+
+// PUT — update the current user's existing application. Validates with the
+// same schema as create, then resets status back to PENDING_REVIEW so an
+// admin re-reviews the change. We preserve id / userId / submittedAt /
+// visibility so the existing listing identity sticks around.
+export async function PUT(req: Request) {
+  const session = getSession();
+  if (!session) {
+    return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+  }
+
+  const existing = await findApplicationByUserId(session.userId);
+  if (!existing) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
+  const json = await req.json().catch(() => ({}));
+  const parsed = tutorApplicationSchema.safeParse(json);
+  if (!parsed.success) {
+    const flat = parsed.error.flatten();
+    return NextResponse.json(
+      { error: "validation", fieldErrors: flat.fieldErrors, formErrors: flat.formErrors },
+      { status: 400 }
+    );
+  }
+  const v = parsed.data;
+
+  const bioFlags = scanForContactInfo(v.publicBio);
+  if (bioFlags.length > 0) {
+    return NextResponse.json(
+      {
+        error: "validation",
+        fieldErrors: { publicBio: [`Bio contains disallowed content (${bioFlags.join(", ")}). Remove it before saving.`] },
+      },
+      { status: 400 }
+    );
+  }
+
+  const updated: TutorApplication = {
+    ...existing,
+    status: "PENDING_REVIEW",
+    // Clear previous review trail — the admin starts fresh on the new content.
+    reviewedAt: undefined,
+    reviewerEmail: undefined,
+    reviewerNotes: undefined,
+
+    firstName: v.firstName,
+    lastInitial: v.lastInitial.toUpperCase(),
+    fullLastName: v.fullLastName,
+    publicBio: v.publicBio,
+    photoUrl: v.photoUrl,
+    contactEmail: v.contactEmail,
+    phone: v.phone,
+    socials: v.socials,
+    dateOfBirth: v.dateOfBirth,
+    schoolId: v.schoolId,
+    otherSchoolName: v.otherSchoolName,
+    tutoringAreaSchoolId: v.tutoringAreaSchoolId,
+    tutoringAreaOther: v.tutoringAreaOther,
+    atar: v.atar,
+    hscResults: v.hscResults,
+    offeredSubjects: v.offeredSubjects,
+    hourlyRateCents: v.hourlyRateCents,
+    suburb: v.suburb,
+    postcode: v.postcode,
+    mode: v.mode,
+    availability: v.availability,
+    wwccNumber: v.wwccNumber,
+    wwccFullName: v.wwccFullName,
+    wwccDob: v.wwccDob,
+    idDocumentNote: v.idDocumentNote,
+    hscDocumentNote: v.hscDocumentNote,
+    bioFlags,
+  };
+  await upsertApplication(updated);
+
+  return NextResponse.json({ ok: true, applicationId: updated.id, status: updated.status });
 }
