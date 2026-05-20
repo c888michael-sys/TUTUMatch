@@ -5,6 +5,11 @@
 import { z } from "zod";
 import { HSC_SUBJECTS } from "./hsc-subjects";
 
+// Sentinel value the high-school dropdown uses to switch on the "Other school"
+// free-text field. Stored as a regular string in `schoolId` so the existing
+// refine sees it like any other slug.
+export const OTHER_SCHOOL_SENTINEL = "__other__";
+
 export const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
 
@@ -57,6 +62,15 @@ export const tutorApplicationSchema = z
     schoolId: z.string().optional().or(z.literal("").transform(() => undefined)),
     otherSchoolName: z.string().trim().max(120).optional().or(z.literal("").transform(() => undefined)),
 
+    // Where the tutor is willing to tutor (drives /schools/[slug] browse tabs).
+    tutoringAreaSchoolId: z.string().min(1, "Pick the area you'd tutor in"),
+    tutoringAreaOther: z
+      .string()
+      .trim()
+      .max(120)
+      .optional()
+      .or(z.literal("").transform(() => undefined)),
+
     atar: z
       .number({ invalid_type_error: "ATAR must be a number" })
       .min(0, "0 minimum")
@@ -77,8 +91,13 @@ export const tutorApplicationSchema = z
       .int()
       .min(MIN_HOURLY_CENTS, `Min $${MIN_HOURLY_CENTS / 100}/hr`)
       .max(MAX_HOURLY_CENTS, `Max $${MAX_HOURLY_CENTS / 100}/hr`),
-    suburb: z.string().trim().min(1, "Required").max(80),
-    postcode: z.string().trim().regex(/^\d{4}$/, "4-digit Australian postcode"),
+    suburb: z.string().trim().max(80).optional().or(z.literal("").transform(() => undefined)),
+    postcode: z
+      .string()
+      .trim()
+      .regex(/^\d{4}$/, "4-digit Australian postcode")
+      .optional()
+      .or(z.literal("").transform(() => undefined)),
     mode: z.enum(["IN_PERSON", "ONLINE", "EITHER"]),
 
     availability: z
@@ -108,9 +127,20 @@ export const tutorApplicationSchema = z
     hscDocumentNote: z.string().trim().max(200).optional().or(z.literal("").transform(() => undefined)),
   })
   .refine((d) => d.schoolId || d.otherSchoolName, {
-    message: "Pick a school or enter 'Other'",
+    message: "Pick your high school or enter it under Other",
     path: ["schoolId"],
   })
+  .refine((d) => d.schoolId !== OTHER_SCHOOL_SENTINEL || (d.otherSchoolName && d.otherSchoolName.length > 0), {
+    message: "Enter the name of your school",
+    path: ["otherSchoolName"],
+  })
+  .refine(
+    (d) => d.tutoringAreaSchoolId !== "other" || (d.tutoringAreaOther && d.tutoringAreaOther.length > 0),
+    {
+      message: "Tell us the suburb/area you'd tutor in",
+      path: ["tutoringAreaOther"],
+    }
+  )
   .refine((d) => d.wwccDob === d.dateOfBirth, {
     message: "WWCC date of birth must match your date of birth",
     path: ["wwccDob"],

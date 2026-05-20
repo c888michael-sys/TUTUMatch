@@ -92,7 +92,16 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
 
           <DetailBlock title="Pricing & location">
             <Row k="Hourly rate" v={`$${(app.hourlyRateCents / 100).toFixed(0)}/hr`} mono />
-            <Row k="Suburb / postcode" v={`${app.suburb} ${app.postcode}`} />
+            <Row
+              k="Tutoring area"
+              v={
+                app.tutoringAreaSchoolId === "other"
+                  ? `Other — ${app.tutoringAreaOther ?? "(not specified)"}`
+                  : `Near ${app.tutoringAreaSchoolId}`
+              }
+            />
+            <Row k="Suburb" v={app.suburb || "—"} />
+            <Row k="Postcode" v={app.postcode || "—"} />
             <Row k="Mode" v={app.mode.replace("_", "-").toLowerCase()} />
           </DetailBlock>
 

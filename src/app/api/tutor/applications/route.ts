@@ -60,6 +60,8 @@ export async function POST(req: Request) {
     dateOfBirth: v.dateOfBirth,
     schoolId: v.schoolId,
     otherSchoolName: v.otherSchoolName,
+    tutoringAreaSchoolId: v.tutoringAreaSchoolId,
+    tutoringAreaOther: v.tutoringAreaOther,
     atar: v.atar,
     hscResults: v.hscResults,
     offeredSubjects: v.offeredSubjects,

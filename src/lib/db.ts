@@ -71,8 +71,14 @@ export type TutorApplication = {
 
   dateOfBirth: string; // ISO date
 
+  // High school attended (alma mater)
   schoolId?: string;
   otherSchoolName?: string;
+
+  // Area the tutor is willing to tutor in — drives the browse-view tabs.
+  // Either a real school slug ("killara"/"masada"/etc) or "other".
+  tutoringAreaSchoolId: string;
+  tutoringAreaOther?: string; // free-text suburb/area when tutoringAreaSchoolId = "other"
 
   atar: number;
   hscResults: HscResult[];
@@ -80,8 +86,8 @@ export type TutorApplication = {
   yearLevels: number[];
 
   hourlyRateCents: number;
-  suburb: string;
-  postcode: string;
+  suburb?: string;     // now optional — area dropdown is the primary location signal
+  postcode?: string;   // now optional
   mode: LessonMode;
 
   availability: Availability;

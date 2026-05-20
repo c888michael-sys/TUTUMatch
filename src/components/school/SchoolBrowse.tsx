@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowIcon } from "@/components/landing/icons";
 import { SAMPLE_TUTORS, type SampleTutor } from "@/lib/sample-tutors";
-import type { School } from "@/lib/schools";
+import { DEFAULT_SCHOOL, OTHER_AREA_SCHOOL, SCHOOLS, type School } from "@/lib/schools";
 import { Footer } from "@/components/landing/Footer";
 
 type Mode = "ANY" | "IN_PERSON" | "ONLINE";
@@ -16,29 +16,32 @@ export function SchoolBrowse({ school }: { school: School }) {
     ["--brand-soft" as string]: school.brandSoft,
   };
 
-  const [scope, setScope] = useState<"SCHOOL" | "ALL">(school.id === "default" ? "ALL" : "SCHOOL");
+  const showingAll = school.id === DEFAULT_SCHOOL.id;
+
   const [subject, setSubject] = useState("");
   const [minAtar, setMinAtar] = useState<number | "">("");
   const [maxRate, setMaxRate] = useState<number | "">("");
   const [mode, setMode] = useState<Mode>("ANY");
 
-  const allTutors = useMemo(() => {
-    if (scope === "SCHOOL") return SAMPLE_TUTORS[school.id] ?? [];
-    // ALL: union across schools, de-duped by name
-    const seen = new Set<string>();
-    const out: (SampleTutor & { fromSchool: string })[] = [];
-    for (const [k, list] of Object.entries(SAMPLE_TUTORS)) {
-      if (k === "default") continue;
-      for (const t of list) {
-        if (seen.has(t.name)) continue;
-        seen.add(t.name);
-        out.push({ ...t, fromSchool: k });
+  const tutors = useMemo<SampleTutor[]>(() => {
+    if (showingAll) {
+      const seen = new Set<string>();
+      const out: SampleTutor[] = [];
+      for (const [k, list] of Object.entries(SAMPLE_TUTORS)) {
+        if (k === "default") continue;
+        for (const t of list) {
+          if (seen.has(t.name)) continue;
+          seen.add(t.name);
+          out.push(t);
+        }
       }
+      return out;
     }
-    return out;
-  }, [scope, school.id]);
+    // Filter by tutoring area
+    return SAMPLE_TUTORS[school.id] ?? [];
+  }, [showingAll, school.id]);
 
-  const filtered = allTutors.filter((t) => {
+  const filtered = tutors.filter((t) => {
     if (subject.trim() && !t.subjects.some((s) => s.s.toLowerCase().includes(subject.trim().toLowerCase()))) return false;
     if (minAtar !== "" && parseFloat(t.atar) < minAtar) return false;
     if (maxRate !== "" && t.rate > maxRate) return false;
@@ -46,6 +49,16 @@ export function SchoolBrowse({ school }: { school: School }) {
     if (mode === "ONLINE" && !/Online/i.test(t.mode)) return false;
     return true;
   });
+
+  const tabs: { id: string; label: string; href: string }[] = [
+    { id: DEFAULT_SCHOOL.id, label: "All tutors", href: "/browse" },
+    ...SCHOOLS.filter((s) => s.active).map((s) => ({
+      id: s.id,
+      label: s.short,
+      href: `/schools/${s.id}`,
+    })),
+    { id: OTHER_AREA_SCHOOL.id, label: OTHER_AREA_SCHOOL.short, href: `/schools/${OTHER_AREA_SCHOOL.id}` },
+  ];
 
   return (
     <div data-school={school.id} style={themeStyle} className="browse-page">
@@ -56,14 +69,28 @@ export function SchoolBrowse({ school }: { school: School }) {
             <span>TutMatch · {school.name}</span>
           </div>
           <h1 className="browse-title">
-            Tutors{school.id === "default" ? "" : ` from ${school.name}`}
+            {showingAll ? "Tutors across NSW" : `Tutors near ${school.name}`}
           </h1>
           <p className="browse-sub">
-            {school.tagline}. Browse free. $20 unlocks a tutor&apos;s contact details and is refunded as their
-            first-lesson discount.
+            {school.tagline}. Browsing is free. You only pay once you&apos;ve picked a tutor — fully refunded if no
+            lessons get agreed.
           </p>
         </div>
       </section>
+
+      <nav className="browse-tabs" aria-label="Tutoring area">
+        <div className="browse-tabs-inner">
+          {tabs.map((t) => (
+            <Link
+              key={t.id}
+              href={t.href}
+              className={`browse-tab ${t.id === school.id ? "active" : ""}`}
+            >
+              {t.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
 
       <section className="browse-controls">
         <div className="browse-controls-inner">
@@ -113,25 +140,6 @@ export function SchoolBrowse({ school }: { school: School }) {
                 </button>
               ))}
             </fieldset>
-            {school.id !== "default" && (
-              <fieldset className="filter mode-filter">
-                <legend>Show</legend>
-                <button
-                  type="button"
-                  className={`chip ${scope === "SCHOOL" ? "active" : ""}`}
-                  onClick={() => setScope("SCHOOL")}
-                >
-                  From {school.short}
-                </button>
-                <button
-                  type="button"
-                  className={`chip ${scope === "ALL" ? "active" : ""}`}
-                  onClick={() => setScope("ALL")}
-                >
-                  All tutors
-                </button>
-              </fieldset>
-            )}
           </div>
           <div className="browse-meta">
             {filtered.length} tutor{filtered.length === 1 ? "" : "s"} matching
@@ -142,8 +150,14 @@ export function SchoolBrowse({ school }: { school: School }) {
       <section className="browse-grid-section">
         {filtered.length === 0 ? (
           <div className="browse-empty">
-            No tutors match those filters. Try widening them, or{" "}
-            <button type="button" className="link-like" onClick={() => { setSubject(""); setMinAtar(""); setMaxRate(""); setMode("ANY"); }}>
+            No tutors match those filters yet. Try widening them, or{" "}
+            <button
+              type="button"
+              className="link-like"
+              onClick={() => {
+                setSubject(""); setMinAtar(""); setMaxRate(""); setMode("ANY");
+              }}
+            >
               clear all
             </button>
             .
@@ -151,7 +165,11 @@ export function SchoolBrowse({ school }: { school: School }) {
         ) : (
           <div className="tutor-grid">
             {filtered.map((t, i) => (
-              <Link href={`/tutors/sample-${school.id}-${i}`} key={`${t.name}-${i}`} className="tcard tcard-link">
+              <Link
+                href={`/tutors/sample-${t.tutoringAreaSchoolId}-${SAMPLE_TUTORS[t.tutoringAreaSchoolId]?.indexOf(t) ?? i}`}
+                key={`${t.name}-${i}`}
+                className="tcard tcard-link"
+              >
                 <span className="example">Example</span>
                 <div className="top">
                   <div className="ph">{t.initials}</div>

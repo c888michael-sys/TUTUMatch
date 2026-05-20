@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HSC_SUBJECTS } from "@/lib/hsc-subjects";
-import { SCHOOLS } from "@/lib/schools";
+import { SCHOOLS, OTHER_AREA_SCHOOL } from "@/lib/schools";
 import {
+  OTHER_SCHOOL_SENTINEL,
   WEEKDAYS,
   YEAR_LEVELS,
   generateTimeOptions,
@@ -40,9 +41,13 @@ export function SignupForm() {
   // Identity
   const [dateOfBirth, setDateOfBirth] = useState("");
 
-  // School
+  // School attended
   const [schoolId, setSchoolId] = useState("");
   const [otherSchoolName, setOtherSchoolName] = useState("");
+
+  // Tutoring area (drives the browse-view tabs)
+  const [tutoringAreaSchoolId, setTutoringAreaSchoolId] = useState("");
+  const [tutoringAreaOther, setTutoringAreaOther] = useState("");
 
   // Academic
   const [atar, setAtar] = useState<number | "">("");
@@ -119,6 +124,13 @@ export function SignupForm() {
 
     const cleanedHsc = hscResults.filter((r) => r.subject && r.bandOrMark);
 
+    // If user picked the "Other school" sentinel for high-school-attended,
+    // store the school as undefined and rely on otherSchoolName instead.
+    const submittedSchoolId =
+      schoolId === OTHER_SCHOOL_SENTINEL ? undefined : (schoolId || undefined);
+    const submittedOtherSchool =
+      schoolId === OTHER_SCHOOL_SENTINEL ? otherSchoolName.trim() || undefined : undefined;
+
     const body = {
       firstName: firstName.trim(),
       lastInitial: lastInitial.trim(),
@@ -129,15 +141,18 @@ export function SignupForm() {
       phone: phone.trim(),
       socials: socials.trim() || undefined,
       dateOfBirth,
-      schoolId: schoolId || undefined,
-      otherSchoolName: otherSchoolName.trim() || undefined,
+      schoolId: submittedSchoolId,
+      otherSchoolName: submittedOtherSchool,
+      tutoringAreaSchoolId,
+      tutoringAreaOther:
+        tutoringAreaSchoolId === OTHER_AREA_SCHOOL.id ? tutoringAreaOther.trim() || undefined : undefined,
       atar: typeof atar === "number" ? atar : undefined,
       hscResults: cleanedHsc,
       offeredSubjects,
       yearLevels,
       hourlyRateCents: typeof hourlyRate === "number" ? Math.round(hourlyRate * 100) : undefined,
-      suburb: suburb.trim(),
-      postcode: postcode.trim(),
+      suburb: suburb.trim() || undefined,
+      postcode: postcode.trim() || undefined,
       mode,
       availability,
       wwccNumber: wwccNumber.trim(),
@@ -232,18 +247,31 @@ export function SignupForm() {
         </Field>
       </Section>
 
-      <Section title="3 · School & academic record" sub="Subjects you can teach are limited to subjects you sat.">
-        <Field label="Alma mater" error={errors.schoolId} hint="Pick from the list, or use 'Other' below.">
-          <select value={schoolId} onChange={(e) => setSchoolId(e.target.value)}>
+      <Section title="3 · High school & academic record" sub="Subjects you can teach are limited to subjects you sat.">
+        <Field label="High school attended" error={errors.schoolId}>
+          <select value={schoolId} onChange={(e) => setSchoolId(e.target.value)} required>
             <option value="">— select —</option>
             {SCHOOLS.map((s) => (
               <option key={s.id} value={s.id}>{s.name}</option>
             ))}
+            <option value={OTHER_SCHOOL_SENTINEL}>Other school…</option>
           </select>
         </Field>
-        <Field label="Other school (free text)" error={errors.otherSchoolName} hint="Leave blank if you picked above.">
-          <input value={otherSchoolName} onChange={(e) => setOtherSchoolName(e.target.value)} maxLength={120} />
-        </Field>
+        {schoolId === OTHER_SCHOOL_SENTINEL && (
+          <Field
+            label="Other school name"
+            error={errors.otherSchoolName}
+            hint="Type the school's full name."
+          >
+            <input
+              value={otherSchoolName}
+              onChange={(e) => setOtherSchoolName(e.target.value)}
+              maxLength={120}
+              required
+              autoFocus
+            />
+          </Field>
+        )}
         <Field label="ATAR" error={errors.atar} hint="0.00 to 99.95">
           <input
             type="number"
@@ -328,7 +356,48 @@ export function SignupForm() {
         </div>
       </Section>
 
-      <Section title="5 · Pricing & location">
+      <Section
+        title="5 · Where you'd tutor"
+        sub="This is the area you're happy to tutor in — not necessarily where you live. If you don't mind travelling further, pick the school area that suits you."
+      >
+        <Field
+          label="Area"
+          error={errors.tutoringAreaSchoolId}
+          full
+          hint="Students browsing a school's page will see tutors who picked that area. 'Other' goes into the Other Locations tab."
+        >
+          <select
+            value={tutoringAreaSchoolId}
+            onChange={(e) => setTutoringAreaSchoolId(e.target.value)}
+            required
+          >
+            <option value="">— select —</option>
+            {SCHOOLS.map((s) => (
+              <option key={s.id} value={s.id}>Near {s.name}</option>
+            ))}
+            <option value={OTHER_AREA_SCHOOL.id}>Other location (somewhere else in NSW)</option>
+          </select>
+        </Field>
+        {tutoringAreaSchoolId === OTHER_AREA_SCHOOL.id && (
+          <Field
+            label="Suburb / area you'd tutor in"
+            error={errors.tutoringAreaOther}
+            hint="A suburb or general area is enough. We don't need a street address."
+            full
+          >
+            <input
+              value={tutoringAreaOther}
+              onChange={(e) => setTutoringAreaOther(e.target.value)}
+              maxLength={120}
+              required
+              autoFocus
+              placeholder="e.g. Inner West, Parramatta, Bondi"
+            />
+          </Field>
+        )}
+      </Section>
+
+      <Section title="6 · Pricing & lesson mode">
         <Field label="Hourly rate (AUD)" error={errors.hourlyRateCents} hint="$20–$200/hr">
           <input
             type="number"
@@ -340,12 +409,6 @@ export function SignupForm() {
             required
           />
         </Field>
-        <Field label="Suburb" error={errors.suburb}>
-          <input value={suburb} onChange={(e) => setSuburb(e.target.value)} required maxLength={80} />
-        </Field>
-        <Field label="Postcode" error={errors.postcode}>
-          <input value={postcode} onChange={(e) => setPostcode(e.target.value)} maxLength={4} required />
-        </Field>
         <Field label="Mode" error={errors.mode}>
           <select value={mode} onChange={(e) => setMode(e.target.value as typeof mode)}>
             <option value="EITHER">In-person or online</option>
@@ -353,9 +416,19 @@ export function SignupForm() {
             <option value="ONLINE">Online only</option>
           </select>
         </Field>
+        <Field
+          label="Suburb (optional)"
+          error={errors.suburb}
+          hint="If you want to be more specific than the area above."
+        >
+          <input value={suburb} onChange={(e) => setSuburb(e.target.value)} maxLength={80} />
+        </Field>
+        <Field label="Postcode (optional)" error={errors.postcode}>
+          <input value={postcode} onChange={(e) => setPostcode(e.target.value)} maxLength={4} />
+        </Field>
       </Section>
 
-      <Section title="6 · Availability" sub="When are you free? Add multiple slots per day if needed (e.g. Mon 9–11am AND 4–6pm).">
+      <Section title="7 · Availability" sub="When are you free? Add multiple slots per day if needed (e.g. Mon 9–11am AND 4–6pm).">
         <div className="full-row">
           {WEEKDAYS.map((day) => (
             <div key={day} className="avail-day">
@@ -404,7 +477,7 @@ export function SignupForm() {
         </div>
       </Section>
 
-      <Section title="7 · Verification" sub="Required by NSW law for anyone working with children. Manual review takes ~48 hours.">
+      <Section title="8 · Verification" sub="Required by NSW law for anyone working with children. Manual review takes ~48 hours.">
         <Field label="WWCC number" error={errors.wwccNumber} hint="The number from your Working With Children Check.">
           <input value={wwccNumber} onChange={(e) => setWwccNumber(e.target.value)} required />
         </Field>

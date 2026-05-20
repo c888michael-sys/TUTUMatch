@@ -47,7 +47,26 @@ export const SCHOOLS: School[] = [
   },
 ];
 
+// Synthetic "school" used to represent the Other Locations tab in the
+// browse view. A tutor with `tutoringAreaSchoolId = "other"` shows up here.
+export const OTHER_AREA_SCHOOL: School = {
+  id: "other",
+  name: "Other Locations",
+  short: "Other",
+  tagline: "Tutors based elsewhere across NSW",
+  brand: "#0F4F4A",
+  brandDeep: "#083633",
+  brandSoft: "#E6F0EE",
+  active: true,
+};
+
 export function findSchool(slug: string | undefined): School | undefined {
   if (!slug) return undefined;
+  if (slug === OTHER_AREA_SCHOOL.id) return OTHER_AREA_SCHOOL;
   return SCHOOLS.find((s) => s.id === slug && s.active);
+}
+
+// All entries that can appear as a tutoring-area tab on the browse view.
+export function tutoringAreaOptions(): School[] {
+  return [...SCHOOLS.filter((s) => s.active), OTHER_AREA_SCHOOL];
 }

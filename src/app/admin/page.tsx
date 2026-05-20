@@ -54,7 +54,8 @@ export default async function AdminPage() {
               <tr>
                 <th>Submitted</th>
                 <th>Tutor</th>
-                <th>School</th>
+                <th>High school</th>
+                <th>Tutoring area</th>
                 <th>ATAR</th>
                 <th>Rate</th>
                 <th>Status</th>
@@ -70,6 +71,11 @@ export default async function AdminPage() {
                     {a.firstName} {a.lastInitial}. <span className="mono-cell muted">({a.contactEmail})</span>
                   </td>
                   <td>{a.schoolId ?? a.otherSchoolName ?? "—"}</td>
+                  <td>
+                    {a.tutoringAreaSchoolId === "other"
+                      ? `Other — ${a.tutoringAreaOther ?? ""}`
+                      : a.tutoringAreaSchoolId ?? "—"}
+                  </td>
                   <td className="mono-cell">{a.atar.toFixed(2)}</td>
                   <td className="mono-cell">${(a.hourlyRateCents / 100).toFixed(0)}/hr</td>
                   <td>
