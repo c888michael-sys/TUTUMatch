@@ -82,8 +82,8 @@ export type TutorApplication = {
 
   atar: number;
   hscResults: HscResult[];
-  offeredSubjects: string[];
-  yearLevels: number[];
+  // Each offer is a subject + the year levels the tutor teaches it to.
+  offeredSubjects: { subject: string; yearLevels: number[] }[];
 
   hourlyRateCents: number;
   suburb?: string;     // now optional — area dropdown is the primary location signal

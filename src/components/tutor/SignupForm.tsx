@@ -52,8 +52,9 @@ export function SignupForm() {
   // Academic
   const [atar, setAtar] = useState<number | "">("");
   const [hscResults, setHscResults] = useState<Result[]>([{ subject: "", bandOrMark: "" }]);
-  const [offeredSubjects, setOfferedSubjects] = useState<string[]>([]);
-  const [yearLevels, setYearLevels] = useState<number[]>([]);
+  // Per-subject year selection. Key = subject. Subject is "offered" iff
+  // it's a key here; the value is which year levels the tutor will teach.
+  const [offers, setOffers] = useState<Record<string, number[]>>({});
 
   // Pricing + location
   const [hourlyRate, setHourlyRate] = useState<number | "">("");
@@ -89,15 +90,45 @@ export function SignupForm() {
     setHscResults((rs) => [...rs, { subject: "", bandOrMark: "" }]);
   }
   function removeHsc(i: number) {
+    const removedSubject = hscResults[i]?.subject;
     setHscResults((rs) => (rs.length === 1 ? rs : rs.filter((_, j) => j !== i)));
-    setOfferedSubjects((os) => os.filter((s) => s !== hscResults[i]?.subject));
+    if (removedSubject) {
+      setOffers((o) => {
+        if (!(removedSubject in o)) return o;
+        const next = { ...o };
+        delete next[removedSubject];
+        return next;
+      });
+    }
   }
 
-  function toggleOffered(s: string) {
-    setOfferedSubjects((os) => (os.includes(s) ? os.filter((x) => x !== s) : [...os, s]));
+  function toggleOffered(subject: string) {
+    setOffers((o) => {
+      if (subject in o) {
+        const next = { ...o };
+        delete next[subject];
+        return next;
+      }
+      // Default new offers to all years — most tutors take all year levels and
+      // can untick the ones they don't want.
+      return { ...o, [subject]: [...YEAR_LEVELS] };
+    });
   }
-  function toggleYear(y: number) {
-    setYearLevels((ys) => (ys.includes(y) ? ys.filter((x) => x !== y) : [...ys, y]));
+
+  function toggleYearFor(subject: string, year: number) {
+    setOffers((o) => {
+      if (!(subject in o)) return o;
+      const cur = o[subject];
+      const next = cur.includes(year) ? cur.filter((y) => y !== year) : [...cur, year];
+      return { ...o, [subject]: next };
+    });
+  }
+
+  function setAllYearsFor(subject: string, all: boolean) {
+    setOffers((o) => {
+      if (!(subject in o)) return o;
+      return { ...o, [subject]: all ? [...YEAR_LEVELS] : [] };
+    });
   }
 
   function addSlot(day: Weekday) {
@@ -123,6 +154,10 @@ export function SignupForm() {
     setTopError(null);
 
     const cleanedHsc = hscResults.filter((r) => r.subject && r.bandOrMark);
+    const offeredSubjects = Object.entries(offers).map(([subject, yearLevels]) => ({
+      subject,
+      yearLevels,
+    }));
 
     // If user picked the "Other school" sentinel for high-school-attended,
     // store the school as undefined and rely on otherSchoolName instead.
@@ -149,7 +184,6 @@ export function SignupForm() {
       atar: typeof atar === "number" ? atar : undefined,
       hscResults: cleanedHsc,
       offeredSubjects,
-      yearLevels,
       hourlyRateCents: typeof hourlyRate === "number" ? Math.round(hourlyRate * 100) : undefined,
       suburb: suburb.trim() || undefined,
       postcode: postcode.trim() || undefined,
@@ -313,46 +347,63 @@ export function SignupForm() {
         </div>
       </Section>
 
-      <Section title="4 · What you teach" sub="Subjects offered must be a subset of subjects you sat.">
+      <Section
+        title="4 · What you teach"
+        sub="Tick each subject you'll tutor. For each one, pick the year levels you're confident teaching it to. 'All years' selects 7–12."
+      >
         <div className="full-row">
-          <div className="repeat-head">
-            <span>Subjects offered ({offeredSubjects.length})</span>
-          </div>
           {subjectsTaken.length === 0 ? (
             <div className="hint-block">Add HSC results first — then you can pick subjects to teach.</div>
           ) : (
-            <div className="chips">
-              {subjectsTaken.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`chip ${offeredSubjects.includes(s) ? "active" : ""}`}
-                  onClick={() => toggleOffered(s)}
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="offer-list">
+              {subjectsTaken.map((subject) => {
+                const isOffered = subject in offers;
+                const years = offers[subject] ?? [];
+                const isAll = years.length === YEAR_LEVELS.length;
+                return (
+                  <div key={subject} className={`offer-row ${isOffered ? "active" : ""}`}>
+                    <label className="offer-row-head">
+                      <input
+                        type="checkbox"
+                        checked={isOffered}
+                        onChange={() => toggleOffered(subject)}
+                      />
+                      <span className="offer-subject">{subject}</span>
+                    </label>
+                    {isOffered && (
+                      <div className="offer-years">
+                        <span className="offer-years-label">Year levels:</span>
+                        <div className="offer-year-chips">
+                          {YEAR_LEVELS.map((y) => (
+                            <button
+                              key={y}
+                              type="button"
+                              className={`chip ${years.includes(y) ? "active" : ""}`}
+                              onClick={() => toggleYearFor(subject, y)}
+                            >
+                              Year {y}
+                            </button>
+                          ))}
+                        </div>
+                        <label className="offer-all">
+                          <input
+                            type="checkbox"
+                            checked={isAll}
+                            onChange={(e) => setAllYearsFor(subject, e.target.checked)}
+                          />
+                          <span>All years</span>
+                        </label>
+                        {years.length === 0 && (
+                          <div className="field-error">Pick at least one year for this subject.</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
           {errors.offeredSubjects && <div className="field-error">{errors.offeredSubjects}</div>}
-        </div>
-        <div className="full-row">
-          <div className="repeat-head">
-            <span>Year levels</span>
-          </div>
-          <div className="chips">
-            {YEAR_LEVELS.map((y) => (
-              <button
-                key={y}
-                type="button"
-                className={`chip ${yearLevels.includes(y) ? "active" : ""}`}
-                onClick={() => toggleYear(y)}
-              >
-                Year {y}
-              </button>
-            ))}
-          </div>
-          {errors.yearLevels && <div className="field-error">{errors.yearLevels}</div>}
         </div>
       </Section>
 

@@ -80,11 +80,17 @@ export const tutorApplicationSchema = z
       .min(1, "Add at least one HSC result")
       .max(15, "Too many"),
     offeredSubjects: z
-      .array(z.string())
+      .array(
+        z.object({
+          subject: z.string().refine((v) => HSC_SUBJECTS.includes(v), {
+            message: "Pick from the HSC subject list",
+          }),
+          yearLevels: z
+            .array(z.number().int().min(7).max(12))
+            .min(1, "Pick at least one year for this subject"),
+        })
+      )
       .min(1, "Offer at least one subject"),
-    yearLevels: z
-      .array(z.number().int().min(7).max(12))
-      .min(1, "Choose at least one year level"),
 
     hourlyRateCents: z
       .number()
@@ -149,7 +155,7 @@ export const tutorApplicationSchema = z
     (d) => {
       // Subjects offered must be a subset of subjects the tutor has a HSC result in.
       const sat = new Set(d.hscResults.map((r) => r.subject));
-      return d.offeredSubjects.every((s) => sat.has(s));
+      return d.offeredSubjects.every((o) => sat.has(o.subject));
     },
     {
       message: "You can only offer subjects you have an HSC result in",

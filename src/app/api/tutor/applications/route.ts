@@ -65,7 +65,6 @@ export async function POST(req: Request) {
     atar: v.atar,
     hscResults: v.hscResults,
     offeredSubjects: v.offeredSubjects,
-    yearLevels: v.yearLevels,
     hourlyRateCents: v.hourlyRateCents,
     suburb: v.suburb,
     postcode: v.postcode,

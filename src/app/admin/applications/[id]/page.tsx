@@ -86,8 +86,26 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
                 ))}
               </ul>
             } />
-            <Row k="Subjects offered" v={app.offeredSubjects.join(", ")} />
-            <Row k="Year levels" v={app.yearLevels.map((y) => `Y${y}`).join(", ")} />
+            <Row
+              k="Subjects offered"
+              v={
+                <ul className="inline-list">
+                  {app.offeredSubjects.map((o, i) => {
+                    const allYears = o.yearLevels.length === 6;
+                    const yearLabel = allYears
+                      ? "all years"
+                      : o.yearLevels.length === 0
+                        ? "(no years)"
+                        : `Y${[...o.yearLevels].sort((a, b) => a - b).join(", Y")}`;
+                    return (
+                      <li key={i}>
+                        {o.subject} · <span className="mono">{yearLabel}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              }
+            />
           </DetailBlock>
 
           <DetailBlock title="Pricing & location">
