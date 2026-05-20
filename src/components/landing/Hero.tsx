@@ -41,7 +41,7 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
     >
       <div className="wordmark-center" aria-hidden="true">
         <span className="mark" />
-        <span>TutMatch</span>
+        <span>TUTUMatch</span>
       </div>
 
       <Link

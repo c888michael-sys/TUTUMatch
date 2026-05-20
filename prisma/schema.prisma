@@ -1,4 +1,4 @@
-// TutMatch data model — covers users, tutor profiles, schools, verifications,
+// TUTUMatch data model — covers users, tutor profiles, schools, verifications,
 // unlocks (the $20 match fee), refunds, messaging, and payment audit trail.
 //
 // Notes:

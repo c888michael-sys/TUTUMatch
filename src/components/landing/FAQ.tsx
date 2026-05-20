@@ -27,7 +27,7 @@ export function FAQ() {
         eyebrow="FAQ"
         heading="Common questions."
         brandWords={1}
-        lede="Anything else? Email hello@tutmatch.com.au and we'll get back the same day."
+        lede="Anything else? Email hello@tutumatch.com.au and we'll get back the same day."
       />
       <div className="faq-tabs reveal" role="tablist">
         {tabs.map((t) => (

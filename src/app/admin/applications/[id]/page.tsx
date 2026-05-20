@@ -6,7 +6,7 @@ import { findApplicationById, findUserById } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { minutesToLabel } from "@/lib/tutor-form";
 
-export const metadata = { title: "Inspect application · Admin · TutMatch" };
+export const metadata = { title: "Inspect application · Admin · TUTUMatch" };
 export const dynamic = "force-dynamic";
 
 const STATUS_LABEL: Record<string, string> = {

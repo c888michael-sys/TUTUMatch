@@ -1,4 +1,4 @@
-export const metadata = { title: "Child Safety Policy · TutMatch" };
+export const metadata = { title: "Child Safety Policy · TUTUMatch" };
 
 export default function ChildSafetyPage() {
   return (
@@ -11,7 +11,7 @@ export default function ChildSafetyPage() {
 
       <h2>Our commitment</h2>
       <p>
-        TutMatch is committed to the safety, participation, and empowerment of children and young people. We have
+        TUTUMatch is committed to the safety, participation, and empowerment of children and young people. We have
         zero tolerance for child abuse and harassment.
       </p>
 
@@ -27,7 +27,7 @@ export default function ChildSafetyPage() {
       <h2>Reporting concerns</h2>
       <p>
         If you have any concern about the safety or conduct of a tutor, please contact{" "}
-        <a href="mailto:safety@tutmatch.com.au">safety@tutmatch.com.au</a> immediately. If a child is in immediate
+        <a href="mailto:safety@tutumatch.com.au">safety@tutumatch.com.au</a> immediately. If a child is in immediate
         danger call <strong>000</strong>. You can also contact the NSW Office of the Children&apos;s Guardian and,
         for serious concerns, the NSW Police.
       </p>

@@ -1,4 +1,4 @@
-export const metadata = { title: "Privacy Policy · TutMatch" };
+export const metadata = { title: "Privacy Policy · TUTUMatch" };
 
 export default function PrivacyPage() {
   return (
@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       </div>
 
       <p>
-        This Privacy Policy explains how TutMatch (&ldquo;we&rdquo;) handles personal information in accordance
+        This Privacy Policy explains how TUTUMatch (&ldquo;we&rdquo;) handles personal information in accordance
         with the Privacy Act 1988 (Cth) and the Australian Privacy Principles (APPs).
       </p>
 
@@ -58,7 +58,7 @@ export default function PrivacyPage() {
       <h2>Your rights</h2>
       <p>
         You may request access to or correction of your personal information at any time:{" "}
-        <a href="mailto:privacy@tutmatch.com.au">privacy@tutmatch.com.au</a>. You may also lodge a complaint with the
+        <a href="mailto:privacy@tutumatch.com.au">privacy@tutumatch.com.au</a>. You may also lodge a complaint with the
         OAIC.
       </p>
 
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
 
       <h2>Contact</h2>
       <p>
-        Privacy questions: <a href="mailto:privacy@tutmatch.com.au">privacy@tutmatch.com.au</a>.
+        Privacy questions: <a href="mailto:privacy@tutumatch.com.au">privacy@tutumatch.com.au</a>.
       </p>
     </main>
   );

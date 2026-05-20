@@ -5,7 +5,7 @@ import { ArrowIcon, LockIcon } from "@/components/landing/icons";
 import { findSampleTutor } from "@/lib/sample-tutors";
 import { findSchool, OTHER_AREA_SCHOOL } from "@/lib/schools";
 
-export const metadata = { title: "Tutor profile · TutMatch" };
+export const metadata = { title: "Tutor profile · TUTUMatch" };
 
 export default function TutorProfilePage({ params }: { params: { id: string } }) {
   // Sample-tutor preview path. Real approved profiles will use the same

@@ -576,7 +576,7 @@ export function SignupForm() {
           {busy ? "Submitting…" : "Submit for review"}
         </button>
         <p className="form-disclaimer">
-          By submitting, you agree to TutMatch&apos;s Terms of Service and Child Safety Policy. Your profile won&apos;t
+          By submitting, you agree to TUTUMatch&apos;s Terms of Service and Child Safety Policy. Your profile won&apos;t
           be public until an admin reviews your ID, WWCC, and HSC documents.
         </p>
       </div>

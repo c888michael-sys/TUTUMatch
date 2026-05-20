@@ -33,10 +33,10 @@ export function LandingPage({ school }: { school: School }) {
       <SchoolBar current={school} />
       <TutorCards school={school} />
       <HowMirrored />
-      <Comparison brand="TutMatch" />
+      <Comparison brand="TUTUMatch" />
       <Trust />
       <Guarantee />
-      <Earnings brand="TutMatch" />
+      <Earnings brand="TUTUMatch" />
       <FAQ />
       <FinalCTA school={school} />
       <Footer />

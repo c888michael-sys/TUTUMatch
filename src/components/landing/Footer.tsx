@@ -7,7 +7,7 @@ export function Footer() {
         <div>
           <div className="foot-brand">
             <span className="mark" />
-            TutMatch
+            TUTUMatch
           </div>
           <p className="foot-blurb">
             A flat-fee NSW tutor marketplace. No per-lesson cut, ever. Tutors and parents deal directly.
@@ -62,7 +62,7 @@ export function Footer() {
           <h5>Contact</h5>
           <ul>
             <li>
-              <a href="mailto:hello@tutmatch.com.au">hello@tutmatch.com.au</a>
+              <a href="mailto:hello@tutumatch.com.au">hello@tutumatch.com.au</a>
             </li>
             <li>
               <a href="#">Instagram</a>
@@ -78,7 +78,7 @@ export function Footer() {
       </div>
       <div className="foot-bottom">
         <span>ABN 00 000 000 000 · Made in NSW</span>
-        <span>© 2026 TutMatch</span>
+        <span>© 2026 TUTUMatch</span>
       </div>
     </footer>
   );

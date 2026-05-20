@@ -4,7 +4,7 @@ import { TopNav } from "@/components/nav/TopNav";
 import { listApplications } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
-export const metadata = { title: "Admin · TutMatch" };
+export const metadata = { title: "Admin · TUTUMatch" };
 export const dynamic = "force-dynamic";
 
 const STATUS_LABEL: Record<string, string> = {

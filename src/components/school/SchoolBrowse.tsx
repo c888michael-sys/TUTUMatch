@@ -66,7 +66,7 @@ export function SchoolBrowse({ school }: { school: School }) {
         <div className="browse-hero-inner">
           <div className="browse-eyebrow">
             <span className="mark" />
-            <span>TutMatch · {school.name}</span>
+            <span>TUTUMatch · {school.name}</span>
           </div>
           <h1 className="browse-title">
             {showingAll ? "Tutors across NSW" : `Tutors near ${school.name}`}

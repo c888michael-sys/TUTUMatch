@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { AuthForms } from "@/components/auth/AuthForms";
 import { TopNav } from "@/components/nav/TopNav";
 
-export const metadata = { title: "Log in · TutMatch" };
+export const metadata = { title: "Log in · TUTUMatch" };
 
 export default function LoginPage() {
   return (

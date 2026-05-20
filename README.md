@@ -1,4 +1,4 @@
-# TutMatch
+# TUTUMatch
 
 A flat-fee NSW tutor marketplace. Tutors list free; parents pay $20 once per match, refunded as the tutor's first-lesson discount. After the introduction, the platform is out of the loop.
 
@@ -118,7 +118,7 @@ These are the things **the founder still needs to do manually** — they don't g
 ### Child safety
 
 - [ ] Build the manual WWCC verification workflow against the NSW OCG public lookup. Document each verification with reviewer name, date, and outcome.
-- [ ] Publish a child-safety contact (`safety@tutmatch.com.au`) and route it to a real inbox.
+- [ ] Publish a child-safety contact (`safety@tutumatch.com.au`) and route it to a real inbox.
 - [ ] Train any admins/reviewers on mandatory reporting.
 - [ ] Align with the National Principles for Child Safe Organisations.
 

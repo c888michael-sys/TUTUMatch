@@ -1,4 +1,4 @@
-export const metadata = { title: "Terms of Service · TutMatch" };
+export const metadata = { title: "Terms of Service · TUTUMatch" };
 
 export default function TermsPage() {
   return (
@@ -8,9 +8,9 @@ export default function TermsPage() {
         DRAFT · Not legal advice. Have a lawyer review before launch. Last updated: TBD.
       </div>
 
-      <h2>1. What TutMatch is</h2>
+      <h2>1. What TUTUMatch is</h2>
       <p>
-        TutMatch is an introduction service that connects parents and students seeking tutoring with independent
+        TUTUMatch is an introduction service that connects parents and students seeking tutoring with independent
         tutors. We verify identity, age, Working With Children Check (WWCC) and HSC/ATAR credentials of tutors before
         they appear on the platform. We are <strong>not</strong> a party to the lessons themselves and do not
         employ, supervise, or guarantee any tutor&apos;s teaching.
@@ -33,7 +33,7 @@ export default function TermsPage() {
 
       <h2>4. Tutors are independent contractors</h2>
       <p>
-        Tutors are not employees, agents, partners or representatives of TutMatch. Each tutor is responsible for
+        Tutors are not employees, agents, partners or representatives of TUTUMatch. Each tutor is responsible for
         their own tax, super, insurance, and conduct. Lesson arrangements are a private contract between the parent
         and the tutor.
       </p>
@@ -49,19 +49,19 @@ export default function TermsPage() {
       <p>
         All tutors hold a current NSW Working With Children Check. We require government-issued ID and HSC/ATAR
         documentation before listing. Concerns about child safety can be reported to{" "}
-        <a href="mailto:safety@tutmatch.com.au">safety@tutmatch.com.au</a> and to the NSW Office of the
+        <a href="mailto:safety@tutumatch.com.au">safety@tutumatch.com.au</a> and to the NSW Office of the
         Children&apos;s Guardian.
       </p>
 
       <h2>7. No guarantee of outcomes</h2>
       <p>
-        TutMatch makes no representation or warranty about tutor quality, student academic outcomes, or any specific
+        TUTUMatch makes no representation or warranty about tutor quality, student academic outcomes, or any specific
         result from a lesson or course of lessons.
       </p>
 
       <h2>8. Liability</h2>
       <p>
-        To the extent permitted by law, TutMatch&apos;s liability is limited to the amount of the unlock fee paid
+        To the extent permitted by law, TUTUMatch&apos;s liability is limited to the amount of the unlock fee paid
         for the relevant introduction. Nothing here limits any consumer guarantees under the Australian Consumer Law.
       </p>
 
@@ -79,7 +79,7 @@ export default function TermsPage() {
 
       <h2>11. Contact</h2>
       <p>
-        Questions? <a href="mailto:hello@tutmatch.com.au">hello@tutmatch.com.au</a>.
+        Questions? <a href="mailto:hello@tutumatch.com.au">hello@tutumatch.com.au</a>.
       </p>
     </main>
   );

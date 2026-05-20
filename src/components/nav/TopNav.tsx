@@ -9,7 +9,7 @@ export function TopNav() {
       <div className="topnav-inner">
         <Link href="/" className="topnav-brand">
           <span className="mark" />
-          TutMatch
+          TUTUMatch
         </Link>
         <nav className="topnav-links">
           <Link href="/browse">Browse tutors</Link>

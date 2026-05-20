@@ -15,8 +15,8 @@ export type School = {
 
 export const DEFAULT_SCHOOL: School = {
   id: "default",
-  name: "TutMatch",
-  short: "TutMatch",
+  name: "TUTUMatch",
+  short: "TUTUMatch",
   tagline: "NSW · independent marketplace",
   brand: "#0F4F4A",
   brandDeep: "#083633",

@@ -5,7 +5,7 @@ import { TopNav } from "@/components/nav/TopNav";
 import { findApplicationByUserId } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
-export const metadata = { title: "List as a tutor · TutMatch" };
+export const metadata = { title: "List as a tutor · TUTUMatch" };
 
 export default async function TutorSignupPage() {
   const session = getSession();

@@ -16,7 +16,7 @@ export function StickyBar() {
     <header className={`stickybar ${show ? "show" : ""}`}>
       <div className="wordmark">
         <span className="tm-dot" />
-        TutMatch
+        TUTUMatch
       </div>
       <div className="ctas">
         <a className="btn ghost" href="#how-20-works">

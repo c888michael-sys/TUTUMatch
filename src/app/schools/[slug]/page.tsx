@@ -13,10 +13,10 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const school = findSchool(params.slug);
-  if (!school) return { title: "School not found · TutMatch" };
+  if (!school) return { title: "School not found · TUTUMatch" };
   return {
-    title: `Tutors at ${school.name} · TutMatch`,
-    description: `Browse TutMatch tutors from ${school.name}. ${school.tagline}.`,
+    title: `Tutors at ${school.name} · TUTUMatch`,
+    description: `Browse TUTUMatch tutors from ${school.name}. ${school.tagline}.`,
   };
 }
 
