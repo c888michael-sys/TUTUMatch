@@ -1483,6 +1483,40 @@ footer {
   position: absolute; right: 8px; top: 32px;
   font-family: var(--mono); font-size: 11px; color: var(--muted);
 }
+
+/* Hourly-rate input with $ prefix and /hr suffix */
+.rate-input {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.rate-input input {
+  padding-left: 28px;
+  padding-right: 44px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.rate-input .rate-prefix,
+.rate-input .rate-suffix {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-family: var(--mono); font-weight: 500;
+  font-size: 13px;
+  color: var(--muted);
+}
+.rate-input .rate-prefix { left: 12px; }
+.rate-input .rate-suffix { right: 12px; font-size: 12.5px; }
+
+/* Hide spin buttons on number inputs — they don't add anything useful
+   here and look out of place next to our own prefix/suffix. */
+.tform input[type="number"]::-webkit-outer-spin-button,
+.tform input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.tform input[type="number"] { -moz-appearance: textfield; }
 .repeat-head {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 10px;

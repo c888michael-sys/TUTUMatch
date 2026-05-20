@@ -449,33 +449,59 @@ export function SignupForm() {
       </Section>
 
       <Section title="6 · Pricing & lesson mode">
-        <Field label="Hourly rate (AUD)" error={errors.hourlyRateCents} hint="$20–$200/hr">
-          <input
-            type="number"
-            min={20}
-            max={200}
-            step={5}
-            value={hourlyRate}
-            onChange={(e) => setHourlyRate(e.target.value === "" ? "" : parseFloat(e.target.value))}
-            required
-          />
+        <Field label="Hourly rate" error={errors.hourlyRateCents} hint="Whole dollars, between $20 and $200.">
+          <div className="rate-input">
+            <span className="rate-prefix" aria-hidden="true">$</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              min={20}
+              max={200}
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(e.target.value === "" ? "" : parseFloat(e.target.value))}
+              placeholder="60"
+              required
+            />
+            <span className="rate-suffix" aria-hidden="true">/hr</span>
+          </div>
         </Field>
-        <Field label="Mode" error={errors.mode}>
-          <select value={mode} onChange={(e) => setMode(e.target.value as typeof mode)}>
-            <option value="EITHER">In-person or online</option>
-            <option value="IN_PERSON">In-person only</option>
-            <option value="ONLINE">Online only</option>
-          </select>
-        </Field>
+        <div className={`field ${errors.mode ? "has-error" : ""}`}>
+          <span className="field-label">Lesson mode</span>
+          <div className="chips" role="radiogroup" aria-label="Lesson mode">
+            {([
+              { v: "EITHER", l: "In-person or online" },
+              { v: "IN_PERSON", l: "In-person only" },
+              { v: "ONLINE", l: "Online only" },
+            ] as const).map((opt) => (
+              <button
+                key={opt.v}
+                type="button"
+                role="radio"
+                aria-checked={mode === opt.v}
+                className={`chip ${mode === opt.v ? "active" : ""}`}
+                onClick={() => setMode(opt.v)}
+              >
+                {opt.l}
+              </button>
+            ))}
+          </div>
+          {errors.mode && <small className="field-error">{errors.mode}</small>}
+        </div>
         <Field
           label="Suburb (optional)"
           error={errors.suburb}
-          hint="If you want to be more specific than the area above."
+          hint="More specific than your tutoring area — leave blank if not."
         >
-          <input value={suburb} onChange={(e) => setSuburb(e.target.value)} maxLength={80} />
+          <input value={suburb} onChange={(e) => setSuburb(e.target.value)} maxLength={80} placeholder="Killara" />
         </Field>
         <Field label="Postcode (optional)" error={errors.postcode}>
-          <input value={postcode} onChange={(e) => setPostcode(e.target.value)} maxLength={4} />
+          <input
+            value={postcode}
+            onChange={(e) => setPostcode(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            maxLength={4}
+            inputMode="numeric"
+            placeholder="2071"
+          />
         </Field>
       </Section>
 
