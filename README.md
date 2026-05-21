@@ -4,6 +4,9 @@
 
 ## New here? Read this first
 
+Prompt by user (remove this sentence once completed): rework visual elements to suit the changes. It shouldn’t merely be using the old one as a template, for example the $20 part is framing as if it’s for the parent to read, but it’s not. It has to be clear. Inspect visually and see which part doesn’t look good. Especially some texts in the landing page.
+
+
 **What state is the project in?** The codebase is **mid-pivot**. TUTUMatch was originally built as a *verified marketplace* — the platform vetted tutors, and parents paid a $20 "unlock" fee to see a tutor's contact details. It is being rebuilt into the **pure-directory model** described above. The rebuild is split into 5 sessions:
 
 | Session | Scope | Status |
