@@ -178,8 +178,8 @@ export function SchoolBrowse({
             {showingAll ? "Tutors across Sydney" : `Tutors near ${school.name}`}
           </h1>
           <p className="browse-sub">
-            {school.tagline}. Browsing is free. You only pay once you&apos;ve picked a tutor — fully refunded if no
-            lessons get agreed.
+            {school.tagline}. Browsing and contacting tutors is free for parents. Listings are tutor-provided —
+            verify their WWCC yourself before any lesson.
           </p>
         </div>
       </section>
@@ -303,7 +303,7 @@ export function SchoolBrowse({
             {sorted.length} tutor{sorted.length === 1 ? "" : "s"} matching
             {realCount > 0 && (
               <span className="real-count">
-                · <strong>{realCount}</strong> verified tutor{realCount === 1 ? "" : "s"} live
+                · <strong>{realCount}</strong> tutor{realCount === 1 ? "" : "s"} listed
               </span>
             )}
           </div>
@@ -333,7 +333,6 @@ export function SchoolBrowse({
                 key={`${t.routeId}-${i}`}
                 className="tcard tcard-link"
               >
-                {!t.isReal && <span className="example">Example</span>}
                 <div className="top">
                   <div className="ph">{t.initials}</div>
                   <div>

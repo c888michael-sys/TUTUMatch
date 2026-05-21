@@ -77,6 +77,17 @@ export default async function TutorProfilePage({ params }: { params: { id: strin
           </div>
         </div>
 
+        <section className="profile-section profile-directory-note">
+          <p>
+            <strong>TUTUMatch is a directory.</strong> This listing was provided by the tutor. TUTUMatch
+            does not verify tutor qualifications, identity, or Working With Children Check status —{" "}
+            <a href="https://www.kidsguardian.nsw.gov.au/working-with-children/check-an-employee-or-volunteer" target="_blank" rel="noopener noreferrer">
+              verify the tutor&apos;s WWCC yourself
+            </a>{" "}
+            with the NSW Office of the Children&apos;s Guardian (free, 30 seconds) before booking a lesson.
+          </p>
+        </section>
+
         <section className="profile-section">
           <h2>HSC subjects &amp; year levels taught</h2>
           <div className="subs">

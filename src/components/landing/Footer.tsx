@@ -10,7 +10,8 @@ export function Footer() {
             TUTUMatch
           </div>
           <p className="foot-blurb">
-            A flat-fee NSW tutor marketplace. No per-lesson cut, ever. Tutors and parents deal directly.
+            An NSW tutor directory. Free for parents — listings are tutor-provided. Tutors pay only when a real
+            student is confirmed.
           </p>
         </div>
         <div>
@@ -34,16 +35,13 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h5>Trust</h5>
+          <h5>About</h5>
           <ul>
             <li>
-              <a href="#">Verification</a>
+              <Link href="/what-we-are">What TUTUMatch is (and isn&apos;t)</Link>
             </li>
             <li>
-              <a href="#">5-day guarantee</a>
-            </li>
-            <li>
-              <Link href="/legal/child-safety">Safety policy</Link>
+              <Link href="/legal/child-safety">Child-safety policy</Link>
             </li>
           </ul>
         </div>
@@ -81,11 +79,16 @@ export function Footer() {
       </div>
       <div className="foot-disclaimer">
         <p>
-          <strong>TUTUMatch is an introduction service, not a tutoring provider.</strong> We verify tutor identity,
-          age, WWCC, and HSC credentials, but we do not employ, supervise, or take responsibility for any tutor or
-          lesson. Lesson locations are chosen by the parent and tutor — public libraries are strongly recommended.
-          TUTUMatch&apos;s liability is limited to the $20 unlock fee per match. See our{" "}
-          <Link href="/legal/terms">Terms of Service</Link> and{" "}
+          <strong>TUTUMatch is a classifieds directory, not a tutoring provider.</strong> Listings are
+          tutor-provided. TUTUMatch does not verify, vet, or screen tutors and makes no representation about
+          tutor identity, qualifications, or Working With Children Check status. Parents are responsible for
+          verifying a tutor&apos;s WWCC directly with the{" "}
+          <a href="https://www.kidsguardian.nsw.gov.au/working-with-children/check-an-employee-or-volunteer" target="_blank" rel="noopener noreferrer">
+            NSW Office of the Children&apos;s Guardian
+          </a>{" "}
+          before any lesson. Lessons are arranged privately between parent and tutor — public libraries are
+          strongly recommended. See our <Link href="/legal/terms">Terms of Service</Link>,{" "}
+          <Link href="/what-we-are">What TUTUMatch is (and isn&apos;t)</Link>, and{" "}
           <Link href="/legal/child-safety">Child Safety Policy</Link> for full detail.
         </p>
         <p className="foot-beta-note">
