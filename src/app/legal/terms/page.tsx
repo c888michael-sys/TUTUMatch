@@ -22,22 +22,35 @@ export default function TermsPage() {
 
         <h2>1. What TUTUMatch is — and isn&apos;t</h2>
         <p>
-          TUTUMatch is an <strong>introduction service</strong>. We help parents and students find tutors. We
-          verify each tutor&apos;s identity, age, Working With Children Check (WWCC), and HSC / ATAR credentials
-          before their profile appears publicly.
+          TUTUMatch is a <strong>classifieds directory</strong>. Tutors publish listings here so that parents can
+          find them. That is the entirety of the platform&apos;s function.
         </p>
         <p>
-          We are <strong>not</strong>:
+          TUTUMatch <strong>does not</strong>:
         </p>
         <ul>
-          <li>the tutor&apos;s employer, agent, partner, or representative</li>
-          <li>a party to any lesson, payment between parent and tutor, or arrangement made after introduction</li>
-          <li>a supervisor of any lesson, location, or interaction between users</li>
-          <li>a guarantor of tutor quality, teaching effectiveness, or academic outcomes</li>
+          <li>verify, vet, or screen tutors&apos; identity, age, qualifications, Working With Children Check status, criminal history, or character</li>
+          <li>endorse, recommend, rank editorially, or vouch for any tutor</li>
+          <li>employ, engage, supervise, or act as agent, partner, or representative of any tutor</li>
+          <li>participate in, mediate, or take any cut of any lesson, payment, or arrangement between parent and tutor</li>
+          <li>provide tutoring services, host lessons, or facilitate any communication that occurs after a parent has obtained a tutor&apos;s contact details</li>
+          <li>guarantee tutor quality, availability, teaching ability, or any academic outcome</li>
         </ul>
         <p>
+          Listings on TUTUMatch are <strong>user-generated content</strong> supplied by individual tutors. The
+          accuracy of any listing is the responsibility of the tutor who posted it.
+        </p>
+        <p>
+          <strong>No consumer transaction with parents.</strong> Parents do not pay TUTUMatch to browse, search,
+          contact, or otherwise use the directory. Whatever a parent later arranges with a tutor — including the
+          tutor&apos;s rate, schedule, lesson location, and payment method — is a private arrangement between the
+          parent and the tutor to which TUTUMatch is not a party.
+        </p>
+        <p>
           Tutors are independent contractors. Each tutor is responsible for their own tax, superannuation,
-          insurance, conduct, lesson plans, and any agreements they make with parents.
+          insurance, conduct, lesson plans, and any agreements they make with parents. Parents must satisfy
+          themselves about a tutor&apos;s suitability, qualifications, and WWCC status before booking any lesson
+          (see section 5).
         </p>
 
         <h2>2. The $20 unlock fee</h2>
@@ -72,20 +85,35 @@ export default function TermsPage() {
           immediate suspension.
         </p>
 
-        <h2>5. Tutor verification</h2>
+        <h2>5. What we ask of tutors (and what parents verify themselves)</h2>
         <p>
-          We verify the following before a tutor is approved:
+          <strong>TUTUMatch does not verify any tutor.</strong> Listings are tutor-provided and self-attested. The
+          platform performs no identity checks, no Working With Children Check verifications, no credential
+          confirmations, no background checks, and no character assessments — at signup or at any later point.
+        </p>
+        <p>
+          The platform <strong>asks</strong> each tutor to have, and to be prepared to provide directly to any
+          parent who requests it:
         </p>
         <ul>
-          <li>Government-issued photo ID</li>
-          <li>Valid current NSW Working With Children Check (verified against the NSW Office of the Children&apos;s Guardian)</li>
-          <li>NESA HSC Record of Achievement / ATAR notice</li>
-          <li>Date of birth (tutors must be 18 or older — under-18 applications are auto-rejected)</li>
+          <li>a current and valid NSW Working With Children Check (WWCC) number, together with the full name and date of birth registered against that WWCC</li>
+          <li>a government-issued photo ID matching the WWCC details</li>
+          <li>truthful information in every field of their listing (subjects, ATAR, year levels taught, area, rate, availability, bio)</li>
         </ul>
         <p>
-          We do <strong>not</strong> conduct criminal background checks beyond the WWCC, employment-history
-          checks, or vouch for personal character beyond these documents. Verification confirms identity and
-          credentials at the time of approval; it does not guarantee future conduct.
+          Each tutor self-attests, at signup and on accepting these Terms, that they are 18 or older, hold a valid
+          WWCC, and will provide WWCC details to any parent who asks. False attestation is a breach of these Terms
+          and grounds for permanent suspension; depending on the conduct involved, it may also be reported to the
+          NSW Office of the Children&apos;s Guardian, the NSW Police, or other authorities. TUTUMatch retains
+          attestation records, IP addresses, and audit logs for this purpose.
+        </p>
+        <p>
+          <strong>Parents must verify each tutor&apos;s WWCC themselves before any lesson</strong>, using the free
+          public lookup tool operated by the{" "}
+          <a href="https://www.kidsguardian.nsw.gov.au/working-with-children/check-an-employee-or-volunteer" target="_blank" rel="noopener noreferrer">
+            NSW Office of the Children&apos;s Guardian
+          </a>. The check takes approximately 30 seconds and is free of charge. TUTUMatch displays no verification
+          badges, ticks, or trust marks, because TUTUMatch performs no verification.
         </p>
 
         <h2>6. Lesson location</h2>
@@ -105,20 +133,23 @@ export default function TermsPage() {
           lesson.
         </p>
 
-        <h2>7. No guarantee of outcomes or quality</h2>
+        <h2>7. No guarantee of accuracy, quality, or outcomes</h2>
         <p>
-          TUTUMatch makes no representation or warranty — express or implied — about:
+          TUTUMatch makes <strong>no representation or warranty</strong> — express or implied — about:
         </p>
         <ul>
-          <li>any tutor&apos;s teaching ability or effectiveness</li>
-          <li>the suitability of any tutor for any particular student or subject</li>
+          <li>the accuracy of any information in any tutor listing, including (without limit) identity, age, ATAR, HSC results, school attended, qualifications, subjects taught, suburb, rate, availability, biography, or WWCC status</li>
+          <li>any tutor&apos;s teaching ability, experience, or effectiveness</li>
+          <li>the suitability of any tutor for any particular student, subject, or learning need</li>
           <li>any academic outcome (ATAR, marks, grades, university admission, scholarship)</li>
-          <li>the accuracy of tutor-supplied biographical information beyond what we verify in section 5</li>
-          <li>continuous availability of any tutor</li>
+          <li>the continuous availability of any tutor, the platform, or any feature of it</li>
         </ul>
         <p>
-          Tutoring is a service provided by an independent tutor; outcomes depend on the tutor, the student, and
-          factors outside the platform&apos;s control.
+          Listings are user-generated content. TUTUMatch does not edit, fact-check, or moderate listings for
+          accuracy. Parents must conduct their own due diligence on any tutor — including verifying the
+          tutor&apos;s WWCC, asking for evidence of qualifications, and forming their own view on suitability —
+          before booking a lesson. Tutoring is a service provided by an independent tutor; outcomes depend on the
+          tutor, the student, and factors outside the platform&apos;s control.
         </p>
 
         <h2>8. Limitation of liability</h2>
