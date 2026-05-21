@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const REASONS: { value: string; label: string }[] = [
-  { value: "contact_info_bypass", label: "Sharing contact info to dodge the $20 fee" },
+  { value: "contact_info_bypass", label: "Off-platform contact to dodge the match commission" },
   { value: "harassment", label: "Harassment or abusive language" },
   { value: "inappropriate_content", label: "Inappropriate or offensive content" },
   { value: "safety_concern", label: "Child-safety concern" },
@@ -17,14 +17,12 @@ const REASONS: { value: string; label: string }[] = [
 export function ReportButton({
   subjectKind,
   subjectId,
-  subjectThreadId,
   subjectLabel,
   variant = "default",
 }: {
-  subjectKind: "USER" | "APPLICATION" | "MESSAGE";
+  subjectKind: "USER" | "APPLICATION";
   subjectId: string;
-  subjectThreadId?: string;
-  subjectLabel: string; // e.g. "Lachlan H." or "this conversation"
+  subjectLabel: string; // e.g. "Lachlan H."
   variant?: "default" | "inline";
 }) {
   const router = useRouter();
@@ -54,7 +52,6 @@ export function ReportButton({
         body: JSON.stringify({
           subjectKind,
           subjectId,
-          subjectThreadId,
           reason,
           description: description.trim(),
         }),
@@ -141,7 +138,7 @@ export function ReportButton({
                     maxLength={2000}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="e.g. They asked me to message them on Instagram before paying, see the chat from yesterday."
+                    placeholder="e.g. Their listing claims a 99+ ATAR but they couldn't answer basic questions about the subject."
                     required
                   />
                   <small className="hint">{description.length} / 2000</small>

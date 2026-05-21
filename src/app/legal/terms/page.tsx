@@ -15,7 +15,7 @@ export default function TermsPage() {
         </div>
 
         <p className="content-lede">
-          By creating an account, listing as a tutor, or paying the unlock fee, you agree to these Terms.
+          By creating an account or listing as a tutor, you agree to these Terms.
           They&apos;re written plainly. Please read them — particularly sections 7–13, which spell out the limits
           of what TUTUMatch is responsible for.
         </p>
@@ -53,36 +53,39 @@ export default function TermsPage() {
           (see section 5).
         </p>
 
-        <h2>2. The $20 unlock fee</h2>
+        <h2>2. Fees</h2>
         <p>
-          Browsing tutor profiles is free. To reveal a tutor&apos;s full contact details and message them through
-          the platform, the parent pays a one-time <strong>AU$20</strong> match fee. The tutor agrees to discount
-          the parent&apos;s first lesson by $20 to offset this fee, so the net cost of the unlock to the parent is
-          $0 once a first lesson is booked.
+          <strong>Parents pay TUTUMatch nothing.</strong> Browsing the directory, searching, and obtaining a
+          tutor&apos;s contact details are all free. There is no parent-side payment of any kind.
         </p>
         <p>
-          No further fees apply after the introduction. Tutors set their own hourly rate and are paid directly by
-          the parent, by whatever method they agree on.
+          <strong>Tutors pay a commission only when a real student is confirmed.</strong> Listing is free. A
+          tutor&apos;s first confirmed match is free; from the second confirmed match onwards, TUTUMatch charges
+          the tutor a flat <strong>AU$20</strong> commission per confirmed match — reduced to <strong>AU$15</strong>{" "}
+          where the tutor self-reports the match honestly within the reporting window. TUTUMatch takes no
+          percentage of any lesson fee. Tutors set their own hourly rate and are paid directly by the parent, by
+          whatever method they agree on.
         </p>
 
-        <h2>3. Five-day refund right</h2>
+        <h2>3. Confirmed matches and disputes</h2>
         <p>
-          If the unlocked tutor does not reply to the parent&apos;s first in-platform message within{" "}
-          <strong>5 calendar days</strong> of the unlock, the parent is entitled to a full $20 refund. The refund
-          is processed automatically — no forms, no admin chasing.
+          A <strong>confirmed match</strong> occurs when a parent who obtained a tutor&apos;s contact details
+          through TUTUMatch goes on to book a lesson with that tutor. The tutor may self-report a confirmed
+          match; if they do not, the parent is asked to confirm whether a lesson took place.
         </p>
         <p>
-          Parents are also entitled to a full refund if they and the tutor cannot agree on a first lesson within
-          14 days of the unlock, for any reason. This is in addition to any rights under the Australian Consumer
-          Law.
+          A tutor who believes a commission has been charged in error may dispute it, and disputes are reviewed
+          manually by TUTUMatch. Because parents make no payment to TUTUMatch, no parent refund arises under
+          these Terms. Nothing in this section limits any right a tutor has under the Australian Consumer Law in
+          respect of a commission they paid.
         </p>
 
         <h2>4. Anti-circumvention</h2>
         <p>
-          Sharing contact details (phone, email, social handles) in profiles, pre-unlock messages, or anywhere on
-          the platform before payment is prohibited. The $20 fee is the only commission TUTUMatch charges, and
-          attempting to circumvent it — by either tutors or parents — is a breach of these Terms and grounds for
-          immediate suspension.
+          The tutor commission described in section 2 is the only money TUTUMatch charges. A tutor who takes on a
+          student introduced through TUTUMatch and deliberately conceals the match to avoid that commission is in
+          breach of these Terms. Repeated or deliberate concealment is grounds for suspension or permanent
+          removal from the directory.
         </p>
 
         <h2>5. What we ask of tutors (and what parents verify themselves)</h2>
@@ -159,8 +162,9 @@ export default function TermsPage() {
         <ul>
           <li>
             TUTUMatch&apos;s total liability arising from or in connection with the platform, your use of it, any
-            tutor introduction, or any lesson is <strong>limited to the amount of the unlock fee actually paid
-            by you for the relevant tutor</strong> (i.e. AU$20 per match, capped per relevant introduction).
+            tutor introduction, or any lesson is <strong>limited, to the maximum extent permitted by law, to
+            AU$20</strong>. Parents pay TUTUMatch nothing; a tutor&apos;s liability cap is the greater of AU$20
+            and the total commission that tutor has paid TUTUMatch in the 12 months before the claim.
           </li>
           <li>
             TUTUMatch is not liable for any indirect, consequential, special, incidental, or punitive damages, or
@@ -215,8 +219,8 @@ export default function TermsPage() {
         <h2 id="13">13. Tutor indemnity</h2>
         <p>
           This section applies to <strong>tutors</strong>. It is a material part of the bargain — without it,
-          TUTUMatch could not justify the cost of facilitating introductions at a flat $20 fee. By signing up as a
-          tutor and accepting it explicitly in the signup form, you agree to the following.
+          TUTUMatch could not justify operating a low-cost directory connecting tutors with parents. By signing
+          up as a tutor and accepting it explicitly in the signup form, you agree to the following.
         </p>
         <p>
           You (the <strong>Tutor</strong>) agree to <strong>indemnify, defend at our request, and hold harmless</strong>{" "}
@@ -232,7 +236,7 @@ export default function TermsPage() {
           <li>your breach of these Terms, the <a href="/legal/child-safety">Child Safety Policy</a>, or the <a href="/legal/privacy">Privacy Policy</a>;</li>
           <li>any misrepresentation by you, or inaccuracy in information you supplied, concerning your identity, age, date of birth, qualifications, ATAR, HSC results, WWCC status, prior conduct, or any other profile field;</li>
           <li>any claim by a third party that materials, content, lesson notes, or resources you provided infringe their rights (including intellectual property, privacy, or confidentiality rights);</li>
-          <li>your failure to apply the $20 first-lesson discount as required, or to issue tax-compliant invoices or receipts;</li>
+          <li>your failure to pay any commission due to TUTUMatch, or to issue tax-compliant invoices or receipts to parents;</li>
           <li>any tax, GST, superannuation, insurance, worker&apos;s compensation, or income-reporting obligation arising from your tutoring work that you failed to meet;</li>
           <li>any breach by you of the <em>Child Protection (Working with Children) Act 2012 (NSW)</em>, the <em>Children and Young Persons (Care and Protection) Act 1998 (NSW)</em>, or any related child-safety law;</li>
           <li>any defamatory, harassing, threatening, or unlawful statement you made in messages, profile content, or otherwise on the platform;</li>
@@ -267,7 +271,7 @@ export default function TermsPage() {
           <li>your breach of these Terms;</li>
           <li>any false, malicious, or knowingly inaccurate report you submit through the Report button or otherwise;</li>
           <li>any defamatory, abusive, threatening, or unlawful content you post in messages, reports, or other communications on the platform;</li>
-          <li>any attempt by you to circumvent the $20 unlock fee, including encouraging or accepting off-platform contact from a tutor before paying;</li>
+          <li>your misuse of any tutor&apos;s contact details obtained through the directory, including unsolicited marketing, spam, or harassment;</li>
           <li>any unauthorised use of your account where the unauthorised use was made possible by your failure to keep credentials secure.</li>
         </ol>
         <p>

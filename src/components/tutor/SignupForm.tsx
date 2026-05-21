@@ -285,7 +285,7 @@ export function SignupForm({
 
   return (
     <form className="tform" onSubmit={onSubmit} noValidate>
-      <Section title="1 · Your details" sub="Only the first name + last initial appear publicly until a parent unlocks you.">
+      <Section title="1 · Your details" sub="Only the first name + last initial appear publicly until a parent requests contact.">
         <Field label="First name" error={errors.firstName}>
           <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required maxLength={50} />
         </Field>
@@ -325,7 +325,7 @@ export function SignupForm({
         </Field>
       </Section>
 
-      <Section title="2 · Contact (private)" sub="Revealed only to parents who pay the $20 unlock fee.">
+      <Section title="2 · Contact (private)" sub="Revealed to a parent only once they request to contact you.">
         <Field label="Email" error={errors.contactEmail}>
           <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required />
         </Field>
@@ -506,7 +506,7 @@ export function SignupForm({
         <div className="safety-callout full-row">
           <div className="safety-callout-head">⚠ Where you actually meet matters</div>
           <p>
-            Once a parent unlocks you, agree on a specific meeting place before the first lesson.{" "}
+            Once a parent contacts you, agree on a specific meeting place before the first lesson.{" "}
             <strong>Public libraries are strongly recommended</strong> — safe, quiet, well-lit and free. Other
             sensible options: school libraries, council community centres, or the student&apos;s home with a parent
             present.
@@ -695,13 +695,13 @@ export function SignupForm({
               parent is present throughout.
             </li>
             <li>
-              <strong>You will apply the $20 first-lesson discount</strong> to every new parent&apos;s first
-              invoice. That&apos;s how the parent recovers the unlock fee they paid TUTUMatch. Failing to apply it
-              repeatedly is grounds for suspension.
+              <strong>You pay a $20 commission per confirmed match</strong> — or $15 if you self-report
+              honestly — starting from your second matched student. Your first matched student is free.
             </li>
             <li>
-              <strong>You will reply within 5 days</strong> when a parent unlocks you. After 5 days of no reply,
-              the parent is automatically refunded and your account is suspended pending appeal.
+              <strong>You will respond promptly when a parent contacts you</strong>, and honestly self-report
+              whether a lesson went ahead. Concealing a real match to dodge the commission is grounds for
+              suspension.
             </li>
             <li>
               <strong>Your WWCC, ID, and HSC documents must be current and accurate.</strong> Misrepresenting
@@ -709,8 +709,9 @@ export function SignupForm({
               suspend your account and may report to authorities.
             </li>
             <li>
-              <strong>Don&apos;t share contact info pre-unlock.</strong> Telling parents to message you off-platform
-              before they&apos;ve paid is a breach of these Terms. Repeat offenders are removed permanently.
+              <strong>Don&apos;t take matches off the books.</strong> Concealing a student you were introduced to
+              through TUTUMatch, in order to dodge the commission, is a breach of these Terms. Repeat offenders
+              are removed permanently.
             </li>
             <li>
               <strong>Mandatory reporting.</strong> If you become aware of a child-safety issue during any lesson

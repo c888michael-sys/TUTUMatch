@@ -62,8 +62,8 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
           <Link className="btn ghost sm" href={`/tutors/${app.id}`} target="_blank">
             View public profile ↗
           </Link>
-          <Link className="btn ghost sm" href={`/unlock/${app.id}`} target="_blank">
-            Test unlock + chat flow ↗
+          <Link className="btn ghost sm" href={`/contact/${app.id}`} target="_blank">
+            Test contact flow ↗
           </Link>
         </div>
 

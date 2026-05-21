@@ -39,8 +39,8 @@ export default function ContactPage() {
           <div className="contact-card">
             <h2>Suspended? Appeal here</h2>
             <p>
-              If your account was suspended (auto-refund timeout, report resolved against you, or manual admin
-              decision) and you think it was wrong, email us with your account email + what happened.
+              If your account was suspended (a report resolved against you, or a manual admin decision) and you
+              think it was wrong, email us with your account email + what happened.
             </p>
             <a className="btn brand" href="mailto:appeals@tutumatch.com.au">
               appeals@tutumatch.com.au
@@ -60,9 +60,9 @@ export default function ContactPage() {
 
         <h2>Or report something specific</h2>
         <p>
-          You don&apos;t need to email us to report a problem with a tutor or a message. Use the{" "}
+          You don&apos;t need to email us to report a problem with a tutor. Use the{" "}
           <strong>Report</strong> button at the bottom of any{" "}
-          <Link href="/browse">tutor profile</Link> or chat thread — it goes straight into the admin queue.
+          <Link href="/browse">tutor profile</Link> — it goes straight into the admin queue.
         </p>
       </main>
     </>

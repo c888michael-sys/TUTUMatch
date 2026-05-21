@@ -10,7 +10,7 @@ export default function LoginPage() {
       <TopNav />
       <main className="page-shell auth-shell">
         <h1>Welcome back</h1>
-        <p>Log in to manage your tutor profile or to unlock tutors. New here? Create an account in the same form.</p>
+        <p>Log in to manage your tutor profile. New here? Create an account in the same form.</p>
         <Suspense fallback={null}>
           <AuthForms defaultMode="login" />
         </Suspense>

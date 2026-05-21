@@ -6,7 +6,7 @@ import type { Weekday } from "./tutor-form";
 import { WEEKDAYS } from "./tutor-form";
 
 export type BrowseTutor = {
-  routeId: string;       // application id — drives `/tutors/<id>` and `/unlock/<id>`
+  routeId: string;       // application id — drives `/tutors/<id>` and `/contact/<id>`
   name: string;          // first name + last initial, e.g. "Lachlan H."
   initials: string;
   suburb: string;

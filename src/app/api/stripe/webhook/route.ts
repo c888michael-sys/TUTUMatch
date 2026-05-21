@@ -4,11 +4,10 @@ import { NextResponse } from "next/server";
 //
 // Stripe webhook handler. Reads raw body for signature verification.
 //
-// Events we care about:
-//   - payment_intent.succeeded   → mark Unlock PAID + set refundEligibleAt = now + 5d
-//                                  + email tutor with the "remember the $20 discount" reminder
-//   - payment_intent.payment_failed → leave Unlock as PENDING_PAYMENT, surface to user
-//   - charge.refunded            → mark Refund PROCESSED + email parent
+// Events we care about (wired in session 3, when tutor-side Stripe Connect lands):
+//   - payment_intent.succeeded   → mark the related Match commission as paid
+//   - payment_intent.payment_failed → hide the tutor's listing pending a payment-method update
+//   - charge.refunded            → handle a TUTUMatch Permanent refund
 //
 // STUB — wiring requires STRIPE_WEBHOOK_SECRET.
 

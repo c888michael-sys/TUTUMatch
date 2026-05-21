@@ -20,7 +20,7 @@ const Patch = z.object({
   status: z.enum(["OPEN", "RESOLVED", "DISMISSED"]),
   resolverNotes: z.string().max(2000).optional(),
   actionTaken: z
-    .enum(["NONE", "WARNED_USER", "SUSPENDED_USER", "REJECTED_APPLICATION", "REFUNDED_PARENT"])
+    .enum(["NONE", "WARNED_USER", "SUSPENDED_USER", "REJECTED_APPLICATION"])
     .optional(),
   // When actionTaken is SUSPENDED_USER, the admin can pass the user id to suspend.
   // Defaults to the report's subject when subjectKind === "USER".

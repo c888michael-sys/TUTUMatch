@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
-import { ArrowIcon, LockIcon } from "@/components/landing/icons";
+import { ArrowIcon } from "@/components/landing/icons";
 import { ReportButton } from "@/components/report/ReportButton";
 import { OTHER_AREA_SCHOOL } from "@/lib/schools";
 import { findSchoolBySlug } from "@/lib/schools-store";
@@ -109,34 +109,16 @@ export default async function TutorProfilePage({ params }: { params: { id: strin
             <div className="profile-contact-card-head">
               <h2>Want to contact this tutor?</h2>
               <p className="profile-contact-sub">
-                Browsing is free. To message {t.name.split(" ")[0]} and reveal their phone, email and full name,
-                there&apos;s a one-time <strong>$20</strong> match fee. Read this first:
+                It&apos;s free. Get {t.name.split(" ")[0]}&apos;s full name, phone, and email, and reach out
+                directly — TUTUMatch never charges parents.
               </p>
             </div>
-            <ul className="refund-list">
-              <li>
-                <strong>$20 off your first lesson.</strong> The tutor applies a $20 discount to your first invoice,
-                so the net cost to you ends up at $0.
-              </li>
-              <li>
-                <strong>Full refund if no agreement.</strong> If you and the tutor can&apos;t agree on a first
-                lesson — for any reason at all — your $20 is refunded in full. No questions, no forms.
-              </li>
-              <li>
-                <strong>5-day automatic refund.</strong> If the tutor doesn&apos;t reply to your first message
-                within 5 days, the $20 comes back to your card automatically.
-              </li>
-              <li>
-                <strong>Nothing is charged yet.</strong> You only pay on the next screen, after you&apos;ve read
-                the terms and confirmed.
-              </li>
-            </ul>
             <div className="profile-contact-actions">
-              <Link className="btn brand lg" href={`/unlock/${params.id}`}>
-                <LockIcon /> Continue to contact details <ArrowIcon />
+              <Link className="btn brand lg" href={`/contact/${params.id}`}>
+                I want this tutor — see contact details <ArrowIcon />
               </Link>
               <span className="profile-contact-fine">
-                You won&apos;t be charged until you confirm on the next page.
+                Free, and no account needed. You arrange the lesson directly with the tutor.
               </span>
             </div>
           </section>

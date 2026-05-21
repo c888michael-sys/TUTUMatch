@@ -24,7 +24,6 @@ const ACTION_LABEL = {
   WARNED_USER: "Warned user",
   SUSPENDED_USER: "Suspended user",
   REJECTED_APPLICATION: "Rejected application",
-  REFUNDED_PARENT: "Refunded parent",
 } as const;
 
 export default async function AdminReportsPage() {
@@ -65,7 +64,7 @@ export default async function AdminReportsPage() {
           subjectName = `${app.firstName} ${app.lastInitial}. (${app.contactEmail})`;
           subjectUserId = app.userId;
         }
-      } else if (r.subjectKind === "USER" || r.subjectKind === "MESSAGE") {
+      } else if (r.subjectKind === "USER") {
         const u = await findUserById(r.subjectId);
         if (u) subjectName = u.email;
         subjectUserId = r.subjectId;
@@ -84,14 +83,13 @@ export default async function AdminReportsPage() {
         <h1>Reports</h1>
         <p>
           {reports.length} total · <strong>{open.length} open</strong>. Reports filed by parents and tutors against
-          profiles, messages, or other users. Resolve them by recording the outcome — optionally suspending the
+          tutor listings or other users. Resolve them by recording the outcome — optionally suspending the
           subject user.
         </p>
 
         {reports.length === 0 ? (
           <div className="stub-note">
-            No reports yet. Report buttons live on tutor profile pages and chat threads — anyone signed in can
-            submit one.
+            No reports yet. Report buttons live on tutor profile pages — anyone signed in can submit one.
           </div>
         ) : (
           <div className="report-list">
@@ -111,14 +109,6 @@ export default async function AdminReportsPage() {
                   <div className="report-meta">
                     <div><strong>Reporter:</strong> {reporterEmail}</div>
                     <div><strong>Subject:</strong> {subjectName} (ID <code>{r.subjectId}</code>)</div>
-                    {r.subjectThreadId && (
-                      <div>
-                        <strong>Thread:</strong>{" "}
-                        <Link href={`/messages/${r.subjectThreadId}`} target="_blank" className="link-like">
-                          /messages/{r.subjectThreadId} ↗
-                        </Link>
-                      </div>
-                    )}
                     {r.subjectKind === "APPLICATION" && (
                       <div>
                         <strong>Application:</strong>{" "}

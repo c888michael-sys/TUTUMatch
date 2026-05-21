@@ -21,8 +21,8 @@ export default function PrivacyPage() {
           subjects, availability, hourly rate, payment receipt info.
         </li>
         <li>
-          <strong>From parents/students:</strong> name, email, payment details (handled by Stripe — we never store
-          raw card data), unlock history, in-platform messages.
+          <strong>From parents/students:</strong> name, email, and the contact requests you make to tutors.
+          Parents make no payment to TUTUMatch.
         </li>
         <li>
           <strong>Automatically:</strong> device, browser, IP address, basic usage analytics.
@@ -32,8 +32,8 @@ export default function PrivacyPage() {
       <h2>How we use it</h2>
       <ul>
         <li>To verify tutor identity, age, working-with-children clearance, and academic claims.</li>
-        <li>To match parents with tutors and process the $20 unlock fee.</li>
-        <li>To run in-platform messaging, refunds, and dispute resolution.</li>
+        <li>To connect parents with tutors.</li>
+        <li>To run match confirmation, tutor commission, and dispute resolution.</li>
         <li>To meet legal obligations (tax, child-safety, complaints).</li>
       </ul>
 
@@ -50,8 +50,8 @@ export default function PrivacyPage() {
         <li>Our email provider for transactional notifications.</li>
         <li>Government or law-enforcement agencies where required by law.</li>
         <li>
-          Parents see the relevant tutor&apos;s public profile pre-unlock, and the tutor&apos;s full contact details
-          post-unlock. Tutors see the parent&apos;s first name + email after unlock.
+          Parents see a tutor&apos;s public profile, and the tutor&apos;s full contact details once they request
+          contact. Tutors see the email address of a parent who requests contact.
         </li>
       </ul>
 
@@ -70,8 +70,9 @@ export default function PrivacyPage() {
 
       <h2>Marketing</h2>
       <p>
-        Marketing emails are opt-in (Spam Act 2003). Transactional emails (verification, unlocks, refunds, messages)
-        are required for the service to function and cannot be unsubscribed from while you hold an account.
+        Marketing emails are opt-in (Spam Act 2003). Transactional emails (match notifications, confirmations,
+        account notices) are required for the service to function and cannot be unsubscribed from while you hold
+        an account.
       </p>
 
       <h2>Children</h2>

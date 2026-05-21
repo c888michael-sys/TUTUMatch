@@ -14,8 +14,6 @@ const UNDER_18_REJECTION_NOTE = (age: number, dob: string) =>
 
 export const runtime = "nodejs";
 
-export const runtime = "nodejs";
-
 export async function POST(req: Request) {
   const session = getSession();
   if (!session) {

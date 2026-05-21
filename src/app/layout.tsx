@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "TUTUMatch — Tutors and parents, no middleman",
+  title: "TUTUMatch — Find a local NSW tutor",
   description:
-    "A flat-fee NSW tutor marketplace. Tutors list for free. Parents pay $20 once per match, refunded as a first-lesson discount.",
+    "A free NSW tutor directory. Parents browse and contact tutors for free. Tutors list free and pay only when a confirmed student comes through.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
 };
 

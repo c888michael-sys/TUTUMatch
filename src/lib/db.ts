@@ -40,9 +40,8 @@ export type StoredUser = {
   passwordHash: string;
   role: Role;
   createdAt: string;
-  // Account suspension state. Set automatically when a tutor fails to reply
-  // to an unlocked parent within 5 days (the same trigger that auto-refunds
-  // the parent's $20). Suspended users can't log in; they appeal by email.
+  // Account suspension state. Set when an admin suspends an account (e.g.
+  // acting on a report). Suspended users can't log in; they appeal by email.
   suspended?: boolean;
   suspendedAt?: string;
   suspendedReason?: string;
@@ -113,115 +112,151 @@ export type TutorApplication = {
   hscDocumentNote?: string;
 
   // Terms-of-Service acceptance: version + timestamp the tutor confirmed.
-  // Recording this gives us evidence of which Terms version they actually
-  // saw + accepted (critical for the indemnity clause). Populated on every
-  // submit / re-submit.
   termsAcceptedVersion?: string;
   termsAcceptedAt?: string;
 
-  // Upload IDs for verification documents. Each points at a record managed
-  // by src/lib/uploads.ts; admin views them via /api/uploads/[id].
+  // Upload IDs for documents the tutor optionally provides. Each points at a
+  // record managed by src/lib/uploads.ts; admin views them via /api/uploads/[id].
   idDocumentUploadId?: string;
   wwccDocumentUploadId?: string;
   hscDocumentUploadId?: string;
 
   bioFlags?: string[]; // any contact-info patterns the scanner caught
+
+  // Number of confirmed paid matches this tutor has completed. Drives the
+  // first-match-free logic. Older records may not have this field — treat
+  // undefined as 0.
+  matchesCompletedCount?: number;
+  // When set and in the future, the tutor's listing is hidden from public
+  // browse — either during the 48h window of an open match, or a strike period.
+  hiddenUntil?: string;
 };
 
 const USERS_FILE = "users.json";
 const APPS_FILE = "applications.json";
-const UNLOCKS_FILE = "unlocks.json";
-const MESSAGES_FILE = "messages.json";
+const MATCHES_FILE = "matches.json";
+const APPEALS_FILE = "appeals.json";
 const REPORTS_FILE = "reports.json";
 
-// ───────────────────────────── Unlocks + messages ─────────────────────────────
+// ───────────────────────────── Matches ─────────────────────────────
 
-export type UnlockStatus = "PAID" | "REFUNDED";
+export type MatchStatus =
+  | "AWAITING_RESOLUTION"        // created when parent clicks "I want this tutor"
+  | "RESOLVED_TUTOR_CONFIRMED"   // tutor self-reported within 48h → $15 charged
+  | "RESOLVED_PARENT_CONFIRMED"  // parent said YES after 48h → $20 charged
+  | "RESOLVED_NO_MATCH"          // parent said NO or both confirmed no-match → no charge
+  | "RESOLVED_APPEALED_WON"      // tutor appealed parent's NO and won → $20 charged
+  | "RESOLVED_APPEALED_LOST"     // tutor appealed and lost → strike applied
+  | "AUTO_CLOSED_NO_RESPONSE";   // 30d silence both sides → no charge
 
-export type Unlock = {
-  id: string;
-  parentUserId: string;
+export type Match = {
+  id: string;                          // app_match_<random>
+  parentEmail: string;                 // captured even if parent isn't logged in
+  parentUserId?: string;               // set if parent is signed in (rare in directory model)
   tutorApplicationId: string;
   tutorUserId: string;
-  amountCents: number;
-  status: UnlockStatus;
-  paidAt: string;          // ISO
-  refundEligibleAt: string; // paidAt + 5 days
-  tutorFirstReplyAt?: string;
-  refundedAt?: string;
-  refundReason?: string;
-  // Dev-only: created via the local 'mark as paid' shortcut so we can demo
-  // chat without Stripe. Will be filtered out once Stripe is live.
-  isDev?: boolean;
+  status: MatchStatus;
+  createdAt: string;                   // ISO timestamp
+  tutorHiddenUntil: string;            // createdAt + 48h
+  resolvedAt?: string;
+  amountChargedCents?: number;         // 1500 or 2000
+  stripeChargeId?: string;
+  parentConfirmation?: "YES" | "NO" | "NOT_YET";
+  parentConfirmedAt?: string;
+  tutorSelfReport?: "YES" | "NO";
+  tutorSelfReportedAt?: string;
+  parentConfirmTokenHash?: string;     // SHA-256 of the email-link token
+  parentConfirmRemindersSent: number;  // 0, 1, 2, 3 (at 2d, 7d, 14d, 30d)
+  appealId?: string;
+  isFreeFirstMatch: boolean;           // true if tutor's matchesCompletedCount was 0
 };
 
-export type Message = {
-  id: string;
-  unlockId: string;
-  senderId: string;
-  senderRole: "PARENT" | "TUTOR";
-  body: string;
-  createdAt: string;
-};
-
-export async function listUnlocks(): Promise<Unlock[]> {
-  return readJson<Unlock[]>(UNLOCKS_FILE, []);
+export async function listMatches(): Promise<Match[]> {
+  return readJson<Match[]>(MATCHES_FILE, []);
 }
 
-export async function listUnlocksForUser(userId: string): Promise<Unlock[]> {
-  const all = await listUnlocks();
-  return all.filter((u) => u.parentUserId === userId || u.tutorUserId === userId);
+export async function listMatchesForUser(userId: string): Promise<Match[]> {
+  const all = await listMatches();
+  return all.filter((m) => m.parentUserId === userId || m.tutorUserId === userId);
 }
 
-export async function findUnlockById(id: string): Promise<Unlock | undefined> {
-  const all = await listUnlocks();
-  return all.find((u) => u.id === id);
+export async function findMatchById(id: string): Promise<Match | undefined> {
+  const all = await listMatches();
+  return all.find((m) => m.id === id);
 }
 
-export async function findExistingUnlock(
-  parentUserId: string,
-  tutorApplicationId: string
-): Promise<Unlock | undefined> {
-  const all = await listUnlocks();
+// An open (unresolved) match between the same parent and tutor. Used to stop a
+// parent creating duplicate match records by clicking "I want this tutor" twice.
+export async function findOpenMatch(
+  tutorApplicationId: string,
+  parentEmail: string
+): Promise<Match | undefined> {
+  const all = await listMatches();
   return all.find(
-    (u) =>
-      u.parentUserId === parentUserId &&
-      u.tutorApplicationId === tutorApplicationId &&
-      u.status !== "REFUNDED"
+    (m) =>
+      m.tutorApplicationId === tutorApplicationId &&
+      m.parentEmail.toLowerCase() === parentEmail.toLowerCase() &&
+      m.status === "AWAITING_RESOLUTION"
   );
 }
 
-export async function createUnlock(unlock: Unlock): Promise<void> {
-  const all = await listUnlocks();
-  all.push(unlock);
-  await writeJson(UNLOCKS_FILE, all);
+export async function createMatch(match: Match): Promise<void> {
+  const all = await listMatches();
+  all.push(match);
+  await writeJson(MATCHES_FILE, all);
 }
 
-export async function patchUnlock(id: string, patch: Partial<Unlock>): Promise<Unlock | undefined> {
-  const all = await listUnlocks();
-  const i = all.findIndex((u) => u.id === id);
+export async function patchMatch(id: string, patch: Partial<Match>): Promise<Match | undefined> {
+  const all = await listMatches();
+  const i = all.findIndex((m) => m.id === id);
   if (i < 0) return undefined;
   all[i] = { ...all[i], ...patch };
-  await writeJson(UNLOCKS_FILE, all);
+  await writeJson(MATCHES_FILE, all);
   return all[i];
 }
 
-export async function listMessages(unlockId: string): Promise<Message[]> {
-  const all = await readJson<Message[]>(MESSAGES_FILE, []);
-  return all
-    .filter((m) => m.unlockId === unlockId)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+// ───────────────────────────── Appeals ─────────────────────────────
+
+export type Appeal = {
+  id: string;
+  matchId: string;
+  tutorUserId: string;                 // the tutor making the appeal
+  description: string;                 // tutor's explanation
+  evidenceUploadIds: string[];         // refs to /api/uploads/[id] files
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  reviewerEmail?: string;
+  reviewerNotes?: string;
+  createdAt: string;
+  resolvedAt?: string;
+};
+
+export async function listAppeals(): Promise<Appeal[]> {
+  return readJson<Appeal[]>(APPEALS_FILE, []);
 }
 
-export async function createMessage(msg: Message): Promise<void> {
-  const all = await readJson<Message[]>(MESSAGES_FILE, []);
-  all.push(msg);
-  await writeJson(MESSAGES_FILE, all);
+export async function findAppealById(id: string): Promise<Appeal | undefined> {
+  const all = await listAppeals();
+  return all.find((a) => a.id === id);
+}
+
+export async function createAppeal(appeal: Appeal): Promise<void> {
+  const all = await listAppeals();
+  all.push(appeal);
+  await writeJson(APPEALS_FILE, all);
+}
+
+export async function patchAppeal(id: string, patch: Partial<Appeal>): Promise<Appeal | undefined> {
+  const all = await listAppeals();
+  const i = all.findIndex((a) => a.id === id);
+  if (i < 0) return undefined;
+  all[i] = { ...all[i], ...patch };
+  await writeJson(APPEALS_FILE, all);
+  return all[i];
 }
 
 // ───────────────────────────── Reports / disputes ─────────────────────────────
 
-export type ReportKind = "USER" | "APPLICATION" | "MESSAGE";
+export type ReportKind = "USER" | "APPLICATION";
 export type ReportStatus = "OPEN" | "RESOLVED" | "DISMISSED";
 
 // Predefined reason codes. Free-text always goes in `description`.
@@ -236,7 +271,7 @@ export type ReportReason =
   | "other";
 
 export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
-  contact_info_bypass: "Sharing contact info to dodge the $20 fee",
+  contact_info_bypass: "Off-platform contact to dodge the match commission",
   harassment: "Harassment or abusive language",
   inappropriate_content: "Inappropriate or offensive content",
   safety_concern: "Child-safety concern",
@@ -251,8 +286,7 @@ export type ReportAction =
   | "NONE"
   | "WARNED_USER"
   | "SUSPENDED_USER"
-  | "REJECTED_APPLICATION"
-  | "REFUNDED_PARENT";
+  | "REJECTED_APPLICATION";
 
 export type Report = {
   id: string;
@@ -260,7 +294,6 @@ export type Report = {
   reporterEmail: string;            // snapshot at report time
   subjectKind: ReportKind;
   subjectId: string;
-  subjectThreadId?: string;         // unlock id, when reporting a chat message / thread
   reason: ReportReason;
   description: string;
   status: ReportStatus;
@@ -295,7 +328,7 @@ export async function patchReport(id: string, patch: Partial<Report>): Promise<R
   return all[i];
 }
 
-// ───────────────────────────── Suspension + auto-refund ─────────────────────────────
+// ───────────────────────────── Suspension ─────────────────────────────
 
 export async function suspendUser(userId: string, reason: string): Promise<void> {
   const users = await listUsers();
@@ -309,41 +342,6 @@ export async function suspendUser(userId: string, reason: string): Promise<void>
     suspendedReason: reason,
   };
   await writeJson(USERS_FILE, users);
-}
-
-// Scans the unlocks store for unlocks past their 5-day refund window
-// that the tutor never replied to. For each match:
-//   - mark the unlock REFUNDED + record reason + refundedAt
-//   - suspend the tutor's user account
-//
-// Returns the IDs of unlocks processed (for logging / banners).
-//
-// In production this runs from a Vercel cron hitting /api/cron/refund-flag.
-// In local dev we ALSO call it lazily on dashboard / messages loads so the
-// founder can demo the flow without waiting for an external scheduler.
-export async function processOverdueRefunds(): Promise<string[]> {
-  const all = await listUnlocks();
-  const now = Date.now();
-  const processed: string[] = [];
-
-  for (const u of all) {
-    if (u.status !== "PAID") continue;
-    if (u.tutorFirstReplyAt) continue;
-    if (Date.parse(u.refundEligibleAt) > now) continue;
-
-    await patchUnlock(u.id, {
-      status: "REFUNDED",
-      refundedAt: new Date().toISOString(),
-      refundReason: "TUTOR_NO_REPLY_5_DAY",
-    });
-    await suspendUser(
-      u.tutorUserId,
-      "Account suspended after failing to reply to a parent within 5 days of being unlocked. Parents who paid the $20 unlock have been auto-refunded."
-    );
-    processed.push(u.id);
-  }
-
-  return processed;
 }
 
 export async function listUsers(): Promise<StoredUser[]> {
@@ -384,10 +382,17 @@ export async function findApplicationByUserId(userId: string): Promise<TutorAppl
 }
 
 // Approved + visible applications. This is what the public browse pages render.
-// Treats a missing `visibility` field as `true` (legacy records).
+// Treats a missing `visibility` field as `true` (legacy records). Listings whose
+// `hiddenUntil` is in the future are temporarily withheld (open-match window).
 export async function listApprovedTutors(): Promise<TutorApplication[]> {
   const apps = await listApplications();
-  return apps.filter((a) => a.status === "APPROVED" && (a.visibility ?? true));
+  const now = Date.now();
+  return apps.filter(
+    (a) =>
+      a.status === "APPROVED" &&
+      (a.visibility ?? true) &&
+      !(a.hiddenUntil && Date.parse(a.hiddenUntil) > now)
+  );
 }
 
 export async function upsertApplication(app: TutorApplication): Promise<void> {
@@ -396,6 +401,18 @@ export async function upsertApplication(app: TutorApplication): Promise<void> {
   if (i >= 0) apps[i] = app;
   else apps.push(app);
   await writeJson(APPS_FILE, apps);
+}
+
+export async function patchApplication(
+  id: string,
+  patch: Partial<TutorApplication>
+): Promise<TutorApplication | undefined> {
+  const apps = await listApplications();
+  const i = apps.findIndex((a) => a.id === id);
+  if (i < 0) return undefined;
+  apps[i] = { ...apps[i], ...patch };
+  await writeJson(APPS_FILE, apps);
+  return apps[i];
 }
 
 export async function updateApplicationStatus(

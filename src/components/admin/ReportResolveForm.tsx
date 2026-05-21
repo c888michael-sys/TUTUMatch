@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Action = "NONE" | "WARNED_USER" | "SUSPENDED_USER" | "REJECTED_APPLICATION" | "REFUNDED_PARENT";
+type Action = "NONE" | "WARNED_USER" | "SUSPENDED_USER" | "REJECTED_APPLICATION";
 
 export function ReportResolveForm({
   reportId,
@@ -54,7 +54,6 @@ export function ReportResolveForm({
               Suspend user {suspendableUserId ? "" : "(no user id available)"}
             </option>
             <option value="REJECTED_APPLICATION">Rejected the application</option>
-            <option value="REFUNDED_PARENT">Refunded the parent</option>
           </select>
         </label>
       </div>

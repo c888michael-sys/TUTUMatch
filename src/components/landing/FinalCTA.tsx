@@ -9,14 +9,14 @@ export function FinalCTA({ school }: { school: School }) {
         <div className="final-tagline">
           Free to list<span className="sep" />
           Free to browse<span className="sep" />
-          $20 to connect
+          Free to connect
         </div>
         <div className="final-grid">
           <div className="final-half reveal d1">
             <div className="eyebrow on-ink">For tutors</div>
             <h3 className="heading">Keep what you earn. Start in six minutes.</h3>
             <p className="sub">
-              List for free, get paid directly. We charge $20 once per match — never again.
+              List for free, get paid directly. First student free, then $20 a match — no per-lesson cut, ever.
             </p>
             <div>
               <Link className="btn brand lg" href="/tutor/signup">
@@ -31,8 +31,7 @@ export function FinalCTA({ school }: { school: School }) {
               Find a tutor{school.id === "default" ? "" : ` at ${school.name}`}.
             </h3>
             <p className="sub">
-              Browse free. Pay $20 only when you unlock a tutor&apos;s contact details — and get it back as a
-              first-lesson discount.
+              Browse free, contact any tutor free. TUTUMatch never charges parents — not a cent, ever.
             </p>
             <div>
               <Link className="btn white lg" href="/browse">

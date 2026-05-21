@@ -5,11 +5,11 @@ export function Pitch() {
         <div className="eyebrow">The bottom line</div>
         <p className="pitch-line">
           Tutoring centres take <span className="num">40–60%</span> of every lesson, forever. We take{" "}
-          <span className="num">$20</span>, once. <span className="num">$0</span> from students.
+          <span className="num">$20</span> once a tutor gets a student. <span className="num">$0</span> from parents.
         </p>
         <p className="pitch-note">
-          A flat $20 per student match. No per-lesson cut, no monthly fee, no upcharge on the tutor&apos;s rate. After
-          lesson one, we&apos;re not in the loop.
+          A flat $20 per matched student, paid by the tutor — the first student free, $15 if self-reported
+          honestly. No per-lesson cut, no monthly fee, no upcharge on the tutor&apos;s rate.
         </p>
       </div>
     </section>

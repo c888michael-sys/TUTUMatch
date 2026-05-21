@@ -7,12 +7,12 @@ export function HowMirrored() {
         eyebrow="How it works"
         heading="Pick your side."
         brandWords={1}
-        lede="Tutor on the left, parent on the right — mirrored steps, same single $20 in the middle. After that, you talk to each other."
+        lede="Tutor on the left, parent on the right. Parents pay nothing. Tutors pay $20 only when a real student comes through — and the first one's free."
       />
       <div className="how-grid">
         <div className="how-col reveal d1" id="tutor-how">
           <span className="badge">For tutors</span>
-          <h3>List, get unlocked, keep teaching.</h3>
+          <h3>List, get matched, keep teaching.</h3>
           <div className="how-step">
             <span className="num">01</span>
             <span className="body">
@@ -22,20 +22,23 @@ export function HowMirrored() {
           <div className="how-step">
             <span className="num">02</span>
             <span className="body">
-              <b>Go live.</b> A quick spam-and-abuse check, then your listing is public. No credential checks, no &ldquo;verified&rdquo; badge.
+              <b>Go live.</b> A quick spam-and-abuse check, then your listing is public. No credential checks, no
+              &ldquo;verified&rdquo; badge.
             </span>
           </div>
           <div className="how-step">
             <span className="num">03</span>
             <span className="body">
-              <b>A parent unlocks you.</b> Our <span className="m">$20</span> commission is collected from them, held
-              for you.
+              <b>A parent picks you.</b> They get your contact details and reach out. Your listing pauses for 48
+              hours while you two talk.
             </span>
           </div>
           <div className="how-step">
             <span className="num">04</span>
             <span className="body">
-              <b>Discount the first lesson by $20.</b> Your invoicing prompts this. The held $20 is released to us.
+              <b>Confirm the match.</b> Booked a lesson? Self-report it. Your first student is free; after that
+              it&apos;s <span className="m">$20</span> — or <span className="m">$15</span> if you self-report
+              honestly.
             </span>
           </div>
           <div className="how-step">
@@ -48,7 +51,7 @@ export function HowMirrored() {
         <div className="how-divider" aria-hidden="true" />
         <div className="how-col reveal d2" id="parent-how">
           <span className="badge">For parents</span>
-          <h3>Browse, unlock, deal directly.</h3>
+          <h3>Browse, connect, deal directly.</h3>
           <div className="how-step">
             <span className="num">01</span>
             <span className="body">
@@ -58,29 +61,28 @@ export function HowMirrored() {
           <div className="how-step">
             <span className="num">02</span>
             <span className="body">
-              <b>Pick your tutor.</b> Open as many profiles as you like, message them through the platform first.
+              <b>Pick your tutor.</b> Open as many profiles as you like — compare and shortlist.
             </span>
           </div>
           <div className="how-step">
             <span className="num">03</span>
             <span className="body">
-              <b>
-                Pay <span className="m">$20</span> to unlock.
-              </b>{" "}
-              That reveals their contact details. We hold the funds.
+              <b>Get their contact details — free.</b> Click &ldquo;I want this tutor&rdquo; and their name, phone
+              and email are yours. No fee, no account needed.
             </span>
           </div>
           <div className="how-step">
             <span className="num">04</span>
             <span className="body">
-              <b>Get $20 off your first lesson.</b> The tutor applies the discount.{" "}
-              <span className="m">Net cost: $0.</span>
+              <b>Reach out directly.</b> Email or call the tutor and arrange a first lesson — rate, schedule and
+              place are between you.
             </span>
           </div>
           <div className="how-step">
             <span className="num">05</span>
             <span className="body">
-              <b>Deal directly from there.</b> No further platform fees, ever.
+              <b>No fees, ever.</b> TUTUMatch never charges parents — not to browse, not to connect, not per
+              lesson.
             </span>
           </div>
         </div>

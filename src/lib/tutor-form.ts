@@ -188,7 +188,7 @@ export function ageInYears(isoDate: string, on: Date = new Date()): number {
   return beforeBirthday ? years - 1 : years;
 }
 
-// Contact-info scanner for bios + pre-unlock messages. Returns the patterns
+// Contact-info scanner for tutor bios. Returns the patterns
 // it found so the form / admin can surface specifics rather than just "blocked".
 export function scanForContactInfo(text: string): string[] {
   const hits: string[] = [];

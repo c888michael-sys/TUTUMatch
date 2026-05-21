@@ -3,7 +3,6 @@ import { Earnings } from "./Earnings";
 import { FAQ } from "./FAQ";
 import { FinalCTA } from "./FinalCTA";
 import { Footer } from "./Footer";
-import { Guarantee } from "./Guarantee";
 import { Hero } from "./Hero";
 import { HowMirrored } from "./HowMirrored";
 import { Mechanic } from "./Mechanic";
@@ -31,7 +30,6 @@ export function LandingPage({ school, schools }: { school: School; schools: Scho
       <SchoolBar current={school} schools={schools} />
       <HowMirrored />
       <Comparison brand="TUTUMatch" />
-      <Guarantee />
       <Earnings brand="TUTUMatch" />
       <FAQ />
       <FinalCTA school={school} />
