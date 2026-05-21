@@ -112,6 +112,13 @@ export type TutorApplication = {
   idDocumentNote?: string;
   hscDocumentNote?: string;
 
+  // Terms-of-Service acceptance: version + timestamp the tutor confirmed.
+  // Recording this gives us evidence of which Terms version they actually
+  // saw + accepted (critical for the indemnity clause). Populated on every
+  // submit / re-submit.
+  termsAcceptedVersion?: string;
+  termsAcceptedAt?: string;
+
   // Upload IDs for verification documents. Each points at a record managed
   // by src/lib/uploads.ts; admin views them via /api/uploads/[id].
   idDocumentUploadId?: string;

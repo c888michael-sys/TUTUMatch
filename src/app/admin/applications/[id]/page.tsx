@@ -149,6 +149,31 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
             <pre className="bio-pre">{app.publicBio}</pre>
           </DetailBlock>
 
+          <DetailBlock title="Terms acceptance" full>
+            <Row
+              k="Tutor indemnity"
+              v={
+                app.termsAcceptedVersion ? (
+                  <>
+                    Accepted version <strong>{app.termsAcceptedVersion}</strong>
+                    {app.termsAcceptedAt && (
+                      <span className="muted small">
+                        {" — "}
+                        {new Date(app.termsAcceptedAt).toLocaleString("en-AU")}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="muted">No acceptance recorded (pre-indemnity legacy record)</span>
+                )
+              }
+            />
+            <p className="muted small">
+              The submitted application explicitly accepted Section 13 (Tutor indemnity) of the Terms. This is the
+              evidence that the tutor agreed to that clause at the time of submission.
+            </p>
+          </DetailBlock>
+
           <DetailBlock title="Verification documents" full>
             <div className="admin-docs">
               <AdminDoc label="Government ID" uploadId={app.idDocumentUploadId} fallbackNote={app.idDocumentNote} />

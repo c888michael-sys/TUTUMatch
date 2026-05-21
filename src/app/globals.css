@@ -1215,6 +1215,66 @@ footer {
   color: var(--muted);
 }
 
+/* Required indemnity-acceptance checkbox (signup form) */
+.indemnity-accept {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 16px 0 4px;
+  padding: 14px 16px;
+  background: var(--brand-soft);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.indemnity-accept input[type="checkbox"] {
+  width: 18px; height: 18px;
+  margin-top: 2px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.indemnity-accept strong { color: var(--brand-deep); }
+.indemnity-accept:hover { background: #DCEAE5; }
+.indemnity-required-note {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  background: #FFFBEB;
+  border-left: 2px solid #D97706;
+  color: #92400E;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  border-radius: 3px;
+}
+
+/* Visible Terms-acceptance line on auth signup */
+.auth-terms-line {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--bg);
+  border-radius: var(--radius-btn);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.auth-terms-line a { color: var(--brand); }
+
+/* Legal-page nested ordered sub-lists (the indemnity items) */
+.legal-sublist {
+  margin: 8px 0 14px;
+  padding-left: 24px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.legal-sublist li {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
 /* "What we aren't" list */
 .what-we-arent {
   list-style: none;

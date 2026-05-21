@@ -139,6 +139,18 @@ export function AuthForms({ defaultMode = "login" as Mode }) {
           </div>
         )}
 
+        {mode === "signup" && (
+          <p className="auth-terms-line">
+            By creating an account you agree to TUTUMatch&apos;s{" "}
+            <a className="mono-link" href="/legal/terms" target="_blank" rel="noopener">Terms of Service</a>
+            {", "}
+            <a className="mono-link" href="/legal/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+            {", and "}
+            <a className="mono-link" href="/legal/child-safety" target="_blank" rel="noopener">Child Safety Policy</a>.
+            Tutors will be asked to explicitly accept the indemnity clause at the listing step.
+          </p>
+        )}
+
         <button className="btn brand lg" type="submit" disabled={busy}>
           {busy ? "Working…" : mode === "login" ? "Log in" : "Create account"}
         </button>

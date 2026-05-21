@@ -135,6 +135,15 @@ export const tutorApplicationSchema = z
     idDocumentUploadId: z.string().trim().min(1).max(80).optional().or(z.literal("").transform(() => undefined)),
     wwccDocumentUploadId: z.string().trim().min(1).max(80).optional().or(z.literal("").transform(() => undefined)),
     hscDocumentUploadId: z.string().trim().min(1).max(80).optional().or(z.literal("").transform(() => undefined)),
+
+    // Explicit indemnity + Terms acceptance. The submit-time checkbox in the
+    // signup form sets this to true; the API rejects anything else.
+    tutorIndemnityAccepted: z.literal(true, {
+      errorMap: () => ({
+        message:
+          "You must accept the tutor indemnity clause (section 13 of the Terms) to list as a tutor.",
+      }),
+    }),
   })
   .refine((d) => d.schoolId || d.otherSchoolName, {
     message: "Pick your high school or enter it under Other",

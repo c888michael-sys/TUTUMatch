@@ -1,4 +1,5 @@
 import { TopNav } from "@/components/nav/TopNav";
+import { TERMS_VERSION } from "@/lib/legal";
 
 export const metadata = { title: "Terms of Service · TUTUMatch" };
 
@@ -9,7 +10,8 @@ export default function TermsPage() {
       <main className="page-shell content-shell">
         <h1>Terms of Service</h1>
         <div className="stub-note">
-          DRAFT · Not legal advice. Have a lawyer review before launch. Last updated: <strong>{new Date().toISOString().slice(0, 10)}</strong>.
+          DRAFT · Not legal advice. Have a lawyer review before public launch. Version{" "}
+          <strong>{TERMS_VERSION}</strong>.
         </div>
 
         <p className="content-lede">
@@ -179,7 +181,70 @@ export default function TermsPage() {
           information, including verification documents.
         </p>
 
-        <h2>13. Beta status</h2>
+        <h2 id="13">13. Tutor indemnity</h2>
+        <p>
+          This section applies to <strong>tutors</strong>. It is a material part of the bargain — without it,
+          TUTUMatch could not justify the cost of facilitating introductions at a flat $20 fee. By signing up as a
+          tutor and accepting it explicitly in the signup form, you agree to the following.
+        </p>
+        <p>
+          You (the <strong>Tutor</strong>) agree to <strong>indemnify, defend at our request, and hold harmless</strong>{" "}
+          TUTUMatch and its directors, officers, employees, agents, and contractors (each an{" "}
+          <em>Indemnified Party</em>) from and against any and all claims, demands, actions, proceedings, losses,
+          damages, liabilities, costs, and expenses (including reasonable legal fees on an indemnity basis, expert
+          fees, settlement amounts, and judgment amounts) that any Indemnified Party suffers, incurs, or is
+          required to pay arising out of or in connection with:
+        </p>
+        <ol className="legal-sublist">
+          <li>your acts, omissions, conduct, or negligence in providing or offering tutoring services, whether on or off the TUTUMatch platform;</li>
+          <li>any incident — including injury, harassment, abuse, theft, property damage, or any criminal act — occurring before, during, or after a lesson facilitated through the platform;</li>
+          <li>your breach of these Terms, the <a href="/legal/child-safety">Child Safety Policy</a>, or the <a href="/legal/privacy">Privacy Policy</a>;</li>
+          <li>any misrepresentation by you, or inaccuracy in information you supplied, concerning your identity, age, date of birth, qualifications, ATAR, HSC results, WWCC status, prior conduct, or any other profile field;</li>
+          <li>any claim by a third party that materials, content, lesson notes, or resources you provided infringe their rights (including intellectual property, privacy, or confidentiality rights);</li>
+          <li>your failure to apply the $20 first-lesson discount as required, or to issue tax-compliant invoices or receipts;</li>
+          <li>any tax, GST, superannuation, insurance, worker&apos;s compensation, or income-reporting obligation arising from your tutoring work that you failed to meet;</li>
+          <li>any breach by you of the <em>Child Protection (Working with Children) Act 2012 (NSW)</em>, the <em>Children and Young Persons (Care and Protection) Act 1998 (NSW)</em>, or any related child-safety law;</li>
+          <li>any defamatory, harassing, threatening, or unlawful statement you made in messages, profile content, or otherwise on the platform;</li>
+          <li>any false statement you made to TUTUMatch in connection with your application, verification, dispute, refund, or account.</li>
+        </ol>
+        <p>
+          This indemnity:
+        </p>
+        <ul>
+          <li><strong>Survives termination</strong> of your account, suspension, or removal from the platform — including for incidents that come to light after your account is closed.</li>
+          <li><strong>Is independent of insurance</strong>. TUTUMatch is not required to first exhaust any insurance policy or other remedy before claiming under this indemnity.</li>
+          <li><strong>Covers settlement amounts</strong> reasonably entered into by an Indemnified Party where the underlying claim would, if proven, fall within this indemnity.</li>
+          <li><strong>Does not extend</strong> to claims caused <strong>solely</strong> by an Indemnified Party&apos;s own negligence or willful misconduct. Where the loss is caused partly by you and partly by TUTUMatch, your liability is reduced proportionately to your share of responsibility.</li>
+        </ul>
+        <p>
+          <strong>Notice and conduct of claims.</strong> If a claim covered by this indemnity is made or
+          threatened against any Indemnified Party, TUTUMatch will notify you in writing without unreasonable
+          delay. You must, at TUTUMatch&apos;s election, either (i) defend the claim using legal counsel approved
+          by TUTUMatch (such approval not to be unreasonably withheld), or (ii) reimburse TUTUMatch&apos;s
+          reasonable defence costs and any settlement or judgment amount. You agree to provide all reasonable
+          cooperation, information, and documents required for the defence of any claim. TUTUMatch reserves the
+          right to participate in or take over the defence of any claim at its own cost.
+        </p>
+
+        <h2 id="14">14. Parent / user indemnity</h2>
+        <p>
+          This section applies to <strong>all users</strong> who are not tutors (parents, students who hold their
+          own account, and any other user). You agree to indemnify TUTUMatch and the Indemnified Parties against
+          any claims, losses, costs, or damages arising from:
+        </p>
+        <ol className="legal-sublist">
+          <li>your breach of these Terms;</li>
+          <li>any false, malicious, or knowingly inaccurate report you submit through the Report button or otherwise;</li>
+          <li>any defamatory, abusive, threatening, or unlawful content you post in messages, reports, or other communications on the platform;</li>
+          <li>any attempt by you to circumvent the $20 unlock fee, including encouraging or accepting off-platform contact from a tutor before paying;</li>
+          <li>any unauthorised use of your account where the unauthorised use was made possible by your failure to keep credentials secure.</li>
+        </ol>
+        <p>
+          <strong>This clause does not exclude or limit any consumer guarantee or right that you have under the
+          Australian Consumer Law or any other law that cannot be lawfully excluded.</strong>
+        </p>
+
+        <h2>15. Beta status</h2>
         <p>
           TUTUMatch is currently in <strong>early beta</strong>. The service may have bugs, downtime, or feature
           limitations. We&apos;re a small team learning as we go. By using TUTUMatch during beta, you accept that
@@ -187,19 +252,20 @@ export default function TermsPage() {
           are still being hardened.
         </p>
 
-        <h2>14. Changes</h2>
+        <h2>16. Changes</h2>
         <p>
-          We may update these Terms. Material changes will be notified by email to your account address.
-          Continued use of the platform after that notice constitutes acceptance.
+          We may update these Terms. The current version is shown at the top of this page and is recorded against
+          your account each time you accept it. Material changes will be notified by email to your account
+          address. Continued use of the platform after that notice constitutes acceptance of the updated version.
         </p>
 
-        <h2>15. Governing law</h2>
+        <h2>17. Governing law</h2>
         <p>
-          These Terms are governed by the laws of New South Wales, Australia. Any dispute is to be resolved in the
-          courts of New South Wales.
+          These Terms are governed by the laws of New South Wales, Australia. Any dispute is to be resolved
+          exclusively in the courts of New South Wales. The parties submit to that jurisdiction.
         </p>
 
-        <h2>16. Contact</h2>
+        <h2>18. Contact</h2>
         <p>
           Questions about these Terms:{" "}
           <a className="mono-link" href="mailto:hello@tutumatch.com.au">hello@tutumatch.com.au</a>.<br />

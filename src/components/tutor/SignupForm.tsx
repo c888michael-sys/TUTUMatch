@@ -107,6 +107,10 @@ export function SignupForm({
   const [hscUploadId, setHscUploadId] = useState<string | undefined>(initial?.hscDocumentUploadId);
   const [hscUploadName, setHscUploadName] = useState<string | undefined>();
 
+  // Indemnity acceptance — required to submit. Pre-fills as accepted on edit
+  // (the tutor accepted at original submit time and we have that on file).
+  const [indemnityAccepted, setIndemnityAccepted] = useState<boolean>(isEdit);
+
   // UX
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -233,6 +237,7 @@ export function SignupForm({
       idDocumentUploadId: idUploadId,
       wwccDocumentUploadId: wwccUploadId,
       hscDocumentUploadId: hscUploadId,
+      tutorIndemnityAccepted: indemnityAccepted,
     };
 
     try {
@@ -713,20 +718,57 @@ export function SignupForm({
               <a className="mono-link" href="mailto:safety@tutumatch.com.au">safety@tutumatch.com.au</a> so we can
               cooperate. For immediate danger, call <strong>000</strong>.
             </li>
+            <li>
+              <strong>You indemnify TUTUMatch (Section 13 of the Terms).</strong> If a parent, student, or other
+              third party sues TUTUMatch over your conduct, your lessons, your documents, or anything else listed
+              in Section 13, you agree to cover the platform&apos;s reasonable legal costs, settlements, and
+              damages. This is what makes the flat $20 model viable — TUTUMatch isn&apos;t insuring you, and
+              you&apos;re responsible for what you do. We recommend you carry your own public liability cover.
+            </li>
           </ul>
-          <p className="tutor-ack-fine">
-            Full detail: <a className="mono-link" href="/legal/terms" target="_blank" rel="noopener">Terms of Service</a>
+
+          <label className="indemnity-accept">
+            <input
+              type="checkbox"
+              checked={indemnityAccepted}
+              onChange={(e) => setIndemnityAccepted(e.target.checked)}
+              required
+              aria-describedby="indemnity-help"
+            />
+            <span>
+              <strong>I have read and accept the tutor indemnity clause</strong> in{" "}
+              <a className="mono-link" href="/legal/terms#13" target="_blank" rel="noopener">
+                Section 13 of the Terms
+              </a>
+              . I understand TUTUMatch is an introduction service, that I&apos;m an independent contractor, and
+              that I&apos;m responsible for what happens at lessons I provide.
+            </span>
+          </label>
+          <p id="indemnity-help" className="tutor-ack-fine">
+            Full detail:{" "}
+            <a className="mono-link" href="/legal/terms" target="_blank" rel="noopener">
+              Terms of Service
+            </a>
             {" · "}
-            <a className="mono-link" href="/legal/child-safety" target="_blank" rel="noopener">Child Safety Policy</a>.
+            <a className="mono-link" href="/legal/child-safety" target="_blank" rel="noopener">
+              Child Safety Policy
+            </a>
+            {" · "}
+            <a className="mono-link" href="/legal/privacy" target="_blank" rel="noopener">
+              Privacy Policy
+            </a>
+            .
           </p>
         </div>
       </Section>
 
       <div className="form-submit-row">
-        <button className="btn brand lg" type="submit" disabled={busy}>
+        <button className="btn brand lg" type="submit" disabled={busy || !indemnityAccepted}>
           {busy
             ? (isEdit ? "Saving…" : "Submitting…")
-            : (isEdit ? "Save changes (re-submits for review)" : "Submit for review — I agree to the above")}
+            : (isEdit
+                ? "Save changes (re-submits for review)"
+                : "Submit & accept indemnity — list me as a tutor")}
         </button>
         <p className="form-disclaimer">
           {isEdit ? (
@@ -737,12 +779,19 @@ export function SignupForm({
             </>
           ) : (
             <>
-              By submitting, you confirm everything above and agree to TUTUMatch&apos;s Terms of Service and Child
-              Safety Policy. Your profile won&apos;t be public until an admin reviews your ID, WWCC, and HSC
-              documents (~48 hours).
+              By submitting you confirm everything above, explicitly accept the{" "}
+              <a className="mono-link" href="/legal/terms#13" target="_blank" rel="noopener">tutor indemnity clause</a>,
+              and agree to TUTUMatch&apos;s Terms of Service and Child Safety Policy. Your profile won&apos;t be
+              public until an admin reviews your ID, WWCC, and HSC documents (~48 hours). TUTUMatch records the
+              version of the Terms you accepted and the timestamp.
             </>
           )}
         </p>
+        {!indemnityAccepted && !isEdit && (
+          <p className="indemnity-required-note" role="alert" aria-live="polite">
+            You need to tick the indemnity acceptance box in Section 9 to submit.
+          </p>
+        )}
       </div>
     </form>
   );

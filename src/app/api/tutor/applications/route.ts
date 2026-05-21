@@ -7,6 +7,7 @@ import {
   type TutorApplication,
 } from "@/lib/db";
 import { ageInYears, scanForContactInfo, tutorApplicationSchema } from "@/lib/tutor-form";
+import { TERMS_VERSION } from "@/lib/legal";
 
 const UNDER_18_REJECTION_NOTE = (age: number, dob: string) =>
   `Automatically rejected: tutors must be 18 or older. Applicant DOB ${dob} (age ${age}). This decision is enforced by the platform on submission — admin override is possible but should require additional ID verification.`;
@@ -91,6 +92,8 @@ export async function POST(req: Request) {
     idDocumentUploadId: v.idDocumentUploadId,
     wwccDocumentUploadId: v.wwccDocumentUploadId,
     hscDocumentUploadId: v.hscDocumentUploadId,
+    termsAcceptedVersion: TERMS_VERSION,
+    termsAcceptedAt: now,
     bioFlags,
   };
   await upsertApplication(app);
@@ -182,6 +185,10 @@ export async function PUT(req: Request) {
     idDocumentUploadId: v.idDocumentUploadId,
     wwccDocumentUploadId: v.wwccDocumentUploadId,
     hscDocumentUploadId: v.hscDocumentUploadId,
+    // Re-record acceptance on every edit. If we bump TERMS_VERSION between
+    // submits, the new acceptance is captured here.
+    termsAcceptedVersion: TERMS_VERSION,
+    termsAcceptedAt: now,
     bioFlags,
   };
   await upsertApplication(updated);
