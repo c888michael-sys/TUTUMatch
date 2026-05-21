@@ -670,7 +670,11 @@ export function SignupForm({
         </Field>
       </Section>
 
-      {topError && <div className="form-toperror">{topError}</div>}
+      {topError && (
+        <div className="form-toperror" role="alert" aria-live="polite">
+          {topError}
+        </div>
+      )}
 
       <div className="form-submit-row">
         <button className="btn brand lg" type="submit" disabled={busy}>

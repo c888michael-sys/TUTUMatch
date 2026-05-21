@@ -133,7 +133,11 @@ export function AuthForms({ defaultMode = "login" as Mode }) {
           </fieldset>
         )}
 
-        {err && <div className="auth-error">{err}</div>}
+        {err && (
+          <div className="auth-error" role="alert" aria-live="polite">
+            {err}
+          </div>
+        )}
 
         <button className="btn brand lg" type="submit" disabled={busy}>
           {busy ? "Working…" : mode === "login" ? "Log in" : "Create account"}

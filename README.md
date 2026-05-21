@@ -121,8 +121,8 @@ Pick Supabase over Neon because: same provider gives you Postgres + Storage (so 
 - [x] **Reports / dispute resolution UI** — anyone signed in can report a tutor profile (from `/tutors/[id]`) or a chat thread (from `/messages/[unlockId]`) with a reason + description. Admin queue at `/admin/reports` shows open reports first, click to expand → resolve / dismiss with optional notes + action taken (Warned / Suspended user / Rejected application / Refunded parent). Suspending from the report applies the same `suspended` flag the auto-refund flow uses.
 - [ ] Tutor photo upload with admin moderation (needs file storage — pair with the WWCC/ID/HSC upload work)
 - [ ] Analytics (Plausible — privacy-friendly, cheap)
-- [ ] WCAG 2.1 AA accessibility audit
-- [ ] Mobile UI polish pass
+- [~] **Accessibility baseline** — visible focus rings on all interactive elements, skip-to-content link, `prefers-reduced-motion` respected globally, form errors announced via `role="alert" aria-live="polite"`, larger tap targets (44px min) on touch devices. Still TODO: a proper end-to-end keyboard nav audit, contrast checks against WCAG AA, and screen-reader testing.
+- [~] **Mobile polish baseline** — TopNav wraps and truncates on small screens, browse hero / controls / tabs get tighter padding under 520px, admin tables scroll horizontally, tutor form grids collapse to single column under 900px. Still TODO: full mobile pass on /admin/applications/[id] and the chat thread on phones.
 
 ### Founder / legal (off-code work)
 

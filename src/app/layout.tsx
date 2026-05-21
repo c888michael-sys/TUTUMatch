@@ -19,7 +19,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+        <div id="main-content">{children}</div>
+      </body>
     </html>
   );
 }

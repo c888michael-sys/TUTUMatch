@@ -43,6 +43,56 @@ body[data-school="masada"] {
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+
+/* ───────── A11y baseline ───────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 8px;
+  z-index: 100;
+  background: var(--ink);
+  color: #FFFFFF;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-family: var(--sans); font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: top 0.15s ease-out;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+  outline: 3px solid var(--brand-soft);
+}
+/* Respect prefers-reduced-motion across the whole app. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* Tap-target sizing for touch users. */
+@media (pointer: coarse) {
+  .btn { min-height: 44px; }
+  .topnav-btn { min-height: 40px; }
+}
+
 body {
   font-family: var(--sans);
   background: var(--bg);
@@ -3117,8 +3167,9 @@ footer {
 }
 
 @media (max-width: 900px) {
-  .topnav-inner { grid-template-columns: auto auto; gap: 12px; }
+  .topnav-inner { grid-template-columns: auto 1fr; gap: 12px; }
   .topnav-links { display: none; }
+  .topnav-actions { flex-wrap: wrap; justify-content: flex-end; }
   .tform-grid { grid-template-columns: 1fr; }
   .repeat-row { grid-template-columns: 1fr 1fr auto; }
   .avail-slot { grid-template-columns: 1fr auto 1fr auto; }
@@ -3126,4 +3177,13 @@ footer {
   .detail-grid { grid-template-columns: 1fr; }
   .detail-row { grid-template-columns: 1fr; gap: 4px; }
   .admin-table { display: block; overflow-x: auto; }
+}
+/* Very small screens — keep the email button readable but bounded */
+@media (max-width: 520px) {
+  .topnav-btn { font-size: 12px !important; padding: 6px 10px !important; }
+  .topnav-btn:has(> :only-child) { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .browse-hero { padding-left: 16px; padding-right: 16px; }
+  .browse-controls-inner, .browse-grid-section, .browse-hero-inner { padding-left: 16px; padding-right: 16px; }
+  .browse-tabs-inner { padding-left: 16px; padding-right: 16px; }
+  .browse-tab { padding: 10px 12px 12px; font-size: 13px; }
 }
