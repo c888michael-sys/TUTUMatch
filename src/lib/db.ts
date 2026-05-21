@@ -106,10 +106,17 @@ export type TutorApplication = {
   wwccFullName: string;
   wwccDob: string; // ISO date
 
-  // File uploads not yet implemented — admin should request these out-of-band
-  // until storage is wired up.
+  // Free-text fallback notes (kept for backwards compat — older records used
+  // these before uploads existed; they let admins record where to request a
+  // scan if the upload never happened).
   idDocumentNote?: string;
   hscDocumentNote?: string;
+
+  // Upload IDs for verification documents. Each points at a record managed
+  // by src/lib/uploads.ts; admin views them via /api/uploads/[id].
+  idDocumentUploadId?: string;
+  wwccDocumentUploadId?: string;
+  hscDocumentUploadId?: string;
 
   bioFlags?: string[]; // any contact-info patterns the scanner caught
 };

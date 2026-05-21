@@ -132,6 +132,9 @@ export const tutorApplicationSchema = z
 
     idDocumentNote: z.string().trim().max(200).optional().or(z.literal("").transform(() => undefined)),
     hscDocumentNote: z.string().trim().max(200).optional().or(z.literal("").transform(() => undefined)),
+    idDocumentUploadId: z.string().trim().min(1).max(80).optional().or(z.literal("").transform(() => undefined)),
+    wwccDocumentUploadId: z.string().trim().min(1).max(80).optional().or(z.literal("").transform(() => undefined)),
+    hscDocumentUploadId: z.string().trim().min(1).max(80).optional().or(z.literal("").transform(() => undefined)),
   })
   .refine((d) => d.schoolId || d.otherSchoolName, {
     message: "Pick your high school or enter it under Other",

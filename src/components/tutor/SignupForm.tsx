@@ -14,6 +14,7 @@ import {
   type Weekday,
 } from "@/lib/tutor-form";
 import type { TutorApplication } from "@/lib/db";
+import { DocumentUploader } from "./DocumentUploader";
 
 type Result = { subject: string; bandOrMark: string };
 type Slot = { startMinutes: number; endMinutes: number };
@@ -99,6 +100,12 @@ export function SignupForm({
   const [wwccFullName, setWwccFullName] = useState(initial?.wwccFullName ?? "");
   const [idDocumentNote, setIdDocumentNote] = useState(initial?.idDocumentNote ?? "");
   const [hscDocumentNote, setHscDocumentNote] = useState(initial?.hscDocumentNote ?? "");
+  const [idUploadId, setIdUploadId] = useState<string | undefined>(initial?.idDocumentUploadId);
+  const [idUploadName, setIdUploadName] = useState<string | undefined>();
+  const [wwccUploadId, setWwccUploadId] = useState<string | undefined>(initial?.wwccDocumentUploadId);
+  const [wwccUploadName, setWwccUploadName] = useState<string | undefined>();
+  const [hscUploadId, setHscUploadId] = useState<string | undefined>(initial?.hscDocumentUploadId);
+  const [hscUploadName, setHscUploadName] = useState<string | undefined>();
 
   // UX
   const [busy, setBusy] = useState(false);
@@ -223,6 +230,9 @@ export function SignupForm({
       wwccDob: dateOfBirth, // form enforces equality
       idDocumentNote: idDocumentNote.trim() || undefined,
       hscDocumentNote: hscDocumentNote.trim() || undefined,
+      idDocumentUploadId: idUploadId,
+      wwccDocumentUploadId: wwccUploadId,
+      hscDocumentUploadId: hscUploadId,
     };
 
     try {
@@ -617,11 +627,46 @@ export function SignupForm({
         <Field label="Full name on the WWCC" error={errors.wwccFullName}>
           <input value={wwccFullName} onChange={(e) => setWwccFullName(e.target.value)} required />
         </Field>
-        <Field label="Government ID — note" error={errors.idDocumentNote} hint="Until file uploads ship, write where admin can request the scan (e.g. 'email on request')." full>
-          <input value={idDocumentNote} onChange={(e) => setIdDocumentNote(e.target.value)} placeholder="email on request" />
+
+        <div className="full-row">
+          <div className="repeat-head">
+            <span>Document uploads</span>
+          </div>
+          <p className="form-help">
+            Upload a clear photo or scan of each document. PDF / JPG / PNG / HEIC / WEBP, max 8 MB each. Files are
+            only visible to you and TUTUMatch admins, never shown to parents or other tutors.
+          </p>
+          <DocumentUploader
+            kind="id_document"
+            label="Government photo ID (driver's licence or passport)"
+            hint="Must match the name on your WWCC."
+            initialUploadId={idUploadId}
+            initialFilename={idUploadName}
+            onChange={(id, name) => { setIdUploadId(id); setIdUploadName(name); }}
+          />
+          <DocumentUploader
+            kind="wwcc_document"
+            label="WWCC document"
+            hint="Your Working With Children Check verification card or letter."
+            initialUploadId={wwccUploadId}
+            initialFilename={wwccUploadName}
+            onChange={(id, name) => { setWwccUploadId(id); setWwccUploadName(name); }}
+          />
+          <DocumentUploader
+            kind="hsc_document"
+            label="HSC Record of Achievement / ATAR notice"
+            hint="The official NESA document showing your subjects and ATAR."
+            initialUploadId={hscUploadId}
+            initialFilename={hscUploadName}
+            onChange={(id, name) => { setHscUploadId(id); setHscUploadName(name); }}
+          />
+        </div>
+
+        <Field label="Government ID — note (optional fallback)" error={errors.idDocumentNote} hint="If you can't upload right now, write where the admin can request the scan." full>
+          <input value={idDocumentNote} onChange={(e) => setIdDocumentNote(e.target.value)} placeholder="e.g. 'email on request'" />
         </Field>
-        <Field label="HSC Record of Achievement — note" error={errors.hscDocumentNote} hint="Same — write how admin can get the scan." full>
-          <input value={hscDocumentNote} onChange={(e) => setHscDocumentNote(e.target.value)} placeholder="email on request" />
+        <Field label="HSC document — note (optional fallback)" error={errors.hscDocumentNote} hint="Same — write how admin can get the scan if upload isn't possible." full>
+          <input value={hscDocumentNote} onChange={(e) => setHscDocumentNote(e.target.value)} placeholder="e.g. 'email on request'" />
         </Field>
       </Section>
 

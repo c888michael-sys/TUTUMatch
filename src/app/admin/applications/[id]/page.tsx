@@ -150,11 +150,15 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
           </DetailBlock>
 
           <DetailBlock title="Verification documents" full>
-            <Row k="Government ID" v={app.idDocumentNote || "(none — request via email)"} />
-            <Row k="HSC document" v={app.hscDocumentNote || "(none — request via email)"} />
+            <div className="admin-docs">
+              <AdminDoc label="Government ID" uploadId={app.idDocumentUploadId} fallbackNote={app.idDocumentNote} />
+              <AdminDoc label="WWCC document" uploadId={app.wwccDocumentUploadId} />
+              <AdminDoc label="HSC Record of Achievement" uploadId={app.hscDocumentUploadId} fallbackNote={app.hscDocumentNote} />
+            </div>
             <p className="muted small">
-              File uploads aren&apos;t wired up yet. Until they are, request scans from the tutor by email and verify
-              manually against the WWCC + ATAR claims above.
+              Documents are stored encrypted-at-rest on the host filesystem (local dev) and are only accessible to
+              the uploading tutor and admin accounts. Real-launch storage should be S3 / Supabase Storage with
+              short-lived signed URLs.
             </p>
           </DetailBlock>
         </div>
@@ -193,6 +197,41 @@ function Row({ k, v, mono }: { k: string; v: React.ReactNode; mono?: boolean }) 
     <div className="detail-row">
       <div className="detail-row-k">{k}</div>
       <div className={`detail-row-v ${mono ? "mono" : ""}`}>{v}</div>
+    </div>
+  );
+}
+
+function AdminDoc({
+  label,
+  uploadId,
+  fallbackNote,
+}: {
+  label: string;
+  uploadId?: string;
+  fallbackNote?: string;
+}) {
+  if (!uploadId) {
+    return (
+      <div className="admin-doc empty">
+        <div className="admin-doc-label">{label}</div>
+        <div className="admin-doc-state">
+          {fallbackNote ? <>Note from tutor: <em>{fallbackNote}</em></> : "Not uploaded"}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="admin-doc">
+      <div className="admin-doc-label">{label}</div>
+      <a
+        className="admin-doc-link"
+        href={`/api/uploads/${uploadId}`}
+        target="_blank"
+        rel="noopener"
+      >
+        Open document ↗
+      </a>
+      <code className="admin-doc-id">{uploadId}</code>
     </div>
   );
 }

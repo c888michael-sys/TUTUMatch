@@ -88,6 +88,9 @@ export async function POST(req: Request) {
     wwccDob: v.wwccDob,
     idDocumentNote: v.idDocumentNote,
     hscDocumentNote: v.hscDocumentNote,
+    idDocumentUploadId: v.idDocumentUploadId,
+    wwccDocumentUploadId: v.wwccDocumentUploadId,
+    hscDocumentUploadId: v.hscDocumentUploadId,
     bioFlags,
   };
   await upsertApplication(app);
@@ -176,6 +179,9 @@ export async function PUT(req: Request) {
     wwccDob: v.wwccDob,
     idDocumentNote: v.idDocumentNote,
     hscDocumentNote: v.hscDocumentNote,
+    idDocumentUploadId: v.idDocumentUploadId,
+    wwccDocumentUploadId: v.wwccDocumentUploadId,
+    hscDocumentUploadId: v.hscDocumentUploadId,
     bioFlags,
   };
   await upsertApplication(updated);

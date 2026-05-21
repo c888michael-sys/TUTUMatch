@@ -52,10 +52,12 @@ Tick items off here as they ship. This list is the canonical source of truth for
   - [x] 5-day auto-refund processor + tutor suspension already wired against the JSON store. Lazy-fires on dashboard + messages page loads. `/api/cron/refund-flag` still needs to hook into the same `processOverdueRefunds()` helper once Stripe is live so production gets a scheduled trigger too.
   - [ ] Wire `POST /api/refund` to actually call Stripe for the money movement (the local processor only flips status + suspends; no real funds move yet)
   - [ ] Configure webhook endpoint in Stripe dashboard pointing at `https://<domain>/api/stripe/webhook`
-- [ ] **Identity & WWCC verification** (manual review is fine for v1)
-  - [ ] File-upload UI in `/tutor/signup` for: government ID, WWCC document scan, HSC Record of Achievement
-  - [ ] Server-side route that stores uploads encrypted at rest in Supabase Storage / S3 with signed URLs
-  - [ ] Admin verification view shows the uploaded documents side-by-side with the form
+- [~] **Identity & WWCC verification** (manual review is fine for v1)
+  - [x] File-upload UI in `/tutor/signup` and `/tutor/edit` for: government ID, WWCC document, HSC Record of Achievement (PDF / JPG / PNG / HEIC / WEBP, 8 MB max each)
+  - [x] Admin verification view shows the uploaded documents inline on `/admin/applications/[id]` — links open the original file in a new tab via the access-checked `/api/uploads/[id]` endpoint
+  - [x] Tutor can view their own uploaded docs; admins can view any; everyone else gets 403
+  - [ ] Real storage (Supabase Storage / S3) with at-rest encryption + short-lived signed URLs — current implementation is **local filesystem only** (`data/uploads/<userId>/`). DO NOT deploy to multi-user prod hosts yet.
+  - [ ] Virus scan on upload (e.g. ClamAV or a SaaS scanner)
   - [ ] Manual WWCC lookup workflow against the NSW OCG public verification (paste number + DOB + name, record the outcome)
   - [ ] Document each verification with reviewer name + date + result on the `Verification` row
 - [ ] **Transactional email** (Resend recommended — see Hosting)
@@ -195,6 +197,8 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `/admin/reports`                    | Admin: reports queue — resolve / dismiss with action taken                | ✅ Done      |
 | `POST /api/reports`                 | Submit a report (any signed-in user)                                      | ✅ Done      |
 | `PATCH /api/admin/reports/[id]`     | Admin resolve / dismiss + optional suspend                                | ✅ Done      |
+| `POST /api/uploads`                 | Upload a verification document (multipart, signed-in user)                | ✅ Done (local) |
+| `GET  /api/uploads/[id]`            | Fetch a doc — owner or admin only                                         | ✅ Done (local) |
 | `GET/POST /api/admin/schools`       | List + create school                                                      | ✅ Done      |
 | `PATCH/DELETE /api/admin/schools/[id]` | Update / delete school                                                 | ✅ Done      |
 | `POST /api/admin/users/[id]/unsuspend` | Admin: clear suspension                                                | ✅ Done      |

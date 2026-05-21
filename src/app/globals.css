@@ -2444,6 +2444,84 @@ footer {
   margin: -8px 0 18px;
 }
 
+/* Document uploader (tutor signup/edit) */
+.doc-uploader {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+  margin-bottom: 8px;
+}
+.doc-uploader-label {
+  font-family: var(--sans); font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+}
+.doc-uploader-pick,
+.doc-uploader-current {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 13px;
+}
+.doc-tick {
+  color: var(--brand);
+  font-weight: 700;
+}
+.doc-uploader-filename {
+  color: var(--brand-deep);
+  font-family: var(--mono); font-size: 12.5px;
+  text-decoration: underline;
+  word-break: break-all;
+  max-width: 260px;
+}
+.doc-uploader-empty {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.form-help {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* Admin verification documents block */
+.admin-docs {
+  display: flex; flex-direction: column; gap: 10px;
+  margin: 8px 0 12px;
+}
+.admin-doc {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+  background: var(--bg);
+}
+.admin-doc.empty { color: var(--muted); }
+.admin-doc-label {
+  font-family: var(--sans); font-weight: 500;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.admin-doc.empty .admin-doc-label { color: var(--muted); }
+.admin-doc-state { font-size: 13px; }
+.admin-doc-link {
+  font-family: var(--sans); font-weight: 600;
+  font-size: 13px;
+  color: var(--brand);
+  text-decoration: underline;
+}
+.admin-doc-id {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--muted);
+  background: var(--surface);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
 /* Report link + dialog */
 .report-row {
   margin: 36px 0 0;
