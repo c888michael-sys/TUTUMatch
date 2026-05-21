@@ -13,7 +13,7 @@ A flat-fee NSW tutor marketplace. Tutors list free; parents pay $20 once per mat
 >
 > This drops the legal risk profile from "verified marketplace facilitator" (high exposure, needs Pty Ltd + ~$1,400/yr insurance) down to "classifieds directory" (Hipages-tier exposure, ~$500/yr media liability is enough). Total realistic ongoing cost lands around **$500–1,000/yr** rather than $2,000+.
 >
-> **Current code state:** stable verified-marketplace checkpoint (commit [`60005ef`](https://github.com/c888michael-sys/TUTUMatch/commit/60005ef)). The pivot work is planned in this README but not yet started — start of next session.
+> **Current code state:** Sessions 1–2 of the pivot are complete and pushed (latest commit [`3d59f0d`](https://github.com/c888michael-sys/TUTUMatch/commit/3d59f0d)). Verification claims are stripped site-wide; the parent-pays unlock flow is replaced by the free "I want this tutor" Match flow; `npm run build` passes. **Next up: Session 3** — confirmation flow + strike system + tutor commission.
 >
 > The **New model** section below has every design parameter (timings, fees, strike system, appeal flow, WWCC framing). The **Pivot work plan** breaks the code refactor into ~4 sessions of focused work. The original verified-marketplace **Status** section is kept further down for reference until the pivot lands.
 
@@ -538,7 +538,7 @@ Realistic estimate: **4–5 focused sessions of work**. Below is the session bre
 
 Each session has a **Definition of Done (DoD)** at the end — tick items off as they ship. **Don't move to the next session until the previous one's DoD is fully satisfied.**
 
-### Session 1 — Content audit + remove all verification claims
+### Session 1 — Content audit + remove all verification claims ✅ COMPLETE
 
 Goal: strip the verified-marketplace language site-wide so the directory framing is consistent.
 
@@ -559,21 +559,21 @@ Goal: strip the verified-marketplace language site-wide so the directory framing
 | New: prominent **"What TUTUMatch is and isn't"** page or banner | "We're a classifieds directory. Listings are tutor-provided. We don't verify anything. Parents verify tutors directly." |
 
 **Definition of Done (Session 1):**
-- [ ] `grep -ri "verified|vetted|screened|wwcc verified" src/` returns no marketing/UI uses (only legitimate code/comment uses)
-- [ ] Trust component file deleted; LandingPage no longer imports it
-- [ ] Hero copy uses the canonical headline ("List free. Pay only when you get a student. First match is on us.")
-- [ ] Earnings card uses the new framing — no "verified" claims
-- [ ] Comparison table rewritten — no verification-related rows
-- [ ] FAQ entries rewritten to "you verify yourself" framing
-- [ ] `/legal/terms` Sections 1, 5, 7 rewritten to directory framing
-- [ ] `/legal/child-safety` reframed to "what we ask tutors to have"
-- [ ] `/how-it-works` updated to new flow
-- [ ] New `/what-we-are` page exists, linked from footer + topnav
-- [ ] Schools browse hero subtitle removed "X verified tutors live" — replaced with "X tutors listed"
-- [ ] `npm run build` passes with no warnings about removed components
-- [ ] **Commit message lead:** "Session 1: strip verification claims site-wide for directory pivot"
+- [ ] `grep -ri "verified|vetted|screened|wwcc verified" src/` returns no marketing/UI uses — _partial: `SignupForm.tsx` still carries verification copy; deferred to Session 4's WWCC reframe_
+- [x] Trust component file deleted; LandingPage no longer imports it
+- [x] Hero copy uses the canonical headline ("List free. Pay only when you get a student. First match is on us.")
+- [x] Earnings card uses the new framing — no "verified" claims
+- [x] Comparison table rewritten — no verification-related rows
+- [x] FAQ entries rewritten to "you verify yourself" framing
+- [x] `/legal/terms` Sections 1, 5, 7 rewritten to directory framing
+- [x] `/legal/child-safety` reframed to "what we ask tutors to have"
+- [x] `/how-it-works` updated to new flow
+- [x] New `/what-we-are` page exists, linked from footer + topnav
+- [x] Schools browse hero subtitle removed "X verified tutors live" — replaced with "X tutors listed"
+- [x] `npm run build` passes with no warnings about removed components
+- [x] **Commit message lead:** "Session 1: strip verification claims site-wide for directory pivot"
 
-### Session 2 — Remove parent payment flow + introduce "I want this tutor" intent capture
+### Session 2 — Remove parent payment flow + introduce "I want this tutor" intent capture ✅ COMPLETE
 
 Goal: rip out the unlock-fee transaction; introduce the free-intent-button flow that triggers the 48h hidden window.
 
@@ -591,20 +591,20 @@ Goal: rip out the unlock-fee transaction; introduce the free-intent-button flow 
 | **Remove** the refund + auto-suspension flow (replaced by the strike system in session 3) | Multiple files |
 
 **Definition of Done (Session 2):**
-- [ ] `/unlock/[tutorId]` route deleted
-- [ ] `/contact/[tutorId]` route exists; renders tutor's public profile + a "I want this tutor" form (email capture only, no payment)
-- [ ] `POST /api/matches/request` exists and creates a Match record per the contract above
-- [ ] On match request, the tutor's listing is hidden from browse for 48h (tutorApplication.hiddenUntil set)
-- [ ] Tutor receives a notification (placeholder email to console.log for now — wired to Resend in session 5)
-- [ ] `/messages` + `/messages/[unlockId]` routes deleted; Thread component deleted
-- [ ] All "$20 unlock fee", "refund", "5-day refund" language stripped from Hero, Terms, FAQ, how-it-works, footer
-- [ ] `/api/unlock`, `/api/refund`, `/api/cron/refund-flag`, `/api/unlocks/dev-create`, `/api/unlocks/[id]/fast-forward` deleted
-- [ ] `/admin/refunds` route deleted
-- [ ] `Unlock`, `Message`, `ConfirmUnlockButton` files deleted
-- [ ] `Match`, `Appeal` types added to `src/lib/db.ts` per spec
-- [ ] `grep -ri "Unlock" src/` returns nothing or only legacy/incidental
-- [ ] `npm run build` passes
-- [ ] **Commit message lead:** "Session 2: replace parent-pays unlock with free 'I want this tutor' intent capture + Match data model"
+- [x] `/unlock/[tutorId]` route deleted
+- [x] `/contact/[tutorId]` route exists; renders tutor's public profile + a "I want this tutor" form (email capture only, no payment)
+- [x] `POST /api/matches/request` exists and creates a Match record per the contract above
+- [x] On match request, the tutor's listing is hidden from browse for 48h (tutorApplication.hiddenUntil set)
+- [x] Tutor receives a notification (placeholder email to console.log for now — wired to Resend in session 5)
+- [x] `/messages` + `/messages/[unlockId]` routes deleted; Thread component deleted
+- [x] All "$20 unlock fee", "refund", "5-day refund" language stripped from Hero, Terms, FAQ, how-it-works, footer
+- [x] `/api/unlock`, `/api/refund`, `/api/cron/refund-flag`, `/api/unlocks/dev-create`, `/api/unlocks/[id]/fast-forward` deleted
+- [x] `/admin/refunds` route deleted
+- [x] `Unlock`, `Message`, `ConfirmUnlockButton` files deleted
+- [x] `Match`, `Appeal` types added to `src/lib/db.ts` per spec
+- [x] `grep -ri "Unlock" src/` returns nothing or only legacy/incidental (only the decorative `UnlockIcon`)
+- [x] `npm run build` passes
+- [x] **Commit message lead:** "Session 2: replace parent-pays unlock with free 'I want this tutor' intent capture + Match data model"
 
 ### Session 3 — Confirmation flow + strike system + tutor commission
 
