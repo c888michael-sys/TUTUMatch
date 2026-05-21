@@ -23,6 +23,7 @@ export async function TopNav() {
         <Link href="/" className="topnav-brand">
           <span className="mark" />
           TUTUMatch
+          <span className="topnav-beta" title="TUTUMatch is in early beta — please read our Terms.">BETA</span>
         </Link>
         <nav className="topnav-links">
           <Link href="/browse">Browse tutors</Link>

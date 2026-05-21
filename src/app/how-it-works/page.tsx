@@ -84,6 +84,26 @@ export default function HowItWorksPage() {
           <Link href="/legal/child-safety">Child Safety Policy</Link> for full detail.
         </p>
 
+        <h2>What we are and aren&apos;t</h2>
+        <p>
+          TUTUMatch is an <strong>introduction service</strong> — we connect parents with tutors and verify each
+          tutor&apos;s identity, age, WWCC, and HSC credentials before they appear publicly.
+        </p>
+        <p>
+          We are <strong>not</strong>:
+        </p>
+        <ul className="what-we-arent">
+          <li>the tutor&apos;s employer, agent, or partner</li>
+          <li>a party to any lesson — those are private arrangements between parent and tutor</li>
+          <li>a supervisor of any lesson location or interaction</li>
+          <li>a guarantor of any specific academic outcome (ATAR, marks, university admission)</li>
+          <li>responsible for what happens before, during, or after any lesson</li>
+        </ul>
+        <p>
+          Our liability is contractually limited to the $20 unlock fee per match. The full picture is in our{" "}
+          <Link href="/legal/terms">Terms of Service</Link>.
+        </p>
+
         <h2>Read the policies</h2>
         <ul className="content-link-list">
           <li><Link href="/legal/terms">Terms of Service</Link></li>

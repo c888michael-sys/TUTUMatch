@@ -1103,14 +1103,137 @@ footer {
 .foot-grid ul li { font-family: var(--sans); font-size: 14px; color: var(--ink-soft); }
 .foot-grid ul a { color: var(--ink-soft); transition: color 0.2s var(--ease); }
 .foot-grid ul a:hover { color: var(--brand); }
+.foot-disclaimer {
+  max-width: var(--maxw); margin: 36px auto 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--hairline);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.foot-disclaimer p { margin: 0 0 8px; }
+.foot-disclaimer p:last-child { margin: 0; }
+.foot-disclaimer strong { color: var(--ink-soft); }
+.foot-disclaimer a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+.foot-beta-note { color: #92400E !important; }
+
 .foot-bottom {
-  max-width: var(--maxw); margin: 48px auto 0;
+  max-width: var(--maxw); margin: 24px auto 0;
   padding-top: 20px;
   border-top: 1px solid var(--hairline);
   display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap;
   font-family: var(--mono); font-weight: 500;
   font-size: 12px;
   color: var(--muted);
+}
+
+/* Unlock + signup disclaimer cards */
+.unlock-disclaimer-card {
+  background: #FFFBEB;
+  border-left: 3px solid #D97706;
+  border-radius: var(--radius-btn);
+  padding: 20px 24px;
+  margin-bottom: 18px;
+}
+.unlock-disclaimer-card h2 {
+  margin: 0 0 12px;
+  font-family: var(--sans); font-weight: 600;
+  font-size: 17px;
+  color: #92400E;
+  letter-spacing: -0.012em;
+}
+.unlock-disclaimer-card p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #78350F;
+}
+.disclaimer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.disclaimer-list li {
+  position: relative;
+  padding: 10px 12px 10px 32px;
+  background: var(--surface);
+  border-radius: var(--radius-btn);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.disclaimer-list li::before {
+  content: "⚠";
+  position: absolute;
+  left: 10px; top: 10px;
+  color: #D97706;
+  font-weight: 700;
+}
+.disclaimer-list li strong { color: #92400E; }
+.disclaimer-fine {
+  margin: 0 !important;
+  font-family: var(--mono); font-weight: 500;
+  font-size: 11.5px;
+  color: #78350F;
+}
+.disclaimer-fine a { color: #92400E; text-decoration: underline; }
+
+/* Tutor signup acknowledgement list */
+.tutor-ack-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.tutor-ack-list li {
+  position: relative;
+  padding: 12px 14px 12px 32px;
+  background: var(--bg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.tutor-ack-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 12px; top: 12px;
+  color: var(--brand);
+  font-weight: 700;
+}
+.tutor-ack-list li strong { color: var(--brand-deep); }
+.tutor-ack-fine {
+  margin: 8px 0 0;
+  font-family: var(--mono); font-weight: 500;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* "What we aren't" list */
+.what-we-arent {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.what-we-arent li {
+  position: relative;
+  padding: 6px 0 6px 22px;
+  font-size: 14.5px;
+  color: var(--ink-soft);
+}
+.what-we-arent li::before {
+  content: "✕";
+  position: absolute;
+  left: 0; top: 6px;
+  color: #DC2626;
+  font-weight: 700;
 }
 
 /* ────────── Scroll-driven reveal (CSS-native, progressive) ────────── */
@@ -1199,6 +1322,18 @@ footer {
   background: var(--brand);
   transform: skewX(-12deg);
   border-radius: 1px;
+}
+.topnav-beta {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  background: #FEF3C7;
+  color: #92400E;
+  font-family: var(--mono); font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  border-radius: 3px;
+  vertical-align: 2px;
 }
 .topnav-links {
   display: flex; align-items: center; gap: 22px;

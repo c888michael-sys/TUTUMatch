@@ -79,6 +79,20 @@ export function Footer() {
           </ul>
         </div>
       </div>
+      <div className="foot-disclaimer">
+        <p>
+          <strong>TUTUMatch is an introduction service, not a tutoring provider.</strong> We verify tutor identity,
+          age, WWCC, and HSC credentials, but we do not employ, supervise, or take responsibility for any tutor or
+          lesson. Lesson locations are chosen by the parent and tutor — public libraries are strongly recommended.
+          TUTUMatch&apos;s liability is limited to the $20 unlock fee per match. See our{" "}
+          <Link href="/legal/terms">Terms of Service</Link> and{" "}
+          <Link href="/legal/child-safety">Child Safety Policy</Link> for full detail.
+        </p>
+        <p className="foot-beta-note">
+          Early beta. We&apos;re a small team learning as we go — please report any issues to{" "}
+          <a href="mailto:hello@tutumatch.com.au">hello@tutumatch.com.au</a>.
+        </p>
+      </div>
       <div className="foot-bottom">
         <span>ABN 00 000 000 000 · Made in NSW</span>
         <span>© 2026 TUTUMatch</span>

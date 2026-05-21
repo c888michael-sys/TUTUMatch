@@ -58,6 +58,39 @@ export default async function UnlockPage({ params }: { params: { tutorId: string
           </p>
         </section>
 
+        <section className="unlock-disclaimer-card">
+          <h2>Before you pay — what TUTUMatch is responsible for, and isn&apos;t</h2>
+          <p>
+            TUTUMatch is an <strong>introduction service</strong>. We verify each tutor&apos;s identity, WWCC, and
+            HSC documents before they appear here. We do <strong>not</strong> employ tutors, supervise lessons, or
+            take responsibility for what happens at any specific lesson.
+          </p>
+          <ul className="disclaimer-list">
+            <li>
+              <strong>Pick a safe meeting place.</strong> Public libraries are strongly recommended — free, quiet,
+              and well-supervised. Avoid private homes for first lessons. The choice of location, and what happens
+              there, is between you and the tutor.
+            </li>
+            <li>
+              <strong>No outcome guarantee.</strong> We don&apos;t guarantee teaching quality or academic results.
+              Tutors are independent contractors who set their own rates and lesson plans.
+            </li>
+            <li>
+              <strong>Liability is capped at this $20 fee.</strong> If something goes wrong at a lesson, our
+              maximum responsibility under our Terms is the unlock fee you paid (per match).
+            </li>
+            <li>
+              <strong>Use the Report button or email{" "}
+              <a className="mono-link" href="mailto:safety@tutumatch.com.au">safety@tutumatch.com.au</a></strong>{" "}
+              if anything concerning happens. For urgent danger, call <strong>000</strong> first.
+            </li>
+          </ul>
+          <p className="disclaimer-fine">
+            Full details: <Link href="/legal/terms">Terms of Service</Link>{" · "}
+            <Link href="/legal/child-safety">Child Safety Policy</Link>.
+          </p>
+        </section>
+
         <section className="unlock-confirm">
           <ConfirmUnlockButton applicationId={applicationId} tutorFirstName={firstName} />
           <Link className="btn ghost" href={`/tutors/${params.tutorId}`}>

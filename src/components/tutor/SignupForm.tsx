@@ -676,22 +676,70 @@ export function SignupForm({
         </div>
       )}
 
+      <Section title="9 · Before you submit — what you're agreeing to" sub="Read this carefully. Listing as a tutor means you accept these obligations.">
+        <div className="full-row">
+          <ul className="tutor-ack-list">
+            <li>
+              <strong>You are an independent contractor</strong>, not a TUTUMatch employee or agent. You set your
+              own rates, schedule, and lesson terms. You handle your own tax, super, and any insurance.
+            </li>
+            <li>
+              <strong>You are responsible for your own conduct and lesson safety.</strong> TUTUMatch does not
+              supervise or choose lesson locations. You agree to meet students in safe, public places — public
+              libraries are strongly recommended for first lessons. Avoid private homes for first lessons unless a
+              parent is present throughout.
+            </li>
+            <li>
+              <strong>You will apply the $20 first-lesson discount</strong> to every new parent&apos;s first
+              invoice. That&apos;s how the parent recovers the unlock fee they paid TUTUMatch. Failing to apply it
+              repeatedly is grounds for suspension.
+            </li>
+            <li>
+              <strong>You will reply within 5 days</strong> when a parent unlocks you. After 5 days of no reply,
+              the parent is automatically refunded and your account is suspended pending appeal.
+            </li>
+            <li>
+              <strong>Your WWCC, ID, and HSC documents must be current and accurate.</strong> Misrepresenting
+              qualifications, using someone else&apos;s WWCC, or providing false documents is fraud — we&apos;ll
+              suspend your account and may report to authorities.
+            </li>
+            <li>
+              <strong>Don&apos;t share contact info pre-unlock.</strong> Telling parents to message you off-platform
+              before they&apos;ve paid is a breach of these Terms. Repeat offenders are removed permanently.
+            </li>
+            <li>
+              <strong>Mandatory reporting.</strong> If you become aware of a child-safety issue during any lesson
+              (including disclosure by a student), NSW law requires you to report it to authorities. Contact{" "}
+              <a className="mono-link" href="mailto:safety@tutumatch.com.au">safety@tutumatch.com.au</a> so we can
+              cooperate. For immediate danger, call <strong>000</strong>.
+            </li>
+          </ul>
+          <p className="tutor-ack-fine">
+            Full detail: <a className="mono-link" href="/legal/terms" target="_blank" rel="noopener">Terms of Service</a>
+            {" · "}
+            <a className="mono-link" href="/legal/child-safety" target="_blank" rel="noopener">Child Safety Policy</a>.
+          </p>
+        </div>
+      </Section>
+
       <div className="form-submit-row">
         <button className="btn brand lg" type="submit" disabled={busy}>
           {busy
             ? (isEdit ? "Saving…" : "Submitting…")
-            : (isEdit ? "Save changes (re-submits for review)" : "Submit for review")}
+            : (isEdit ? "Save changes (re-submits for review)" : "Submit for review — I agree to the above")}
         </button>
         <p className="form-disclaimer">
           {isEdit ? (
             <>
-              Any change to a tutor profile drops the listing back to <strong>Pending review</strong> until an admin
-              re-approves it. This is intentional — child-safety information needs a fresh look on every change.
+              Any change to a tutor profile drops the listing back to <strong>Pending review</strong> until an
+              admin re-approves it. This is intentional — child-safety information needs a fresh look on every
+              change.
             </>
           ) : (
             <>
-              By submitting, you agree to TUTUMatch&apos;s Terms of Service and Child Safety Policy. Your profile
-              won&apos;t be public until an admin reviews your ID, WWCC, and HSC documents.
+              By submitting, you confirm everything above and agree to TUTUMatch&apos;s Terms of Service and Child
+              Safety Policy. Your profile won&apos;t be public until an admin reviews your ID, WWCC, and HSC
+              documents (~48 hours).
             </>
           )}
         </p>
