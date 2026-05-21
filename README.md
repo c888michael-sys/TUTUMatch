@@ -2,15 +2,23 @@
 
 A flat-fee NSW tutor marketplace. Tutors list free; parents pay $20 once per match, refunded as the tutor's first-lesson discount. After the introduction, the platform is out of the loop.
 
+> ## 🟡 Status: paused (2026-05-21)
+>
+> The codebase is at a **clean checkpoint**. Every local-only feature works end-to-end (auth, tutor signup with verification document upload + WWCC + age gate, admin approval flow, browse with sort/filter, post-unlock chat, reports queue, refund/suspension flow, schools CRUD, full disclaimer + indemnity layer with explicit acceptance tracking).
+>
+> Resuming requires external services (Stripe, Supabase, Resend, domain, hosting) — see **[SETUP.md](./SETUP.md)** for the step-by-step walkthrough when ready.
+>
+> Before any public-facing launch, see the legal posture section below. **Phase 1 (closed beta with people you know) is safe to demo today; Phase 2 (public users paying real money) needs Pty Ltd + insurance + lawyer review of the Terms first.**
+
 ---
 
 ## Status (as of latest commit)
 
 What's working end-to-end right now:
 
-- **Landing page** — full v3 design ported, all sections (Hero with For-parents/For-tutors split, Pitch, Mechanic, How, Comparison, Trust, Guarantee, sample tutor cards, Earnings, FAQ, Final CTA, Footer).
+- **Landing page** — full v3 design ported, all sections (Hero with For-parents/For-tutors split, Pitch, Mechanic, How, Comparison, Trust, Guarantee, Earnings, FAQ, Final CTA, Footer + site-wide disclaimer block).
 - **School-branded landing pages** at `/schools/[slug]` and an `Other Locations` route at `/schools/other`. Browse tabs switch between areas. Same layout, only the brand colour + content change per area.
-- **Browse view** with filters (subject category chips: Math / English / Physics / Chemistry / Biology / Science K-10 — in that order; day-of-week availability chips with a "you might be limiting options" warning; min ATAR; max $/hr; mode) and sort (Oldest profiles first by default, Highest subject result alternative — bands map to marks: B6/E4 → 90, B5/E3 → 80, etc.). Reads **real approved tutor applications** from the JSON store (with `status=APPROVED` and `visibility=true`) and merges them with the demo samples — real first, deduped by name. Real cards have no "Example" badge and link to their actual `/tutors/[applicationId]` profile.
+- **Browse view** with filters (subject category chips: Math / English / Physics / Chemistry / Biology / Science K-10 — in that order; day-of-week availability chips with a "you might be limiting options" warning; min ATAR; max $/hr; mode) and sort (Oldest profiles first by default, Highest subject result alternative — bands map to marks: B6/E4 → 90, B5/E3 → 80, etc.). Reads **real approved tutor applications** from the JSON store (with `status=APPROVED` and `visibility=true`) and shows them as proper cards linking to `/tutors/[applicationId]`. The "X verified tutors live" counter sits under the filters. Sample tutors have been removed — browse is real-only.
 - **Tutor profile page** at `/tutors/[id]` with the refund policy laid out before any payment ask.
 - **Unlock confirm page** at `/unlock/[tutorId]` with the same refund explainer — the actual $20 charge is a stub until Stripe is wired.
 - **Auth** — sign up, log in, log out. HMAC-signed cookie sessions, `scrypt` password hashing, password show/hide toggle. Admin promotion via `ADMIN_EMAILS` env allowlist. Storage is a local JSON file (`data/users.json`).
@@ -26,7 +34,9 @@ What's working end-to-end right now:
 - **Tutor dashboard** — `/dashboard` shows status pill, reviewer notes, edit + view-public-profile buttons, visibility toggle, and conversation count. `/tutor/edit` reuses the signup form pre-filled with the existing submission; saving updates the application and resets status to Pending review (admin re-approves). Visibility toggle is a one-click switch independent of status.
 - **Safety, suspension & auto-refund** — the tutor signup form has a prominent safety callout (public libraries recommended; TUTUMatch verifies identity but does not choose lesson locations or take responsibility for what happens at any lesson). The chat thread surfaces the same reminder to the tutor side. If a tutor doesn't reply to an unlocked parent within 5 days, the platform auto-refunds the parent's $20 AND suspends the tutor's account. Suspended users are signed out, can't log back in, and see an explicit appeal-by-email message (`appeals@tutumatch.com.au`). The refund/suspension processor runs lazily on dashboard + messages page loads (and will move to a Vercel cron once production hits). A dev-only "Skip the 5-day wait" button on the parent's side of the chat lets us demo the flow locally.
 - **Platform chat** — `/messages` lists threads, `/messages/[unlockId]` is the chat. Post-unlock contact info is revealed inside the thread. Tutor reminder to apply the $20 first-lesson discount is surfaced on their side. First tutor reply records `tutorFirstReplyAt` (used by the 5-day refund auto-flag once Stripe is wired). Local-dev unlock shortcut at `POST /api/unlocks/dev-create` lets us exercise the full sign-up → approve → unlock → chat loop without Stripe.
-- **Legal stubs** — Terms, Privacy (APP-aligned), Child Safety drafts at `/legal/*`.
+- **Disclaimer layer** — visible at every decision point: a `BETA` tag in the TopNav, a permanent footer block ("we're an introduction service, not a tutoring provider; lesson locations are not chosen by us; liability is capped at the $20 unlock fee"), an explicit warning card on `/unlock/[tutorId]` right before the pay button, a 7-bullet acknowledgement list on tutor signup, and a "What we are and aren't" section on `/how-it-works`.
+- **Tutor indemnity** — a properly drafted Section 13 of the Terms with 10 enumerated triggers (acts/omissions, lesson incidents, misrepresentation, IP claims, $20-discount failure, tax/super, child-safety law breaches, defamation, false statements). Mirror parent clause in Section 14 with full ACL carve-outs preserved. A required checkbox in signup form Section 9 ("I have read and accept the tutor indemnity clause") blocks submission until ticked. Submit button reads "Submit & accept indemnity — list me as a tutor". Server stamps `termsAcceptedVersion` + `termsAcceptedAt` on every application; the admin detail page surfaces this as evidence on file. Bumping `TERMS_VERSION` in `src/lib/legal.ts` re-records acceptance on the next edit.
+- **Legal docs** — Terms (with the indemnity, version-stamped), Privacy (APP-aligned), Child Safety drafts at `/legal/*`. All still draft — lawyer review required before public launch.
 - **Prisma schema** — full data model (users, tutor profiles, schools, HSC results, subjects, availability, verifications, unlocks, payments, refunds, messages, reports). Not yet connected to a real DB.
 
 The original v3 prototype (HTML + JSX + screenshots) lives in `design-reference/` for visual diffing.
@@ -126,15 +136,39 @@ Pick Supabase over Neon because: same provider gives you Postgres + Storage (so 
 
 ### Founder / legal (off-code work)
 
-- [ ] Register an ABN
-- [ ] Decide sole trader vs Pty Ltd — strongly consider Pty Ltd for liability cover given child-safety exposure
-- [ ] Public liability + professional indemnity insurance quotes
-- [ ] Have a lawyer review the Terms, Privacy, Child Safety drafts in `src/app/legal/`
-- [ ] Business bank account
-- [ ] GST registration reminder (mandatory once turnover ≥ $75k/yr)
-- [ ] **Get written permission from each school** before activating their landing page — save the evidence and only then flip `School.active = true`
-- [ ] Set up `safety@tutumatch.com.au` and route it to a real inbox; train admins on mandatory reporting
-- [ ] OAIC data-breach response plan documented
+The codebase has done all it can to manage legal risk (disclaimers everywhere, tutor indemnity with explicit acceptance, age gate, WWCC enforcement, reports queue). Disclaimers + indemnities are useful but **do not eliminate liability** — they help you recover from the tutor afterwards, they don't stop a parent from suing the platform. The real protection comes from corporate structure + insurance. See the phased approach below.
+
+#### Phase 1 — Closed beta (safe to run today, ~$30 outlay)
+
+Defensible for testing the model with people in your network. No insurance, no Pty Ltd, no lawyer review yet.
+
+- [ ] **ABN** as sole trader (~15 min, free, https://abr.gov.au/)
+- [ ] **Domain** (~$15-20/yr — `tutumatch.com.au`, `.au`, or `.com`)
+- [ ] Set up `safety@tutumatch.com.au` and `appeals@tutumatch.com.au` routed to a real inbox you check daily
+- [ ] **Only promote within your personal network** — friends, family, school alumni. **Do not** publicly advertise, run paid ads, or take signups from strangers.
+- [ ] Keep volume small (under ~20 active tutors, under ~50 unlocks)
+- [ ] Manually verify WWCC for every tutor against the [NSW OCG public lookup](https://www.kidsguardian.nsw.gov.au/child-safe-organisations/working-with-children-check)
+- [ ] The codebase already shows `BETA` and "early access" framing prominently — keep it that way for Phase 1
+
+#### Phase 2 — Public launch (~$2k upfront, ~$1.3k/yr ongoing)
+
+Required before opening to strangers paying real money.
+
+- [ ] **Pty Ltd** company structure — ~$700 setup, ~$300/yr ongoing (use **EasyCompanies**, **Lawpath**, or an accountant). This is the single biggest protection: it shields personal assets so a lawsuit against the platform can't wipe out your savings, future wages, or family home.
+- [ ] **Public liability insurance** — ~$700-1,400/yr. Quote from **BizCover**, **CGU**, or **Insurance House**. Specify "online marketplace connecting tutors and parents". Bundle with **professional indemnity** for ~$300-600 more.
+- [ ] **Lawyer review** of Terms, Privacy, Child Safety drafts in `src/app/legal/` — ~$1-2k one-time. They'll refine the indemnity (Section 13), check ACL compliance, and confirm the limitation-of-liability cap is enforceable.
+- [ ] **Business bank account** (sole trader → company)
+- [ ] **GST registration** trigger reminder (mandatory once turnover ≥ $75k/yr)
+- [ ] **Written permission from each school** before activating their landing page — save the evidence and only then flip `School.active = true` in `/admin/schools`. Using a school's name / colours without permission risks defamation + trademark issues.
+- [ ] **OAIC data-breach response plan** documented (who notifies, in what window, what content)
+
+#### Why this matters — the honest version
+
+If a child is harmed at a lesson and parents sue, **disclaimers do not stop the lawsuit**. They help your defence; they don't prevent it. Without insurance, you pay your own legal costs (~$50k-200k for a serious case) and any verdict out of pocket. As a sole trader, that can come from personal savings + future wages + forced sale of assets. **A worst-case incident without Phase 2 protections can result in personal bankruptcy** (3 years of severe restrictions, permanent record on the National Personal Insolvency Index).
+
+The tutor indemnity (already in Section 13 of the Terms) gives you a *recovery* right against the tutor if their conduct caused the loss. In practice, recent-HSC-graduate tutors typically have $0 in collectable assets, so recovery is often pyrrhic. The indemnity is one of four layers (disclaimer / indemnity / Pty Ltd / insurance); all four work together.
+
+**$1.3k/yr for insurance vs realistic exposure of tens-to-hundreds of thousands** is the actual trade. Don't open the platform to public users without it.
 
 ---
 
@@ -163,9 +197,13 @@ npm run seed               # inserts the two demo schools
 
 Type-check: `npm run typecheck`. Build: `npm run build`.
 
-## Adding a new school (no code, once admin CRUD ships)
+For the **production setup** (Stripe, Supabase, Resend, domain, Vercel), see **[SETUP.md](./SETUP.md)** — a step-by-step walkthrough of every external service signup, what to copy where, and what costs what.
 
-Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts` (slug, name, tagline, brand colours). The CSS-variables theming means no recompile is needed at runtime — once the field is in the DB, a row insert is enough.
+## Adding a new school
+
+Sign in as an admin (email in `ADMIN_EMAILS`) and go to **`/admin/schools`**. Fill the form: slug auto-generates from the name, three brand colours drive the theming via CSS variables, and the `active` toggle controls whether the school appears publicly. **Get written permission from the school first** before flipping `active` to true — using their name and colours without consent risks defamation and trademark issues.
+
+Schools are stored in `data/schools.json` (will move to Postgres once Supabase is wired). The two seeded schools (Killara, Masada) live in `src/lib/schools.ts` as `SEED_SCHOOLS` — used to bootstrap the JSON store on first run.
 
 ## Routes
 
