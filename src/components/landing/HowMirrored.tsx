@@ -22,7 +22,7 @@ export function HowMirrored() {
           <div className="how-step">
             <span className="num">02</span>
             <span className="body">
-              <b>Get verified.</b> WWCC, photo ID, HSC/ATAR scans — manual review in 48 hrs.
+              <b>Go live.</b> A quick spam-and-abuse check, then your listing is public. No credential checks, no &ldquo;verified&rdquo; badge.
             </span>
           </div>
           <div className="how-step">

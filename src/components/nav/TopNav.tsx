@@ -28,6 +28,7 @@ export async function TopNav() {
         <nav className="topnav-links">
           <Link href="/browse">Browse tutors</Link>
           <Link href="/tutor/signup">For tutors</Link>
+          <Link href="/what-we-are">What we are</Link>
         </nav>
         <div className="topnav-actions">
           {session ? (

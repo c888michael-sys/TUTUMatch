@@ -16,7 +16,7 @@ export function FinalCTA({ school }: { school: School }) {
             <div className="eyebrow on-ink">For tutors</div>
             <h3 className="heading">Keep what you earn. Start in six minutes.</h3>
             <p className="sub">
-              List for free, pass verification, get paid directly. We charge $20 once per match — never again.
+              List for free, get paid directly. We charge $20 once per match — never again.
             </p>
             <div>
               <Link className="btn brand lg" href="/tutor/signup">

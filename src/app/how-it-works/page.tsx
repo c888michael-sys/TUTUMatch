@@ -10,105 +10,121 @@ export default function HowItWorksPage() {
       <main className="page-shell content-shell">
         <h1>How TUTUMatch works</h1>
         <p className="content-lede">
-          A flat-fee tutor marketplace. We don&apos;t take a cut of any lesson. Tutors list free, parents browse
-          free, and the only money TUTUMatch ever sees is the one-time $20 fee when a parent decides to contact a
-          specific tutor — and even that comes back as a $20 discount on the first lesson.
+          TUTUMatch is a classifieds directory for NSW tutors. Parents browse and make contact
+          completely free. Tutors list for free and only ever pay when a real student is confirmed —
+          and the first matched student is on us.
         </p>
 
         <h2>If you&apos;re a parent or student</h2>
         <ol className="how-list">
           <li>
-            <strong>Browse for free.</strong> Open <Link href="/browse">/browse</Link> or pick your school
-            (Killara, Masada, or Other Locations). Filter by subject, year level, ATAR, rate, days available.
+            <strong>Browse for free.</strong> Open <Link href="/browse">/browse</Link> or pick your
+            school. Filter by subject, year level, ATAR, rate, and days available. No account, no
+            fee.
           </li>
           <li>
-            <strong>Read profiles for free.</strong> Every tutor shows their HSC subjects + bands, year levels
-            they teach, rate, suburb, and a bio. No login required.
+            <strong>Read profiles for free.</strong> Every listing shows the tutor&apos;s subjects,
+            year levels, rate, suburb, and a bio. Listings are written by the tutors themselves.
           </li>
           <li>
-            <strong>Pay $20 once, only when you&apos;ve picked one.</strong> The $20 unlocks their full name,
-            phone, and email, and opens an in-platform chat. Stripe handles the payment.
+            <strong>Contact the tutor directly.</strong> When you&apos;ve found someone, get their
+            contact details and reach out. There&apos;s no platform fee and no middleman — from here
+            on you deal with the tutor directly.
           </li>
           <li>
-            <strong>The tutor takes $20 off your first lesson.</strong> Net cost of the unlock = $0.
-          </li>
-          <li>
-            <strong>If something falls through, you get the $20 back.</strong> Full refund if no agreement is
-            reached for any reason. If the tutor doesn&apos;t reply within 5 days, the refund happens
-            automatically — no forms, no chasing.
+            <strong>Verify, then arrange the lesson.</strong> Ask the tutor for their Working With
+            Children Check and verify it yourself with the NSW Office of the Children&apos;s
+            Guardian — it&apos;s free and takes about 30 seconds. Then agree the time, place, and
+            rate directly. Public libraries are strongly recommended.
           </li>
         </ol>
+        <p>
+          Parents never pay TUTUMatch anything. Read the{" "}
+          <Link href="/legal/child-safety">Child Safety Policy</Link> before booking — it walks
+          through exactly how to check a WWCC and choose a safe location.
+        </p>
 
         <h2>If you&apos;re a tutor</h2>
         <ol className="how-list">
           <li>
-            <strong>List for free.</strong> Fill in <Link href="/tutor/signup">/tutor/signup</Link>: your HSC
-            results, the subjects + year levels you can teach, your rate, your availability, and which area you&apos;d
-            tutor in.
+            <strong>List for free.</strong> Fill in <Link href="/tutor/signup">/tutor/signup</Link>:
+            your subjects and year levels, your rate, your availability, the area you tutor in, and a
+            bio. There is no listing fee, ever.
           </li>
           <li>
-            <strong>Upload your verification documents.</strong> Photo ID, WWCC card / letter, NESA HSC Record of
-            Achievement. Only TUTUMatch admins can see them. Manual review takes ~48 hours.
+            <strong>Go live.</strong> Your listing appears in browse after a quick spam-and-abuse
+            check. TUTUMatch does not verify your credentials and shows no &ldquo;verified&rdquo;
+            badge — your listing is presented as your own.
           </li>
           <li>
-            <strong>Once approved, you appear in browse.</strong> Parents can read your profile and contact you
-            after they pay $20.
+            <strong>Your first matched student is free.</strong> When a parent picks you, you pay
+            nothing for that first match — our way of letting you prove the directory works before
+            you spend a cent.
           </li>
           <li>
-            <strong>Apply the $20 first-lesson discount.</strong> On every new parent&apos;s first invoice. After
-            that, you keep 100% of every lesson, forever.
+            <strong>After that, $20 per confirmed match.</strong> From your second student onwards,
+            TUTUMatch charges a flat $20 when a match is confirmed — or $15 if you self-report the
+            match honestly. No subscription, no per-lesson cut. Prefer to skip per-match fees?
+            TUTUMatch Permanent is a one-time $60 — list forever, no commissions (it pays for itself
+            at your fourth student).
           </li>
           <li>
-            <strong>Reply within 5 days.</strong> If you go silent on a parent who&apos;s already paid, they get
-            an automatic refund and your account is suspended pending appeal.
+            <strong>Report honestly.</strong> When a parent contacts you, you have 48 hours to tell
+            us whether it led to a lesson. Honest self-reporting earns the $15 rate and keeps your
+            listing visible. Claiming &ldquo;no match&rdquo; when there was one risks a strike on
+            your listing.
           </li>
         </ol>
 
         <h2>How TUTUMatch makes money</h2>
         <p>
-          The $20 unlock fee is the only money the platform ever sees. It pays for hosting, document verification,
-          and Stripe processing. We don&apos;t take a percentage of any lesson. Once you&apos;ve been introduced,
-          we&apos;re not in the loop — you and the tutor sort everything else out directly.
+          The only money the platform ever sees is the $20 commission a tutor pays when a real
+          student is confirmed — or $15 with honest self-reporting, or a one-time $60 for TUTUMatch
+          Permanent. Parents pay nothing. We don&apos;t take a percentage of any lesson. Once a
+          parent and tutor are in touch, the arrangement is entirely theirs.
         </p>
 
         <h2>Safety</h2>
         <p>
-          Every tutor clears a WWCC check, a government ID match, and a manual HSC document review before going
-          live. Tutors must be 18 or older — under-18 applications are auto-rejected on submission. Any user can
-          report a profile or message; we review reports manually and can suspend accounts.
-        </p>
-        <p>
-          Lesson locations are up to you and the tutor. <strong>Public libraries are strongly recommended</strong>
-          {" "}— safe, quiet, free, and well-supervised. TUTUMatch verifies tutors but does not choose where
-          lessons happen and is not responsible for what happens at any specific lesson. Read our{" "}
-          <Link href="/legal/child-safety">Child Safety Policy</Link> for full detail.
+          TUTUMatch is a directory — we publish tutor-supplied listings, and we do{" "}
+          <strong>not</strong> verify, vet, or screen tutors. Before any lesson, parents should
+          verify the tutor&apos;s WWCC directly with the{" "}
+          <a
+            href="https://www.kidsguardian.nsw.gov.au/working-with-children/check-an-employee-or-volunteer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            NSW Office of the Children&apos;s Guardian
+          </a>
+          . Lesson locations are arranged privately —{" "}
+          <strong>public libraries are strongly recommended</strong>: safe, quiet, free, and
+          well-supervised. Any user can report a listing; we review reports and can remove listings
+          from the directory. Our full guidance is in the{" "}
+          <Link href="/legal/child-safety">Child Safety Policy</Link>.
         </p>
 
-        <h2>What we are and aren&apos;t</h2>
+        <h2>What TUTUMatch is — and isn&apos;t</h2>
         <p>
-          TUTUMatch is an <strong>introduction service</strong> — we connect parents with tutors and verify each
-          tutor&apos;s identity, age, WWCC, and HSC credentials before they appear publicly.
-        </p>
-        <p>
-          We are <strong>not</strong>:
-        </p>
-        <ul className="what-we-arent">
-          <li>the tutor&apos;s employer, agent, or partner</li>
-          <li>a party to any lesson — those are private arrangements between parent and tutor</li>
-          <li>a supervisor of any lesson location or interaction</li>
-          <li>a guarantor of any specific academic outcome (ATAR, marks, university admission)</li>
-          <li>responsible for what happens before, during, or after any lesson</li>
-        </ul>
-        <p>
-          Our liability is contractually limited to the $20 unlock fee per match. The full picture is in our{" "}
-          <Link href="/legal/terms">Terms of Service</Link>.
+          TUTUMatch is a classifieds directory, like the trades or jobs listings you already know.
+          We are not a tutoring provider, not the tutor&apos;s employer or agent, not a party to any
+          lesson, and not a guarantor of any academic outcome. The full picture is on our{" "}
+          <Link href="/what-we-are">What TUTUMatch is (and isn&apos;t)</Link> page.
         </p>
 
         <h2>Read the policies</h2>
         <ul className="content-link-list">
-          <li><Link href="/legal/terms">Terms of Service</Link></li>
-          <li><Link href="/legal/privacy">Privacy Policy</Link></li>
-          <li><Link href="/legal/child-safety">Child Safety Policy</Link></li>
+          <li>
+            <Link href="/what-we-are">What TUTUMatch is (and isn&apos;t)</Link>
+          </li>
+          <li>
+            <Link href="/legal/terms">Terms of Service</Link>
+          </li>
+          <li>
+            <Link href="/legal/privacy">Privacy Policy</Link>
+          </li>
+          <li>
+            <Link href="/legal/child-safety">Child Safety Policy</Link>
+          </li>
         </ul>
       </main>
     </>
