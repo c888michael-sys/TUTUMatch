@@ -127,6 +127,11 @@ export type TutorApplication = {
   // first-match-free logic. Older records may not have this field — treat
   // undefined as 0.
   matchesCompletedCount?: number;
+  strikeCount?: number;
+  strikeHistory?: Array<{ appliedAt: string; matchId: string; parentEmail: string; strikeNumber: number }>;
+  noHonestyDiscount?: boolean;
+  permanentListing?: boolean;
+  permanentListingPurchasedAt?: string;
   // When set and in the future, the tutor's listing is hidden from public
   // browse — either during the 48h window of an open match, or a strike period.
   hiddenUntil?: string;
@@ -437,4 +442,16 @@ export async function updateApplicationStatus(
 
 export function newId(prefix: string): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
+}
+
+// ───────────────────────────── Token helpers ─────────────────────────────
+
+import crypto from "node:crypto";
+
+export function generateToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+export function hashToken(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }

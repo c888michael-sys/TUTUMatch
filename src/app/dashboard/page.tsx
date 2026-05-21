@@ -2,7 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { VisibilityToggle } from "@/components/tutor/VisibilityToggle";
-import { findApplicationByUserId, findUserById } from "@/lib/db";
+import { SelfReportButton } from "@/components/tutor/SelfReportButton";
+import { findApplicationByUserId, findUserById, listMatchesForUser } from "@/lib/db";
+import { strikeSummary } from "@/lib/strike";
 import { clearSession, getSession } from "@/lib/session";
 
 export const metadata = { title: "Dashboard · TUTUMatch" };
@@ -15,6 +17,16 @@ const STATUS_LABEL: Record<string, string> = {
   REJECTED: "Rejected",
 };
 
+const MATCH_STATUS_LABEL: Record<string, string> = {
+  AWAITING_RESOLUTION: "Awaiting resolution",
+  RESOLVED_TUTOR_CONFIRMED: "Confirmed by you",
+  RESOLVED_PARENT_CONFIRMED: "Confirmed by parent",
+  RESOLVED_NO_MATCH: "No match",
+  RESOLVED_APPEALED_WON: "Appeal won",
+  RESOLVED_APPEALED_LOST: "Appeal lost",
+  AUTO_CLOSED_NO_RESPONSE: "Auto-closed",
+};
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -23,9 +35,6 @@ export default async function DashboardPage({
   const session = getSession();
   if (!session) redirect("/login?next=/dashboard");
 
-  // Re-load the current user fresh from the store so a just-suspended
-  // tutor sees the banner immediately even though their cookie session is
-  // still valid.
   const me = await findUserById(session.userId);
   if (me?.suspended) {
     clearSession();
@@ -60,6 +69,10 @@ export default async function DashboardPage({
   const app = await findApplicationByUserId(session.userId);
   const isLiveTutor = !!app && app.status === "APPROVED";
   const visibility = app?.visibility ?? true;
+  const matches = app ? await listMatchesForUser(session.userId) : [];
+  const pendingMatches = matches.filter((m) => m.status === "AWAITING_RESOLUTION");
+  const recentMatches = matches.filter((m) => m.status !== "AWAITING_RESOLUTION").slice(0, 5);
+  const strikeMsg = app ? strikeSummary(app) : null;
 
   return (
     <>
@@ -90,7 +103,15 @@ export default async function DashboardPage({
 
         {session.role === "ADMIN" && (
           <div className="stub-note">
-            Admin tools: <Link href="/admin">Tutor applications →</Link>
+            Admin tools:{" "}
+            <Link href="/admin">Tutor applications →</Link>{" "}
+            <Link href="/admin/appeals">Appeals →</Link>
+          </div>
+        )}
+
+        {strikeMsg && (
+          <div className="reject-banner">
+            <strong>Strike notice:</strong> {strikeMsg}
           </div>
         )}
 
@@ -135,6 +156,17 @@ export default async function DashboardPage({
                   <strong>Reviewer notes:</strong> {app.reviewerNotes}
                 </div>
               )}
+              {(app.strikeCount ?? 0) > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <strong>Strikes:</strong>{" "}
+                  <span style={{ color: "var(--error, #dc2626)" }}>
+                    {app.strikeCount}/3{app.noHonestyDiscount ? " (no honesty discount — perpetual)" : ""}
+                  </span>
+                </div>
+              )}
+              {(app.matchesCompletedCount ?? 0) > 0 && (
+                <div><strong>Confirmed matches:</strong> {app.matchesCompletedCount}</div>
+              )}
             </div>
 
             <div className="dashboard-app-section">
@@ -154,7 +186,68 @@ export default async function DashboardPage({
           </div>
         )}
 
-        <h2>Browse</h2>
+        {pendingMatches.length > 0 && (
+          <div style={{ marginTop: 32 }}>
+            <h2>Pending matches — action required</h2>
+            <p className="muted small">
+              A parent has selected you. Self-report within 48 hours to claim the $15 honesty rate
+              and keep your listing visible.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {pendingMatches.map((m) => (
+                <div key={m.id} className="dashboard-card" style={{ borderLeft: "3px solid var(--brand)" }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <strong>Parent:</strong> {m.parentEmail}
+                  </div>
+                  <div className="muted small" style={{ marginBottom: 12 }}>
+                    Match opened: {new Date(m.createdAt).toLocaleString("en-AU")} ·
+                    Hidden until: {new Date(m.tutorHiddenUntil).toLocaleString("en-AU")}
+                    {m.isFreeFirstMatch && " · First match — no commission!"}
+                  </div>
+                  <SelfReportButton matchId={m.id} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {recentMatches.length > 0 && (
+          <div style={{ marginTop: 32 }}>
+            <h2>Recent match history</h2>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Parent</th>
+                  <th>Status</th>
+                  <th>Commission</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentMatches.map((m) => (
+                  <tr key={m.id}>
+                    <td className="mono-cell">{new Date(m.createdAt).toLocaleDateString("en-AU")}</td>
+                    <td>{m.parentEmail}</td>
+                    <td>
+                      <span className="status-pill approved">
+                        {MATCH_STATUS_LABEL[m.status] ?? m.status}
+                      </span>
+                    </td>
+                    <td className="mono-cell">
+                      {m.amountChargedCents !== undefined
+                        ? m.amountChargedCents === 0
+                          ? "Free (first match)"
+                          : `$${(m.amountChargedCents / 100).toFixed(0)}`
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <h2 style={{ marginTop: 32 }}>Browse</h2>
         <p>Take a look at the public site as your students would:</p>
         <p>
           <Link className="btn ghost" href="/browse">All tutors</Link>{" "}

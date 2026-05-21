@@ -48,6 +48,7 @@ export default async function AdminPage() {
         <p className="admin-tools-row">
           <Link className="btn ghost sm" href="/admin/schools">Manage schools</Link>
           <Link className="btn ghost sm" href="/admin/reports">Reports</Link>
+          <Link className="btn ghost sm" href="/admin/appeals">Appeals</Link>
         </p>
 
         {apps.length === 0 ? (
