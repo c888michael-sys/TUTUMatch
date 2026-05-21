@@ -116,7 +116,7 @@ Pick Supabase over Neon because: same provider gives you Postgres + Storage (so 
 - [x] **Schools CRUD admin UI** — `/admin/schools` lets you add/edit/deactivate schools (slug, name, tagline, three brand colours, active toggle). Stored in `data/schools.json`. New schools become tabs on the public site instantly; their brand colour drives the theming via CSS variables.
 - [x] **Refund queue UI** in `/admin/refunds` — buckets unlocks into auto-refunded (with tutor suspension status + one-click unsuspend), approaching the 5-day window, and active.
 - [x] **Manual unsuspend** — admin button on the refunds page; clears suspension fields so the user can log in again.
-- [ ] Reports / dispute resolution UI
+- [x] **Reports / dispute resolution UI** — anyone signed in can report a tutor profile (from `/tutors/[id]`) or a chat thread (from `/messages/[unlockId]`) with a reason + description. Admin queue at `/admin/reports` shows open reports first, click to expand → resolve / dismiss with optional notes + action taken (Warned / Suspended user / Rejected application / Refunded parent). Suspending from the report applies the same `suspended` flag the auto-refund flow uses.
 - [ ] Tutor photo upload with admin moderation (needs file storage — pair with the WWCC/ID/HSC upload work)
 - [ ] Analytics (Plausible — privacy-friendly, cheap)
 - [ ] WCAG 2.1 AA accessibility audit
@@ -192,6 +192,9 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `GET/PATCH /api/admin/applications` | List + approve/reject                                                     | ✅ Done      |
 | `/admin/schools`                    | Admin: add / edit / deactivate schools                                    | ✅ Done      |
 | `/admin/refunds`                    | Admin: refund queue + tutor suspension status + unsuspend                 | ✅ Done      |
+| `/admin/reports`                    | Admin: reports queue — resolve / dismiss with action taken                | ✅ Done      |
+| `POST /api/reports`                 | Submit a report (any signed-in user)                                      | ✅ Done      |
+| `PATCH /api/admin/reports/[id]`     | Admin resolve / dismiss + optional suspend                                | ✅ Done      |
 | `GET/POST /api/admin/schools`       | List + create school                                                      | ✅ Done      |
 | `PATCH/DELETE /api/admin/schools/[id]` | Update / delete school                                                 | ✅ Done      |
 | `POST /api/admin/users/[id]/unsuspend` | Admin: clear suspension                                                | ✅ Done      |

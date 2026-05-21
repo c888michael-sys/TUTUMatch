@@ -118,6 +118,7 @@ const USERS_FILE = "users.json";
 const APPS_FILE = "applications.json";
 const UNLOCKS_FILE = "unlocks.json";
 const MESSAGES_FILE = "messages.json";
+const REPORTS_FILE = "reports.json";
 
 // ───────────────────────────── Unlocks + messages ─────────────────────────────
 
@@ -202,6 +203,82 @@ export async function createMessage(msg: Message): Promise<void> {
   const all = await readJson<Message[]>(MESSAGES_FILE, []);
   all.push(msg);
   await writeJson(MESSAGES_FILE, all);
+}
+
+// ───────────────────────────── Reports / disputes ─────────────────────────────
+
+export type ReportKind = "USER" | "APPLICATION" | "MESSAGE";
+export type ReportStatus = "OPEN" | "RESOLVED" | "DISMISSED";
+
+// Predefined reason codes. Free-text always goes in `description`.
+export type ReportReason =
+  | "contact_info_bypass"
+  | "harassment"
+  | "inappropriate_content"
+  | "safety_concern"
+  | "qualifications_misrepresented"
+  | "no_show"
+  | "spam"
+  | "other";
+
+export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
+  contact_info_bypass: "Sharing contact info to dodge the $20 fee",
+  harassment: "Harassment or abusive language",
+  inappropriate_content: "Inappropriate or offensive content",
+  safety_concern: "Child-safety concern",
+  qualifications_misrepresented: "Misrepresenting qualifications / ATAR",
+  no_show: "Tutor didn't show up to a booked lesson",
+  spam: "Spam or scam",
+  other: "Something else",
+};
+
+// Optional admin-recorded outcome at resolution time.
+export type ReportAction =
+  | "NONE"
+  | "WARNED_USER"
+  | "SUSPENDED_USER"
+  | "REJECTED_APPLICATION"
+  | "REFUNDED_PARENT";
+
+export type Report = {
+  id: string;
+  reporterUserId: string;
+  reporterEmail: string;            // snapshot at report time
+  subjectKind: ReportKind;
+  subjectId: string;
+  subjectThreadId?: string;         // unlock id, when reporting a chat message / thread
+  reason: ReportReason;
+  description: string;
+  status: ReportStatus;
+  createdAt: string;
+  resolvedAt?: string;
+  resolverEmail?: string;
+  resolverNotes?: string;
+  actionTaken?: ReportAction;
+};
+
+export async function listReports(): Promise<Report[]> {
+  return readJson<Report[]>(REPORTS_FILE, []);
+}
+
+export async function findReportById(id: string): Promise<Report | undefined> {
+  const all = await listReports();
+  return all.find((r) => r.id === id);
+}
+
+export async function createReport(r: Report): Promise<void> {
+  const all = await listReports();
+  all.push(r);
+  await writeJson(REPORTS_FILE, all);
+}
+
+export async function patchReport(id: string, patch: Partial<Report>): Promise<Report | undefined> {
+  const all = await listReports();
+  const i = all.findIndex((r) => r.id === id);
+  if (i < 0) return undefined;
+  all[i] = { ...all[i], ...patch };
+  await writeJson(REPORTS_FILE, all);
+  return all[i];
 }
 
 // ───────────────────────────── Suspension + auto-refund ─────────────────────────────

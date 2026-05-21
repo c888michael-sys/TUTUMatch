@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { Thread } from "@/components/messages/Thread";
+import { ReportButton } from "@/components/report/ReportButton";
 import { FastForwardRefund } from "@/components/messages/FastForwardRefund";
 import {
   findApplicationById,
@@ -137,6 +138,22 @@ export default async function ThreadPage({ params }: { params: { unlockId: strin
         )}
 
         <Thread unlockId={unlock.id} viewerRole={isParent ? "PARENT" : "TUTOR"} initialMessages={messages} />
+
+        <div className="report-row">
+          <ReportButton
+            subjectKind="MESSAGE"
+            subjectId={isParent ? unlock.tutorUserId : unlock.parentUserId}
+            subjectThreadId={unlock.id}
+            subjectLabel={isParent ? tutorDisplay : "this parent"}
+            variant="inline"
+          />
+          <span className="report-row-note">
+            Use this if {isParent ? "the tutor" : "the parent"} is being abusive, sharing contact info
+            inappropriately, or anything else worth flagging. For urgent child-safety issues, also email{" "}
+            <a href="mailto:safety@tutumatch.com.au" className="mono-link">safety@tutumatch.com.au</a>
+            {" "}or contact the police directly.
+          </span>
+        </div>
       </main>
     </>
   );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { TopNav } from "@/components/nav/TopNav";
 import { ArrowIcon, LockIcon } from "@/components/landing/icons";
+import { ReportButton } from "@/components/report/ReportButton";
 import { OTHER_AREA_SCHOOL } from "@/lib/schools";
 import { findSchoolBySlug } from "@/lib/schools-store";
 import { findApplicationById } from "@/lib/db";
@@ -129,6 +130,19 @@ export default async function TutorProfilePage({ params }: { params: { id: strin
             </div>
           </section>
         )}
+
+        <div className="report-row">
+          <ReportButton
+            subjectKind="APPLICATION"
+            subjectId={app.id}
+            subjectLabel={`${app.firstName} ${app.lastInitial}.`}
+            variant="inline"
+          />
+          <span className="report-row-note">
+            Spot something off? Misleading qualifications, contact-info bypass, or a safety concern —
+            tell us.
+          </span>
+        </div>
 
         {!isLive && (
           <section className="stub-note">
