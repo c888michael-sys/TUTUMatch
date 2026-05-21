@@ -23,10 +23,13 @@ export function Footer() {
               <Link href="/tutor/signup">For tutors</Link>
             </li>
             <li>
-              <a href="#how-20-works">How it works</a>
+              <Link href="/how-it-works">How it works</Link>
             </li>
             <li>
               <Link href="/schools/killara">Schools</Link>
+            </li>
+            <li>
+              <Link href="/contact">Contact</Link>
             </li>
           </ul>
         </div>
@@ -62,16 +65,16 @@ export function Footer() {
           <h5>Contact</h5>
           <ul>
             <li>
+              <Link href="/contact">Get in touch</Link>
+            </li>
+            <li>
               <a href="mailto:hello@tutumatch.com.au">hello@tutumatch.com.au</a>
             </li>
             <li>
-              <a href="#">Instagram</a>
+              <a href="mailto:safety@tutumatch.com.au">safety@tutumatch.com.au</a>
             </li>
             <li>
-              <a href="#">TikTok</a>
-            </li>
-            <li>
-              <a href="#">LinkedIn</a>
+              <a href="mailto:appeals@tutumatch.com.au">appeals@tutumatch.com.au</a>
             </li>
           </ul>
         </div>

@@ -187,6 +187,8 @@ Until the admin CRUD form is built, add a school by editing `src/lib/schools.ts`
 | `/legal/terms`                      | Terms of Service                                                          | 📝 Draft     |
 | `/legal/privacy`                    | Privacy Policy                                                            | 📝 Draft     |
 | `/legal/child-safety`               | Child Safety Policy                                                       | 📝 Draft     |
+| `/how-it-works`                     | Standalone explainer (parent + tutor flows + safety summary)              | ✅ Done      |
+| `/contact`                          | Routed contact emails: general / safety / appeals / privacy               | ✅ Done      |
 | `POST /api/auth/{signup,login,logout,me}` | Cookie-based auth                                                  | ✅ Done      |
 | `POST /api/tutor/applications`      | Submit a tutor application                                                | ✅ Done      |
 | `PUT  /api/tutor/applications`      | Update current user's application (sets status back to Pending review)    | ✅ Done      |

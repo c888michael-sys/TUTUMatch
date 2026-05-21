@@ -138,6 +138,14 @@ export function AuthForms({ defaultMode = "login" as Mode }) {
         <button className="btn brand lg" type="submit" disabled={busy}>
           {busy ? "Working…" : mode === "login" ? "Log in" : "Create account"}
         </button>
+
+        {mode === "login" && (
+          <p className="auth-help">
+            Forgot password? Self-serve reset isn&apos;t live yet — email{" "}
+            <a className="mono-link" href="mailto:hello@tutumatch.com.au">hello@tutumatch.com.au</a>
+            {" "}with your account email and we&apos;ll sort it manually.
+          </p>
+        )}
       </form>
     </div>
   );

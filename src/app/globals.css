@@ -2444,6 +2444,110 @@ footer {
   margin: -8px 0 18px;
 }
 
+/* Error pages (404 / 500) */
+.error-shell { max-width: 640px; text-align: center; }
+.error-code {
+  font-family: var(--mono); font-weight: 600;
+  font-size: 64px;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+  margin: 0 0 4px;
+}
+.error-shell h1 {
+  font-family: var(--sans); font-weight: 600;
+  font-size: clamp(28px, 3vw, 36px);
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+}
+.error-lede {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin-bottom: 26px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.error-links {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+/* Content pages (how-it-works, contact) */
+.content-shell { max-width: 760px; }
+.content-lede {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin-bottom: 28px;
+}
+.content-shell h2 {
+  margin: 32px 0 10px;
+  font-family: var(--sans); font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.018em;
+  color: var(--ink);
+}
+.content-shell p { font-size: 15px; line-height: 1.65; color: var(--ink); margin: 0 0 14px; }
+.how-list {
+  list-style: decimal inside;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.how-list li {
+  font-size: 15px; line-height: 1.6; color: var(--ink);
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-btn);
+}
+.how-list li strong { color: var(--brand-deep); }
+.content-link-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; gap: 18px; flex-wrap: wrap;
+}
+.content-link-list a {
+  color: var(--brand);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+/* Contact page */
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 18px 0 32px;
+}
+.contact-card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-card);
+  padding: 22px 24px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: var(--shadow-card);
+}
+.contact-card h2 {
+  margin: 0;
+  font-family: var(--sans); font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: -0.012em;
+}
+.contact-card p { font-size: 14px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
+
+/* Login: forgot-password help */
+.auth-help {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
 /* Document uploader (tutor signup/edit) */
 .doc-uploader {
   display: flex; flex-direction: column; gap: 6px;
