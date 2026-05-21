@@ -1,21 +1,43 @@
 # TUTUMatch
 
-A flat-fee NSW tutor marketplace. Tutors list free; parents pay $20 once per match, refunded as the tutor's first-lesson discount. After the introduction, the platform is out of the loop.
+**TUTUMatch is a free NSW tutor directory** — think Hipages or Indeed, for high-school tutoring. Parents browse listings and contact tutors completely free. Tutors list for free and pay a flat commission ($20, or $15 if they self-report honestly) **only when a real student is confirmed** — and a tutor's first matched student is free. The platform makes no verification claims: listings are tutor-provided and parents verify tutors themselves. Once an introduction is made, the platform is out of the loop.
 
-> ## 🔄 Direction: pivoting to pure-directory model (decided 2026-05-21)
->
-> After working through the legal-exposure analysis with parents-paying versus tutors-paying-commission models, the chosen direction is **a pure directory** (Hipages / Indeed style) where:
->
-> - Parents browse, contact, and use everything completely **free** (no platform transaction at all)
-> - Tutors are charged a **commission per confirmed match** ($20, or $15 with the honesty discount)
-> - The first matched student is **free for the tutor** — commission kicks in for the second matched student onwards (marketing framing: "first student free")
-> - The platform makes **no verification claims** about tutors anywhere — listings are tutor-provided, parents verify directly
->
-> This drops the legal risk profile from "verified marketplace facilitator" (high exposure, needs Pty Ltd + ~$1,400/yr insurance) down to "classifieds directory" (Hipages-tier exposure, ~$500/yr media liability is enough). Total realistic ongoing cost lands around **$500–1,000/yr** rather than $2,000+.
->
-> **Current code state:** Sessions 1–2 of the pivot are complete and pushed (latest commit [`3d59f0d`](https://github.com/c888michael-sys/TUTUMatch/commit/3d59f0d)). Verification claims are stripped site-wide; the parent-pays unlock flow is replaced by the free "I want this tutor" Match flow; `npm run build` passes. **Next up: Session 3** — confirmation flow + strike system + tutor commission.
->
-> The **New model** section below has every design parameter (timings, fees, strike system, appeal flow, WWCC framing). The **Pivot work plan** breaks the code refactor into ~4 sessions of focused work. The original verified-marketplace **Status** section is kept further down for reference until the pivot lands.
+## New here? Read this first
+
+**What state is the project in?** The codebase is **mid-pivot**. TUTUMatch was originally built as a *verified marketplace* — the platform vetted tutors, and parents paid a $20 "unlock" fee to see a tutor's contact details. It is being rebuilt into the **pure-directory model** described above. The rebuild is split into 5 sessions:
+
+| Session | Scope | Status |
+|---|---|---|
+| 1 | Remove all verification claims site-wide | ✅ Complete |
+| 2 | Remove parent payment; add the free "I want this tutor" Match flow | ✅ Complete |
+| 3 | Confirmation flow + strike system + tutor commission (Stripe) | ⬜ **Next** |
+| 4 | WWCC reframe + admin pivot + auto-approval | ⬜ Not started |
+| 5 | Automation hardening + audit logging + retention | ⬜ Not started |
+
+Latest commit: [`9b9b454`](https://github.com/c888michael-sys/TUTUMatch/commit/9b9b454). `npm run build` passes.
+
+**Where do I find things in this README?**
+
+- **The new model** — every design parameter: fees, the 48-hour match flow, the strike system, appeals, WWCC framing. This is the product spec.
+- **Pricing & monetization** / **Data model changes** / **API contracts** — the canonical implementation references. Build from these; don't fork the numbers or shapes into individual files.
+- **For maintainers — hand-off guide** — read this before writing code. It has the quick state check, how to start a session, code conventions, and the decision log.
+- **Pivot work plan** — the session-by-session breakdown, each with a Definition of Done checklist. Start the next session whose DoD isn't satisfied.
+- **Local setup** — how to install and run it.
+
+**Picking up the build?** Go straight to *For maintainers — hand-off guide*, then start the next unfinished session in the *Pivot work plan*.
+
+**One caveat:** the **Status** section and parts of **Technical roadmap** further down describe the *pre-pivot* verified-marketplace build. They are kept for historical reference only — the directory model above supersedes them wherever they conflict.
+
+## Why the pivot? (decided 2026-05-21)
+
+The original verified-marketplace model made TUTUMatch a "verified marketplace facilitator" in legal terms — high exposure, needing a Pty Ltd structure and ~$1,400/yr insurance. After working through the legal-exposure analysis (parents-paying vs. tutors-paying-commission), the chosen direction is **a pure directory** (Hipages / Indeed style):
+
+- Parents browse, contact, and use everything completely **free** — no platform transaction at all
+- Tutors are charged a **commission per confirmed match** ($20, or $15 with the honesty discount)
+- The first matched student is **free for the tutor** — commission starts on the second match onwards (marketing framing: "first student free")
+- The platform makes **no verification claims** about tutors anywhere — listings are tutor-provided, parents verify directly
+
+This drops the legal risk profile from "verified marketplace facilitator" down to "classifieds directory" (Hipages-tier exposure — ~$500/yr media liability is enough), and total realistic ongoing cost to **$500–1,000/yr** rather than $2,000+.
 
 ---
 
