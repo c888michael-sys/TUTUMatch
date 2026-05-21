@@ -98,9 +98,54 @@ This is the genuine differentiator vs. tutoring centres (40-60% per lesson, fore
 
 ---
 
+## Engineering principles — locked in for the build
+
+These principles drive every design decision in the pivot. They are not aspirations; they're requirements that shape the code.
+
+### Legal-risk minimization (architectural, not just disclaimers)
+
+1. **No editorial judgment.** Listing order is algorithmic only (oldest, score, distance). No human-curated "recommended", "featured", or "best" anywhere. The moment we curate, we accept editorial responsibility.
+2. **Minimum platform knowledge.** We track only what's needed to operate (match status, payment status, strike count). No lesson outcomes, no lesson notes, no parent-tutor conversation content. Less knowledge = less implied duty of care.
+3. **Audit trail on every action.** Signup, listing, contact request, dispute, payment — each logs IP, user agent, timestamp, terms version accepted, into an append-only audit table. Invisible to users; critical for any future dispute.
+4. **No platform-mediated communications.** Once contact details are revealed, parent and tutor talk off-platform. We don't host the conversation so we don't gain knowledge that creates duty.
+5. **Listings are user content.** We don't edit them. We don't curate them. We only remove on report, and document the removal.
+6. **WWCC + ID stay private to the tutor.** Uploaded for the tutor's own use ("so you have them ready to give parents directly"). Never displayed publicly. Platform never claims they verify anything. Parents are directed to verify with NSW OCG directly.
+7. **Self-attestation under audit risk.** Tutors tick checkboxes affirming age, WWCC validity, conduct, etc. False attestation = strike + suspension + records preserved for any authority that asks.
+8. **Records retention is automated.** 7 years for transactional records (ATO + legal-defence compliance); shorter for personal data; all auto-purged on schedule.
+
+### Minimum-supervision principles
+
+1. **Default to self-service** everywhere — onboarding, edits, pause, delete, dispute submission.
+2. **Auto-approve unless flagged.** New tutors live immediately after passing automated checks (phone OTP, email verify, bio content scan, age tickbox). Manual review only for flagged content. Most signups never touch a human.
+3. **Auto-charge via Stripe Connect.** When commission is owed, tutor's saved card is charged automatically. No manual invoicing, no reconciliation.
+4. **Auto-suspend on triggers.** Strikes accumulate automatically. Multiple reports about one tutor in a rolling 30-day window = auto-suspended pending review.
+5. **Auto-resolve stale disputes.** Match opened, neither party responds within 30 days → auto-close, no charge. Default = no transaction happened.
+6. **Cron-driven scheduling.** Every time-based event is a Vercel Cron job. Zero manual triggers.
+7. **Three admin queues only:** (a) Spam/abuse moderation, (b) Appeals (tutor disputes a parent's "no" with evidence), (c) Schools CRUD. Realistic admin time at small scale: 15–30 min/day.
+8. **Tutor self-reports as the primary path.** System actively encourages it (fast reappearance + $5 discount). Honest tutors typically skip the parent-confirmation loop entirely.
+9. **Idempotent endpoints.** Safe to retry. Cron and webhooks can be aggressive without causing duplicate charges or broken state.
+10. **Observability over intervention.** Dashboards show patterns (match volume, dispute rate, suspension rate). System runs without watching.
+
+### Implementation choices that follow from these principles
+
+| Choice | Reason |
+|---|---|
+| **Stripe Connect Express** for tutor accounts | Handles saved cards, charges, refunds, AU tax compliance. No manual money movement. |
+| **Phone OTP at signup** (Twilio Verify or similar) | Cheap fraud prevention. Stops automated tutor signup spam. ~$0.07 per verification. |
+| **Cloudflare Turnstile** on signup + contact-request forms | Bot prevention without captcha UX friction |
+| **Resend for ALL transactional email** | Templated; never manual; includes delivery audit trail |
+| **Vercel Cron Jobs** for scheduled tasks | Built into hosting; no separate worker service |
+| **Dedicated audit log table** (append-only) | Immutable, easy to query, exportable for compliance |
+| **No in-platform messaging** | Directory ≠ communications platform. We reveal contact details and step out. |
+| **Algorithmic listing order only** | Removes editorial liability. Sort = function of public data, not human choice. |
+| **Content scanning on bios** (regex first, optional ML later) | Catches obvious spam/scam patterns without manual review |
+| **Soft-delete with retention** | Removed listings stay queryable for 7 years for audit, hidden from public |
+
+---
+
 ## Pivot work plan — what changes in the code
 
-Realistic estimate: **3–4 focused sessions of work**. Below is the session breakdown.
+Realistic estimate: **4–5 focused sessions of work**. Below is the session breakdown. Each session bakes in the engineering principles above — automation and legal-risk minimization are not separate work, they're built into every step.
 
 ### Session 1 — Content audit + remove all verification claims
 
@@ -155,7 +200,7 @@ Goal: build the post-match resolution flow (self-report, parent confirmation, st
 | **Add** appeal endpoint for tutors who dispute a no-match parent reply | Upload evidence → admin review |
 | **Add** admin view: pending appeals queue with evidence images | Extends `/admin` |
 
-### Session 4 — WWCC reframe + admin pivot + polish
+### Session 4 — WWCC reframe + admin pivot + auto-approval flow
 
 | Change | Notes |
 |---|---|
@@ -163,12 +208,36 @@ Goal: build the post-match resolution flow (self-report, parent confirmation, st
 | **Reframe** WWCC display on the tutor's own dashboard (visible to them, not the public) | New dashboard widget |
 | **Remove** WWCC from public profile display (parents see "ask the tutor for their WWCC" prompt instead) | `src/app/tutors/[id]/page.tsx` |
 | **Reframe** admin approval queue as **spam/abuse moderation only**, NOT credential check | Admin pages |
+| **Auto-approve flow** — new tutor signups go live immediately after passing: phone OTP, email verify, content scan, age tickbox. Only flagged content reaches admin. | New API + scanner |
+| **Phone OTP integration** (Twilio Verify or similar) | `src/lib/otp.ts` + signup form |
+| **Bot-prevention** — Cloudflare Turnstile on signup + contact-request forms | Layout + forms |
+| **Bio content scanner** (regex first; ML later) for obvious scam/spam/contact-info patterns; auto-flags for admin if matched | `src/lib/content-scanner.ts` |
 | **Remove** the "auto-reject under 18" auto-mechanism in favour of "you must self-declare 18+ to list" tickbox (we don't verify DOB ourselves) | `src/app/api/tutor/applications/route.ts` |
 | **Remove** the document upload + admin verification block from the signup form | These become tutor-private optional uploads, not part of verification |
 | **Update** the indemnity clause in Terms to reflect new model (lower platform exposure, narrower indemnity scope) | `src/app/legal/terms/page.tsx` |
 | **Update** Privacy Policy to reflect the data we now collect (less, mostly tutor-side) | `src/app/legal/privacy/page.tsx` |
 | **Update** `/how-it-works` to match the new flow with diagrams | `src/app/how-it-works/page.tsx` |
 | Re-test all the disclaimers, footer copy, and the "What TUTUMatch is and isn't" page | All-pages pass |
+
+### Session 5 — Automation hardening + audit logging + retention policies
+
+Goal: bake in the "minimum supervision" principles. After this session, the platform should run with 15–30 min/day of admin time at modest scale.
+
+| Change | Why / Notes |
+|---|---|
+| **Audit log table** — append-only record of every user action (signup, listing, contact request, dispute, payment, terms acceptance). Captures IP + UA + timestamp + Terms version. | Critical evidence trail for any legal challenge; invisible to users |
+| **Audit log middleware** for all API routes that mutate state | Automatic; no per-route work |
+| **Rate limiting** on signup, contact request, dispute submission (IP + user-based) | Prevents abuse; upstash redis or Postgres-based |
+| **Cron jobs** — at minimum: confirmation-prompt sender, retry scheduler, strike-period expiry checker, listing-inactivity hider, data-retention purger | All Vercel Cron, all idempotent |
+| **Auto-suspension triggers** — N reports about same tutor in 30 days = auto-suspend pending review (configurable threshold) | Removes manual trigger work |
+| **Auto-resolution timer** — match opened, no resolution in 30 days → auto-close with no charge | Default = no transaction happened |
+| **Data retention policies** — 7yr for transactional records, shorter for personal data, automated purge | ATO + legal-defence compliance |
+| **Self-service data export + deletion** — user-facing endpoint to download their data (JSON) or request account deletion (with retention exceptions for legal records) | Privacy Act compliance, GDPR-style |
+| **Operational dashboard** at `/admin/health` — match volume, dispute rate, suspension rate, payment success rate, no manual reconciliation needed | Pattern observation, not intervention |
+| **Compliance auto-report** — generate a periodic CSV of: terms-acceptance log, removals, suspensions, refunds, disputes | For if you ever need to demonstrate good-faith operation to a regulator or court |
+| **Stripe Connect tax/GST handling** — once GST threshold is approached, automated alerting + integration with Stripe Tax | Reduces accountant work |
+| **Email digest** — weekly automated summary to admin email: counts, anomalies, items needing attention | Replaces daily admin attention with weekly review |
+| **Sentry integration** for error monitoring | Optional, ~free tier; spots issues without manual log-checking |
 
 ---
 
