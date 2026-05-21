@@ -21,12 +21,21 @@ A flat-fee NSW tutor marketplace. Tutors list free; parents pay $20 once per mat
 
 ## The new model — directory + confirmed-match commission
 
-### Money flow (the key change)
+### The headline (canonical phrasing — use everywhere)
 
-- Parent pays **$0** to the platform — ever, in any flow
-- Tutor pays **$20** when a parent confirms a match with them (or **$15** if the tutor self-reports the match honestly before the parent confirmation prompt arrives)
-- **First matched student for any new tutor is free** — commission starts on second confirmed match onwards. This is the headline marketing pitch for tutors
-- Future possibility (not now): bump base commission to **$25 ($20 with honesty discount)** for *new* tutors only, if the model proves out
+> **List free. Pay only when you get a student. First match is on us.**
+>
+> After that, $20 per student you actually take on — or $15 if you self-report honestly. Or skip per-match fees with **TUTUMatch Permanent**: $60 once, list forever, no more commissions (pays for itself at your 4th student).
+
+This is the single-paragraph value prop. Hero, landing page, signup form intro, and tutor dashboard all use this language verbatim or close to it. **Do not** use "free listing first time" — that's ambiguous about what happens later. The above framing is unambiguous: free to list permanently, pay per outcome.
+
+### Money flow (the key change from pre-pivot)
+
+- **Parent pays $0** to the platform — ever, in any flow
+- **Tutor pays $20** when a parent confirms a match (or **$15** if the tutor self-reports honestly before the parent confirmation prompt arrives)
+- **First confirmed match is free** for every new tutor — commission starts on the second match onwards. Headline marketing hook.
+- **TUTUMatch Permanent**: optional $60 one-time upgrade. Tutor never pays per-match commission again. 14-day no-questions refund on the purchase. Forfeited on 3rd-strike permanent suspension.
+- Future possibility (not for now): bump base commission to **$25 ($20 with honesty)** for *new* tutors only, after the model proves out. Permanent stays at $60.
 
 ### The match flow, end to end
 
@@ -98,6 +107,139 @@ This is the genuine differentiator vs. tutoring centres (40-60% per lesson, fore
 
 ---
 
+## Pricing & monetization (canonical values — hardcode from here)
+
+These are the numbers the build uses. If they change, the change goes through this section first, then a search/replace through the codebase. Don't fork pricing decisions into individual files.
+
+| Item | Amount | Notes |
+|---|---|---|
+| **Listing fee** | $0 | No upfront cost. Ever. |
+| **First confirmed match per tutor** | $0 | The free-first-match sweetener. Tracked on the tutor's record (`matchesCompletedCount === 0`). |
+| **Standard commission per confirmed match** | $20 AUD | Charged via Stripe Connect to tutor's saved card. |
+| **Honesty-discount commission** | $15 AUD | Applies when tutor self-reports the match before the parent-confirmation prompt fires (i.e., within the 48-hour window). |
+| **TUTUMatch Permanent (one-time)** | $60 AUD | Tutor pays once, never pays per-match commission again. 14-day no-questions refund. Forfeited on 3rd-strike permanent suspension. |
+| **Permanent break-even** | 4th student | At standard $20 × 3 = $60, so the 4th confirmed match onwards is pure savings. Mention this in marketing copy. |
+| **Future bump (not now)** | $25 / $20 honesty | For *new* tutors only, after model is validated. Permanent stays $60 (or rises in lockstep — decide at activation). |
+
+### What's free vs paid (canonical)
+
+| Action | Cost to user |
+|---|---|
+| Browse the directory | Free (no account needed) |
+| Search / filter / sort tutors | Free |
+| Click "I want this tutor" → see contact details | Free (no platform transaction) |
+| Tutor signs up + lists a profile | Free |
+| Tutor's profile appears in browse | Free (until past first confirmed match, then per-match commission applies) |
+| Tutor self-reports a confirmed match honestly | $15 (Stripe charge) |
+| Tutor charged by parent confirmation | $20 (Stripe charge) |
+| Tutor upgrades to Permanent | $60 one-time (Stripe charge) |
+| Re-listing after strike 1 reappearance | $20 to clear missed commission |
+| Re-listing after strike 2 reappearance | $20 to clear missed commission (no penalty fee) |
+| Re-listing after strike 3 reappearance | $20 (and ALL future matches cost $20 — no honesty discount, perpetual) |
+| Appeal evidence upload | Free |
+
+### Refund / write-off policy
+
+| Scenario | Outcome |
+|---|---|
+| Parent says NO (no match happened) | Tutor not charged. |
+| Both parties silent for 30 days | Auto-close, no charge. |
+| Tutor wins appeal (parent's NO overturned) | Tutor charged $20 standard (no honesty discount — they didn't self-report in time). |
+| Tutor loses appeal | Strike applied (1, 2, or 3). |
+| Permanent purchase, refund requested within 14 days | Full refund via Stripe, permanent flag removed, per-match commission resumes. |
+| Permanent purchase, after 14 days | No refund. |
+| 3rd-strike permanent suspension with Permanent upgrade | Permanent fee forfeited. No refund. (Discourages bad-faith permanent purchases.) |
+| Stripe payment fails (declined card, expired etc.) | Tutor's listing hidden pending payment method update; profile reappears once payment succeeds. |
+
+---
+
+## For maintainers (humans and AI agents) — hand-off guide
+
+If you're a future Claude / human picking up this project mid-build, **read this section first**. It's the source of truth for direction, conventions, and "what's about to happen next".
+
+### Quick state check (do this first)
+
+1. **What direction is the project going?** See the **🔄 Direction** banner at the top of this README. Currently: **pivoting from verified-marketplace to pure directory**.
+2. **What's the current code state?** Check the most recent commit message. If it ends with "Session X complete", that's the last finished session. If it's docs-only, the pivot rework hasn't started yet.
+3. **What's pending?** See the **Pivot work plan** below. Each session has a Definition of Done — start the next session whose DoD isn't yet satisfied.
+
+### How to start the next session
+
+1. Read the README in full, in order. Especially:
+   - **The new model** (mechanics)
+   - **Pricing & monetization** (canonical $)
+   - **Engineering principles** (architectural requirements)
+   - **Pivot work plan** session-by-session
+   - **Decision log** below (why we chose what we chose)
+2. Read the user's most recent message in the chat for any updates not yet in the README. If something they said contradicts the README, *ask before assuming the README is right*.
+3. Identify the next unfinished session (check the DoD lists). Confirm with the user before starting if the README's plan vs the user's last instruction don't line up.
+4. Use TodoWrite to break the session into todos.
+5. After each meaningful change, commit + push to `origin/main` immediately. **The user's memory has an explicit rule for this: "Push every update to GitHub".** Don't batch.
+6. When the session is done, update this README:
+   - Tick the session's DoD items off
+   - Move shipped items in the "Pivot work plan" or "Roadmap" from `[ ]` to `[x]`
+   - Update the routes table state icons
+   - Update the Status section bullets if a feature is now live
+
+### Conventions used in this codebase
+
+- **File organization:**
+  - `src/app/[route]/page.tsx` — server components (default)
+  - `src/app/[route]/route.ts` or `src/app/api/[path]/route.ts` — API handlers
+  - `src/components/[feature]/ComponentName.tsx` — React components grouped by feature
+  - `src/lib/[utility].ts` — shared utilities (db helpers, validators, etc.)
+- **Component conventions:**
+  - Server components by default; `"use client"` directive only when interactivity is needed
+  - PascalCase for component names, camelCase for utilities
+  - Each client component imports its own hooks at top of file
+- **Styling:**
+  - `src/app/globals.css` is the single CSS file. Component-specific classes are namespaced (`thread-row`, `dashboard-card`, etc.). No CSS modules.
+  - CSS variables drive theming (`--brand`, `--brand-deep`, `--brand-soft`, etc.). Don't hardcode colours.
+  - Mobile-first responsive — breakpoints at 520, 900, 1100.
+- **State / data flow:**
+  - `useState` for component state; no Redux/Zustand
+  - Server components fetch data directly; client components fetch via `fetch('/api/...')`
+  - `src/lib/db.ts` is the JSON-store layer that mimics what Prisma+Postgres will look like
+- **Forms:**
+  - zod for client AND server validation. The schemas live in `src/lib/` so they're shared.
+  - Client-side validation is UX; server-side is authoritative
+- **Commit messages:**
+  - Multi-paragraph descriptive. No Claude attribution footer (user prefers it without).
+  - Lead line: short imperative description ("Build X", "Fix Y", "Add Z"). Following paragraphs: what + why.
+  - HEREDOC style (see existing commits for examples).
+- **Push discipline:**
+  - Every commit goes to `origin/main` immediately. No local-only batching.
+  - This is in the user's saved memory and is non-negotiable for this project.
+- **README maintenance:**
+  - When you ship a roadmap item, tick it off in the same commit. Don't separate doc updates from feature commits.
+  - This is also in the user's saved memory.
+- **Asking the user before changing direction:**
+  - The README is the source of truth for the plan
+  - If you have a better idea, ask before implementing — don't unilaterally pivot mid-session
+
+### Decision log — why we chose what we chose
+
+Each row is a decision that's already been made. Don't re-litigate unless the user asks.
+
+| Decision | Reasoning |
+|---|---|
+| Pure directory model (not verified marketplace) | Drops legal-exposure tier from $50k-200k defence-cost range to $10k-30k. Loses some product differentiation but keeps the "pay-per-real-match" economics. |
+| No in-platform chat | Removes platform-mediated communications → less duty of care, no "what we knew" liability about parent-tutor conversations |
+| Parent pays $0, tutor pays commission | Avoids creating a consumer contract with parents (which would trigger Australian Consumer Law guarantees). Aligns with Hipages / Indeed model. |
+| First match free + $20 commission afterward | Aligns cost with value delivered. Lower friction than pay-to-list. |
+| $15 honesty discount | The $5 savings rewards self-reporting more than the $5 saves; better than relying on parent prompt response rates |
+| $60 permanent option (3-match break-even) | Serves high-volume tutors; predictable revenue for platform; clear value proposition (4th student onwards = savings) |
+| No "featured" or editorial sort | Algorithmic ordering only. Editorial selection creates editorial liability. |
+| WWCC collected privately, never displayed as "verified" | Avoid verification representation that creates duty of care. Tutor uses their own WWCC to satisfy parents directly. |
+| Strike system: 7d / 30d / permanent (no penalty fee on strike 2) | Honest mistakes recoverable. Third strike sticky enough to deter habitual dishonesty. |
+| Appeal via evidence + manual admin review (bank-transfer name match = auto-pass) | Protect honest tutors against parents who lie. Auto-pass for unambiguous cases minimises admin work. |
+| Auto-approve tutors after phone OTP + email verify + content scan + age tickbox | Removes admin bottleneck. Manual review only for flagged content. |
+| Idempotent endpoints + cron-driven scheduling | Reliable automation without manual intervention or worry about retries |
+| 7-year audit log retention | Standard for AU legal records + ATO. Append-only for evidence integrity. |
+| Self-service data export + deletion | Privacy Act compliance + reduces support workload |
+
+---
+
 ## Engineering principles — locked in for the build
 
 These principles drive every design decision in the pivot. They are not aspirations; they're requirements that shape the code.
@@ -143,9 +285,258 @@ These principles drive every design decision in the pivot. They are not aspirati
 
 ---
 
+## Data model changes (canonical — implement these in session 2 and 3)
+
+The pivot replaces the `Unlock` + `Message` entities with `Match` + `Appeal`. The `TutorApplication` type also grows several fields and loses a few.
+
+```ts
+// REMOVE entirely
+type Unlock = {...};   // gone — no parent-side payment
+type Message = {...};  // gone — no in-platform chat
+
+// ADD: Match (replaces Unlock)
+type MatchStatus =
+  | "AWAITING_RESOLUTION"        // created when parent clicks "I want this tutor"
+  | "RESOLVED_TUTOR_CONFIRMED"   // tutor self-reported within 48h → $15 charged
+  | "RESOLVED_PARENT_CONFIRMED"  // parent said YES after 48h → $20 charged
+  | "RESOLVED_NO_MATCH"          // parent said NO or both confirmed no-match → no charge
+  | "RESOLVED_APPEALED_WON"      // tutor appealed parent's NO and won → $20 charged
+  | "RESOLVED_APPEALED_LOST"     // tutor appealed and lost → strike applied
+  | "AUTO_CLOSED_NO_RESPONSE";   // 30d silence both sides → no charge
+
+type Match = {
+  id: string;                          // app_match_<random>
+  parentEmail: string;                 // captured even if parent isn't logged in
+  parentUserId?: string;               // set if parent is signed in (rare in directory model)
+  tutorApplicationId: string;
+  tutorUserId: string;
+  status: MatchStatus;
+  createdAt: string;                   // ISO timestamp
+  tutorHiddenUntil: string;            // createdAt + 48h
+  resolvedAt?: string;
+  amountChargedCents?: number;         // 1500 or 2000
+  stripeChargeId?: string;
+  parentConfirmation?: "YES" | "NO" | "NOT_YET";
+  parentConfirmedAt?: string;
+  tutorSelfReport?: "YES" | "NO";
+  tutorSelfReportedAt?: string;
+  parentConfirmTokenHash?: string;     // SHA-256 of the email-link token
+  parentConfirmRemindersSent: number;  // 0, 1, 2, 3 (at 2d, 7d, 14d, 30d)
+  appealId?: string;
+  isFreeFirstMatch: boolean;           // true if tutor's matchesCompletedCount was 0
+};
+
+// ADD: Appeal
+type Appeal = {
+  id: string;
+  matchId: string;
+  tutorUserId: string;                 // the tutor making the appeal
+  description: string;                 // tutor's explanation
+  evidenceUploadIds: string[];         // refs to /api/uploads/[id] files
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  reviewerEmail?: string;
+  reviewerNotes?: string;
+  createdAt: string;
+  resolvedAt?: string;
+};
+
+// MODIFY: TutorApplication
+type TutorApplication = {
+  // existing fields kept: id, userId, firstName, lastInitial, fullLastName, publicBio, etc.
+
+  // ADD
+  matchesCompletedCount: number;       // for first-match-free logic. 0 until first paid match clears.
+  strikeCount: number;                 // 0, 1, 2, 3+
+  strikeHistory: {                     // immutable audit
+    date: string;
+    matchId: string;
+    reason: string;
+  }[];
+  permanentListing: boolean;           // $60 upgrade
+  permanentListingPurchasedAt?: string;
+  permanentListingStripeChargeId?: string;
+
+  stripeConnectAccountId?: string;     // Stripe Connect Express account
+  stripeDefaultPaymentMethodId?: string;
+
+  phoneNumber: string;                 // required, OTP-verified
+  phoneVerifiedAt?: string;            // null until OTP completes
+
+  attestations: {
+    is18Plus: boolean;
+    hasValidWWCC: boolean;
+    willProvideWWCCToParents: boolean;
+    isAccurateProfile: boolean;
+    acceptedAt: string;
+    acceptedTermsVersion: string;
+  };
+
+  hiddenUntil?: string;                // tutor's listing temp-hidden (during 48h match window OR strike period)
+
+  // REMOVE (was indemnity-specific to pre-pivot model)
+  // termsAcceptedVersion, termsAcceptedAt
+  // bioFlags (replaced by content scanner output stored on review record)
+};
+
+// ADD: AuditLog (append-only)
+type AuditLog = {
+  id: string;
+  userId?: string;                     // null for anonymous parent actions
+  ip: string;
+  userAgent: string;
+  timestamp: string;                   // ISO
+  action: string;                      // "TUTOR_SIGNUP", "MATCH_REQUESTED", "PARENT_CONFIRMED_YES", etc.
+  targetType?: string;                 // "match", "application", "user", "appeal"
+  targetId?: string;
+  metadata?: Record<string, unknown>;  // anything else relevant
+  termsVersionAccepted?: string;
+};
+```
+
+## API contracts (canonical — implement these in session 2 and 3)
+
+### Match flow
+
+```http
+POST /api/matches/request
+Auth: optional (parent may or may not be signed in)
+Body: { tutorApplicationId: string, parentEmail: string }
+Returns: 201 { matchId: string, tutor: { firstName: string, fullName: string, phone: string, email: string } }
+Side effects:
+  - Create Match (status AWAITING_RESOLUTION)
+  - Set tutorApplication.hiddenUntil = now + 48h
+  - Send tutor notification email ("[Parent email] selected you — self-report within 48h for $15")
+  - Schedule parent-confirmation cron at +48h
+  - Audit log entry
+
+POST /api/matches/[id]/self-report
+Auth: required (tutor must own the match)
+Body: { confirmed: boolean }
+Returns: 200 { ok: true, charged?: { amountCents: 1500 } }
+Side effects:
+  - confirmed=true: Stripe charge $15 (unless free first match), match.status = RESOLVED_TUTOR_CONFIRMED, clear hiddenUntil
+  - confirmed=false: match.status = RESOLVED_NO_MATCH, clear hiddenUntil
+  - Increment matchesCompletedCount if confirmed
+  - Audit log entry
+
+POST /api/matches/[id]/parent-confirm
+Auth: none required (token-based — signed link from email)
+Body: { confirmation: "YES" | "NO" | "NOT_YET", token: string }
+Returns: 200 { ok: true }
+Side effects:
+  - Validate token against match.parentConfirmTokenHash
+  - YES + tutor hasn't self-reported: Stripe charge $20, match.status = RESOLVED_PARENT_CONFIRMED, increment matchesCompletedCount
+  - YES + tutor self-reported NO: open appeal window (24h), notify tutor
+  - NO + tutor self-reported YES: open appeal window (24h), notify tutor
+  - NO + no tutor input: match.status = RESOLVED_NO_MATCH
+  - NOT_YET: increment parentConfirmRemindersSent, schedule next reminder
+  - Audit log entry
+
+POST /api/matches/[id]/appeal
+Auth: required (tutor)
+Body: { description: string, evidenceUploadIds: string[] }
+Returns: 201 { appealId: string }
+Side effects:
+  - Create Appeal record (status PENDING)
+  - Match.appealId set
+  - Auto-check: if any evidence file is bank-transfer-like AND name match found, suggest auto-approve in admin UI
+  - Notify admin via dashboard + weekly digest
+  - Audit log entry
+
+PATCH /api/admin/appeals/[id]
+Auth: admin only
+Body: { decision: "APPROVED" | "REJECTED", notes?: string }
+Returns: 200 { ok: true }
+Side effects:
+  - APPROVED: match.status = RESOLVED_APPEALED_WON, charge $20 to tutor
+  - REJECTED: match.status = RESOLVED_APPEALED_LOST, increment tutor.strikeCount
+  - Audit log entry
+
+GET /api/cron/match-checkin
+Auth: cron secret only
+Returns: 200 { processed: number }
+Side effects:
+  - For matches past 48h without resolution → send parent confirmation email (if reminders sent < max)
+  - For matches at day 30 with no resolution → auto-close (AUTO_CLOSED_NO_RESPONSE)
+  - For listings past hiddenUntil → ensure they're public again
+  - For tutors at end of strike period → restore visibility
+```
+
+### Permanent listing
+
+```http
+POST /api/tutor/permanent
+Auth: required (tutor)
+Returns: 200 { stripeCheckoutUrl: string }
+Side effects: Create Stripe Checkout session for $60, redirect tutor to pay.
+
+POST /api/stripe/webhook (existing route, extend)
+Handles: checkout.session.completed for permanent purchase
+Side effects:
+  - Set tutor.permanentListing = true
+  - Record purchase date + Stripe charge ID
+  - Audit log entry
+
+POST /api/tutor/permanent/refund
+Auth: required (tutor)
+Returns: 200 { ok: true }
+Side effects:
+  - Validate purchase was within last 14 days
+  - Stripe refund the $60
+  - Set tutor.permanentListing = false
+  - Audit log entry
+```
+
+### Auto-approval flow (session 4)
+
+```http
+POST /api/auth/signup
+(existing, but extend to require phone in body)
+Body: { email, password, phone, role: "TUTOR" | "PARENT" }
+Returns: 201 { userId: string, otpRequiredForPhone: true }
+Side effects:
+  - Create user (phoneVerifiedAt = null)
+  - Send phone OTP via Twilio Verify
+  - Audit log entry
+
+POST /api/auth/verify-phone
+Body: { code: string }
+Returns: 200 { verified: true }
+Side effects:
+  - Mark phoneVerifiedAt = now
+  - Audit log entry
+
+POST /api/tutor/applications
+(existing, but extend to require attestations + run content scanner)
+Body: { ...existing fields, attestations: { is18Plus, hasValidWWCC, willProvideWWCCToParents, isAccurateProfile } }
+Returns: 201 { applicationId, status: "AUTO_APPROVED" | "PENDING_REVIEW" }
+Side effects:
+  - Validate all attestations === true (else reject)
+  - Run bioContentScanner(publicBio) — if returns flags, status = PENDING_REVIEW
+  - If no flags AND phone verified: AUTO_APPROVED, immediately public
+  - Audit log entry with attestations payload
+```
+
+### Automation routes (session 5)
+
+```http
+GET /api/cron/match-checkin              # every 15 min
+GET /api/cron/strike-expiry              # daily
+GET /api/cron/inactivity-hide            # daily — hide tutors with no activity 90d
+GET /api/cron/retention-purge            # weekly — delete records past retention
+POST /api/admin/export-audit             # one-off CSV export for compliance
+GET /api/admin/health                    # dashboard data (counts, rates)
+GET /api/user/data-export                # self-service: returns JSON of all user's data
+DELETE /api/user/account                 # self-service: soft-delete account + 30d grace period
+```
+
+---
+
 ## Pivot work plan — what changes in the code
 
 Realistic estimate: **4–5 focused sessions of work**. Below is the session breakdown. Each session bakes in the engineering principles above — automation and legal-risk minimization are not separate work, they're built into every step.
+
+Each session has a **Definition of Done (DoD)** at the end — tick items off as they ship. **Don't move to the next session until the previous one's DoD is fully satisfied.**
 
 ### Session 1 — Content audit + remove all verification claims
 
@@ -167,6 +558,21 @@ Goal: strip the verified-marketplace language site-wide so the directory framing
 | `src/components/landing/Earnings.tsx` | Reframe "$50 in your pocket" with the "first student free, $20 thereafter" framing |
 | New: prominent **"What TUTUMatch is and isn't"** page or banner | "We're a classifieds directory. Listings are tutor-provided. We don't verify anything. Parents verify tutors directly." |
 
+**Definition of Done (Session 1):**
+- [ ] `grep -ri "verified|vetted|screened|wwcc verified" src/` returns no marketing/UI uses (only legitimate code/comment uses)
+- [ ] Trust component file deleted; LandingPage no longer imports it
+- [ ] Hero copy uses the canonical headline ("List free. Pay only when you get a student. First match is on us.")
+- [ ] Earnings card uses the new framing — no "verified" claims
+- [ ] Comparison table rewritten — no verification-related rows
+- [ ] FAQ entries rewritten to "you verify yourself" framing
+- [ ] `/legal/terms` Sections 1, 5, 7 rewritten to directory framing
+- [ ] `/legal/child-safety` reframed to "what we ask tutors to have"
+- [ ] `/how-it-works` updated to new flow
+- [ ] New `/what-we-are` page exists, linked from footer + topnav
+- [ ] Schools browse hero subtitle removed "X verified tutors live" — replaced with "X tutors listed"
+- [ ] `npm run build` passes with no warnings about removed components
+- [ ] **Commit message lead:** "Session 1: strip verification claims site-wide for directory pivot"
+
 ### Session 2 — Remove parent payment flow + introduce "I want this tutor" intent capture
 
 Goal: rip out the unlock-fee transaction; introduce the free-intent-button flow that triggers the 48h hidden window.
@@ -184,6 +590,22 @@ Goal: rip out the unlock-fee transaction; introduce the free-intent-button flow 
 | **Remove** the in-platform chat thread feature entirely | Delete `src/app/messages/`, `src/components/messages/Thread.tsx`, related APIs |
 | **Remove** the refund + auto-suspension flow (replaced by the strike system in session 3) | Multiple files |
 
+**Definition of Done (Session 2):**
+- [ ] `/unlock/[tutorId]` route deleted
+- [ ] `/contact/[tutorId]` route exists; renders tutor's public profile + a "I want this tutor" form (email capture only, no payment)
+- [ ] `POST /api/matches/request` exists and creates a Match record per the contract above
+- [ ] On match request, the tutor's listing is hidden from browse for 48h (tutorApplication.hiddenUntil set)
+- [ ] Tutor receives a notification (placeholder email to console.log for now — wired to Resend in session 5)
+- [ ] `/messages` + `/messages/[unlockId]` routes deleted; Thread component deleted
+- [ ] All "$20 unlock fee", "refund", "5-day refund" language stripped from Hero, Terms, FAQ, how-it-works, footer
+- [ ] `/api/unlock`, `/api/refund`, `/api/cron/refund-flag`, `/api/unlocks/dev-create`, `/api/unlocks/[id]/fast-forward` deleted
+- [ ] `/admin/refunds` route deleted
+- [ ] `Unlock`, `Message`, `ConfirmUnlockButton` files deleted
+- [ ] `Match`, `Appeal` types added to `src/lib/db.ts` per spec
+- [ ] `grep -ri "Unlock" src/` returns nothing or only legacy/incidental
+- [ ] `npm run build` passes
+- [ ] **Commit message lead:** "Session 2: replace parent-pays unlock with free 'I want this tutor' intent capture + Match data model"
+
 ### Session 3 — Confirmation flow + strike system + tutor commission
 
 Goal: build the post-match resolution flow (self-report, parent confirmation, strike system, payment).
@@ -199,6 +621,26 @@ Goal: build the post-match resolution flow (self-report, parent confirmation, st
 | **Add** Stripe Connect integration so tutors have a saved payment method (required to list once past their first free match) | Replaces the current Stripe-stub |
 | **Add** appeal endpoint for tutors who dispute a no-match parent reply | Upload evidence → admin review |
 | **Add** admin view: pending appeals queue with evidence images | Extends `/admin` |
+| **Add** permanent listing purchase flow (Stripe Checkout, $60 one-time) | New endpoint + dashboard button |
+| **Add** 14-day refund window enforcement for permanent purchases | API + UI |
+
+**Definition of Done (Session 3):**
+- [ ] Tutor dashboard shows pending matches with a "Self-report — did you book a lesson? (charges $15)" button on each
+- [ ] `POST /api/matches/[id]/self-report` works, charges via Stripe Connect, clears hiddenUntil
+- [ ] Parent receives confirmation email at 48h (via Resend stub or console.log; full wiring in session 5)
+- [ ] Parent-confirm email link works without auth — token-validated
+- [ ] `POST /api/matches/[id]/parent-confirm` charges $20 on YES, no charge on NO, schedules reminder on NOT_YET
+- [ ] Strike system: `strikeCount` increments correctly; profile hidden for 7d on strike 1, 30d on strike 2, permanent on strike 3+
+- [ ] Strike re-listing: paying the missed $20 lifts the temporary hide
+- [ ] Strike 3+: per-match cost is $20 with no honesty discount (codified in pricing logic)
+- [ ] `POST /api/matches/[id]/appeal` works; evidence uploads stored; admin queue at `/admin/appeals` displays pending appeals
+- [ ] Admin can approve/reject appeal; approval charges $20, rejection applies strike
+- [ ] Bank-transfer name-match check: simple OCR-or-filename pattern detection that surfaces "looks like a name match" hint to admin (doesn't auto-approve, just suggests)
+- [ ] Permanent listing: `POST /api/tutor/permanent` creates Stripe Checkout; webhook handles completion; tutor.permanentListing = true
+- [ ] Permanent refund within 14 days works via `/api/tutor/permanent/refund`
+- [ ] Permanent-listing tutors are skipped from commission charges
+- [ ] `npm run build` passes
+- [ ] **Commit message lead:** "Session 3: build the match-confirmation flow, strikes, appeals, and tutor-side Stripe commission"
 
 ### Session 4 — WWCC reframe + admin pivot + auto-approval flow
 
@@ -219,6 +661,25 @@ Goal: build the post-match resolution flow (self-report, parent confirmation, st
 | **Update** `/how-it-works` to match the new flow with diagrams | `src/app/how-it-works/page.tsx` |
 | Re-test all the disclaimers, footer copy, and the "What TUTUMatch is and isn't" page | All-pages pass |
 
+**Definition of Done (Session 4):**
+- [ ] Phone OTP integration (Twilio Verify or similar) works at signup
+- [ ] Tutor cannot list until phone is verified
+- [ ] Cloudflare Turnstile (or equivalent) on signup form + contact-request form
+- [ ] Bio content scanner (`src/lib/content-scanner.ts`) flags scam/spam/contact-info patterns
+- [ ] New tutor signup with no flags: status = AUTO_APPROVED, instantly public
+- [ ] New tutor signup with flags: status = PENDING_REVIEW, admin sees it in queue
+- [ ] WWCC info on tutor signup form labelled "we ask so you have it ready for parents — we don't verify"
+- [ ] Tutor's own dashboard shows their WWCC info privately (for them to copy when a parent asks)
+- [ ] Public tutor profile page does NOT show WWCC info (or any platform-stamped verification)
+- [ ] `/tutors/[id]` shows a "Verify this tutor's WWCC yourself with the NSW OCG" link next to where verification was
+- [ ] Admin approval queue copy reframed to "spam/abuse moderation" — no credential review
+- [ ] Under-18 auto-reject removed; replaced with required age tickbox attestation on signup
+- [ ] Verification document upload block removed from signup form (it's all private uploads now, optional)
+- [ ] Indemnity clause updated in Terms — narrower scope, directory framing
+- [ ] Privacy Policy updated to reflect reduced data collection
+- [ ] `npm run build` passes
+- [ ] **Commit message lead:** "Session 4: auto-approval flow, phone OTP, WWCC reframe, admin pivot to spam-only"
+
 ### Session 5 — Automation hardening + audit logging + retention policies
 
 Goal: bake in the "minimum supervision" principles. After this session, the platform should run with 15–30 min/day of admin time at modest scale.
@@ -238,6 +699,27 @@ Goal: bake in the "minimum supervision" principles. After this session, the plat
 | **Stripe Connect tax/GST handling** — once GST threshold is approached, automated alerting + integration with Stripe Tax | Reduces accountant work |
 | **Email digest** — weekly automated summary to admin email: counts, anomalies, items needing attention | Replaces daily admin attention with weekly review |
 | **Sentry integration** for error monitoring | Optional, ~free tier; spots issues without manual log-checking |
+
+**Definition of Done (Session 5):**
+- [ ] Audit log table exists in JSON store + Prisma schema; `appendAudit()` helper used by every API mutation route
+- [ ] Audit log middleware records: action, userId (if any), IP, UA, timestamp, terms version
+- [ ] Rate limiting in place: 5 signups/hour/IP, 10 contact-requests/hour/user, 3 disputes/day/user
+- [ ] Vercel Cron configured for all schedules:
+  - `*/15 * * * *` → match-checkin
+  - `0 3 * * *` → strike-expiry, inactivity-hide
+  - `0 4 * * 0` → retention-purge, admin digest email
+- [ ] Auto-suspension trigger: if a tutor receives ≥3 reports in 30 days, status auto-flips to suspended pending review
+- [ ] Auto-resolution timer: matches at 30d with no party engagement auto-close as RESOLVED_NO_MATCH
+- [ ] `/api/user/data-export` returns JSON dump of user's data
+- [ ] `/api/user/account` DELETE soft-deletes account; data purged after 30d grace period (transaction records preserved per retention policy)
+- [ ] `/admin/health` shows: 7d match volume, dispute rate, suspension rate, Stripe success rate, open appeals count
+- [ ] Weekly admin digest email sent (Sundays via cron) with the above metrics + items needing attention
+- [ ] `/api/admin/export-audit` returns CSV of audit log for date range
+- [ ] Sentry SDK integrated (optional but recommended)
+- [ ] Resend wired for all transactional emails (signup verify, phone OTP fallback, match notification, parent confirmation, refund processed, strike notice, etc.) — templates in `src/lib/email-templates.ts`
+- [ ] All emails go through one `sendEmail()` helper that logs to the audit log
+- [ ] `npm run build` passes; all crons return 200 in local testing
+- [ ] **Commit message lead:** "Session 5: automation hardening — audit logging, retention, cron scheduling, self-service data tools"
 
 ---
 
