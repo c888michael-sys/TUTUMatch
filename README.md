@@ -2,19 +2,201 @@
 
 A flat-fee NSW tutor marketplace. Tutors list free; parents pay $20 once per match, refunded as the tutor's first-lesson discount. After the introduction, the platform is out of the loop.
 
-> ## 🟡 Status: paused (2026-05-21)
+> ## 🔄 Direction: pivoting to pure-directory model (decided 2026-05-21)
 >
-> The codebase is at a **clean checkpoint**. Every local-only feature works end-to-end (auth, tutor signup with verification document upload + WWCC + age gate, admin approval flow, browse with sort/filter, post-unlock chat, reports queue, refund/suspension flow, schools CRUD, full disclaimer + indemnity layer with explicit acceptance tracking).
+> After working through the legal-exposure analysis with parents-paying versus tutors-paying-commission models, the chosen direction is **a pure directory** (Hipages / Indeed style) where:
 >
-> Resuming requires external services (Stripe, Supabase, Resend, domain, hosting) — see **[SETUP.md](./SETUP.md)** for the step-by-step walkthrough when ready.
+> - Parents browse, contact, and use everything completely **free** (no platform transaction at all)
+> - Tutors are charged a **commission per confirmed match** ($20, or $15 with the honesty discount)
+> - The first matched student is **free for the tutor** — commission kicks in for the second matched student onwards (marketing framing: "first student free")
+> - The platform makes **no verification claims** about tutors anywhere — listings are tutor-provided, parents verify directly
 >
-> Before any public-facing launch, see the legal posture section below. **Phase 1 (closed beta with people you know) is safe to demo today; Phase 2 (public users paying real money) needs Pty Ltd + insurance + lawyer review of the Terms first.**
+> This drops the legal risk profile from "verified marketplace facilitator" (high exposure, needs Pty Ltd + ~$1,400/yr insurance) down to "classifieds directory" (Hipages-tier exposure, ~$500/yr media liability is enough). Total realistic ongoing cost lands around **$500–1,000/yr** rather than $2,000+.
+>
+> **Current code state:** stable verified-marketplace checkpoint (commit [`60005ef`](https://github.com/c888michael-sys/TUTUMatch/commit/60005ef)). The pivot work is planned in this README but not yet started — start of next session.
+>
+> The **New model** section below has every design parameter (timings, fees, strike system, appeal flow, WWCC framing). The **Pivot work plan** breaks the code refactor into ~4 sessions of focused work. The original verified-marketplace **Status** section is kept further down for reference until the pivot lands.
 
 ---
 
-## Status (as of latest commit)
+## The new model — directory + confirmed-match commission
 
-What's working end-to-end right now:
+### Money flow (the key change)
+
+- Parent pays **$0** to the platform — ever, in any flow
+- Tutor pays **$20** when a parent confirms a match with them (or **$15** if the tutor self-reports the match honestly before the parent confirmation prompt arrives)
+- **First matched student for any new tutor is free** — commission starts on second confirmed match onwards. This is the headline marketing pitch for tutors
+- Future possibility (not now): bump base commission to **$25 ($20 with honesty discount)** for *new* tutors only, if the model proves out
+
+### The match flow, end to end
+
+1. **Tutor lists for free.** Profile shows their info, subjects, rate, area, etc. Submits WWCC details (see WWCC framing below). Profile goes live after a light spam/abuse-only check by admin — **no credential verification**.
+2. **Parent browses for free.** No signup needed to browse. Filter by subject, area, rate.
+3. **Parent clicks "I want this tutor".** Free click; reveals the tutor's contact details (email + phone) so the parent can reach out directly. Account creation may be needed at this point for tracking, but no money changes hands.
+4. **The 48-hour conversation window opens.** As soon as the parent clicks, the tutor's listing is **temporarily hidden** from public browse (other parents can't simultaneously "claim" them). The tutor is notified immediately: "[Parent name] selected you — self-report within 48 hours if you book a lesson for the $15 honesty rate AND to keep your listing visible."
+5. **Tutor either self-reports OR waits.**
+   - **Self-reports a confirmed match** within 48h → charged **$15**, listing immediately returns to public browse. Done.
+   - **Self-reports no match** within 48h → no charge, listing returns to browse.
+   - **Doesn't respond** → goes to step 6 after 48h.
+6. **Confirmation prompt sent to parent after 48 hours.** "Did you have a lesson with [tutor]? Yes / No / Not yet." Single-click email links. Multiple reminders at 7, 14, 30 days if no reply.
+7. **Resolution paths:**
+   - Parent says **Yes** → tutor charged **$20** (no honesty discount; they missed the self-report window). Listing returns to browse.
+   - Parent says **No** → no charge. Listing returns to browse.
+   - Parent doesn't reply within 30 days → platform asks the tutor directly. If tutor says yes → charged $15 (treated as late self-report). If tutor says no → no charge but logged for audit (random spot-checks happen — see below).
+8. **Listing returns to public browse** in all resolved cases.
+
+### The strike system (for tutors who lie about no match when there was one)
+
+A "strike" is triggered when:
+- Parent confirms a match happened, AND
+- Tutor previously said no, AND
+- (After appeal process if used — see below)
+
+| Strike | Penalty | Reinstatement |
+|---|---|---|
+| **1** | Profile hidden 7 days | Pay the missed $20 to reappear |
+| **2** | Profile hidden 30 days | Pay the missed $20 to reappear (no penalty fee) |
+| **3** | Profile permanently hidden | Pay $20 to unlock. **All future matches cost $20** (no honesty discount, perpetual) |
+| 4+ | Same as 3 — pay $20 per unlock each time | |
+
+The user's explicit reasoning here: keep the strike penalties moderate so honest mistakes can be recovered from, but make a third strike permanently sticky on the $20 rate so consistently dishonest tutors are effectively gating themselves out of the discount.
+
+### Appeal flow (for genuine disputes)
+
+When the parent says no but the tutor insists a match happened, the tutor can **appeal** before the strike is recorded:
+
+- Tutor uploads evidence (bank transfer screenshot, lesson notes, parent's reply mentioning the lesson, etc.)
+- Admin manually reviews. Bank transfer with name match = automatic pass.
+- If admin agrees → tutor's claim wins, $20 charged, no strike.
+- If admin disagrees → strike applied as normal.
+
+This protects honest tutors against parents who lie to avoid the platform seeing the match (which could happen if the tutor and parent took everything off-platform and the parent thinks the tutor should eat the cost).
+
+### WWCC handling — the careful framing
+
+This is the most delicate part of the directory positioning. We need WWCC for child-safety reasons but we **cannot frame ourselves as verifying it** — that's what made the verified-marketplace model legally exposed.
+
+**The platform's framing to tutors at signup:**
+> "We ask for your WWCC details so you have them ready to give directly to parents who ask. Parents have the right (and the responsibility) to verify your WWCC directly with the [NSW Office of the Children's Guardian](https://www.kidsguardian.nsw.gov.au/working-with-children/employer-or-agency/how-to-verify-a-wwcc) before any lesson. We don't perform that verification for them and we don't display a 'verified' badge — but having your WWCC ready means a parent can do their own check in 30 seconds."
+
+**The platform's framing to parents:**
+> "Tutors on TUTUMatch self-declare a WWCC. **TUTUMatch does not verify WWCCs.** Before booking a lesson, please verify the tutor's WWCC directly at the NSW OCG public lookup [link]. It takes 30 seconds and is free."
+
+**What we collect (same as today):** WWCC number, WWCC full name, WWCC date of birth. These are stored on the application and **shown to the tutor on their own dashboard** so they can copy them when a parent asks. They are **not displayed publicly** and not used to grant any platform-side badge.
+
+**What we DON'T do:** check WWCCs ourselves, display verification badges, claim the tutor is "screened" or "vetted" or "safe", show any platform-stamped trust signal anywhere on the site.
+
+This gives the safety benefit (tutors have WWCCs, parents can verify) without the legal exposure (no verification representation by the platform).
+
+### Free-for-the-first-student framing
+
+This is a real positioning advantage and should be on the landing page front and centre:
+
+> **List free. Your first matched student costs you nothing. From your second student onwards, TUTUMatch charges a flat $20 commission per match — refundable as a $15 rate if you self-report honestly. No subscription. No per-lesson cut. Only pay when a real student commits.**
+
+This is the genuine differentiator vs. tutoring centres (40-60% per lesson, forever) and pay-to-list directories (upfront cost with no guaranteed return).
+
+---
+
+## Pivot work plan — what changes in the code
+
+Realistic estimate: **3–4 focused sessions of work**. Below is the session breakdown.
+
+### Session 1 — Content audit + remove all verification claims
+
+Goal: strip the verified-marketplace language site-wide so the directory framing is consistent.
+
+| File / location | Change |
+|---|---|
+| `src/components/landing/Hero.tsx` | Remove "verified tutor" framing; reframe as "find a local tutor" |
+| `src/components/landing/Trust.tsx` | **Delete** the whole Trust section ("WWCC verified", "Government ID checked", etc.) |
+| `src/components/landing/Comparison.tsx` | Remove rows that hinge on verification; replace with "listed locally" angle |
+| `src/components/landing/FAQ.tsx` | Rewrite verification-related FAQs into "you verify yourself" answers |
+| `src/components/landing/LandingPage.tsx` | Remove Trust from the section order |
+| `src/components/school/SchoolBrowse.tsx` | Remove "X verified tutors live" counter; replace with "X tutors listed" |
+| `src/app/tutors/[id]/page.tsx` | Remove anything implying TUTUMatch vouches for the tutor |
+| `src/app/legal/terms/page.tsx` | Rewrite Sections 1, 5, 7 to reflect directory positioning — no verification claims, no consumer relationship with parents |
+| `src/app/legal/child-safety/page.tsx` | Reframe as "what we ask tutors to have" rather than "what we verify" |
+| `src/components/landing/Footer.tsx` | Disclaimer block already mostly aligned — small tweaks |
+| `src/app/how-it-works/page.tsx` | Rewrite both flows for the new model |
+| `src/components/landing/Earnings.tsx` | Reframe "$50 in your pocket" with the "first student free, $20 thereafter" framing |
+| New: prominent **"What TUTUMatch is and isn't"** page or banner | "We're a classifieds directory. Listings are tutor-provided. We don't verify anything. Parents verify tutors directly." |
+
+### Session 2 — Remove parent payment flow + introduce "I want this tutor" intent capture
+
+Goal: rip out the unlock-fee transaction; introduce the free-intent-button flow that triggers the 48h hidden window.
+
+| Change | Files |
+|---|---|
+| **Delete** the unlock confirm page in favour of an "I want this tutor — see contact details" page (no payment, just reveals contact) | `src/app/unlock/[tutorId]/page.tsx` → replace with `src/app/contact/[tutorId]/page.tsx` (or rename route) |
+| **Delete** the `ConfirmUnlockButton` payment wiring | `src/components/unlock/ConfirmUnlockButton.tsx` |
+| **Delete** parent-side dev unlock shortcut | `src/app/api/unlocks/dev-create/route.ts` |
+| **Rewrite** the Unlock data type → `Match` (no money on parent side; tracks the 48h window + later commission flow) | `src/lib/db.ts` |
+| **Add** "request contact" API that creates a Match record, hides tutor profile temporarily, notifies tutor | New `src/app/api/matches/request/route.ts` |
+| **Add** tutor notification flow ("[Parent] selected you — self-report for $15 + faster profile reappear") | New page + email template stub |
+| **Strip** all of `/legal/terms` references to the $20 unlock fee + 5-day parent refund mechanic | `src/app/legal/terms/page.tsx` |
+| **Strip** parent-facing refund language site-wide | Multiple files |
+| **Remove** the in-platform chat thread feature entirely | Delete `src/app/messages/`, `src/components/messages/Thread.tsx`, related APIs |
+| **Remove** the refund + auto-suspension flow (replaced by the strike system in session 3) | Multiple files |
+
+### Session 3 — Confirmation flow + strike system + tutor commission
+
+Goal: build the post-match resolution flow (self-report, parent confirmation, strike system, payment).
+
+| Change | Notes |
+|---|---|
+| **Add** tutor self-report endpoint + dashboard button ("I had a lesson with this parent — confirm match for $15") | Triggers Stripe charge of $15 |
+| **Add** scheduled parent-confirmation prompt at 48h after the match request | Email + on-site banner. Single-click "Yes / No / Not yet" buttons. |
+| **Add** parent-confirmation API | Triggers $20 charge to tutor on yes; no charge on no. |
+| **Add** retry schedule for unresponsive parents | 7 days, 14 days, 30 days. Then auto-ask tutor. |
+| **Add** strike system tracking on user record | New fields: `strikeCount`, `strikeHistory`, etc. |
+| **Add** strike actions: hide profile for 7 days (strike 1) → 30 days (strike 2) → permanent + $20-per-match perpetual (strike 3+) | Includes a "pay the missed $20 to reappear" mechanism for strike 1/2 |
+| **Add** Stripe Connect integration so tutors have a saved payment method (required to list once past their first free match) | Replaces the current Stripe-stub |
+| **Add** appeal endpoint for tutors who dispute a no-match parent reply | Upload evidence → admin review |
+| **Add** admin view: pending appeals queue with evidence images | Extends `/admin` |
+
+### Session 4 — WWCC reframe + admin pivot + polish
+
+| Change | Notes |
+|---|---|
+| **Reframe** tutor signup WWCC section as "we ask so you have it ready for parents" | `src/components/tutor/SignupForm.tsx` |
+| **Reframe** WWCC display on the tutor's own dashboard (visible to them, not the public) | New dashboard widget |
+| **Remove** WWCC from public profile display (parents see "ask the tutor for their WWCC" prompt instead) | `src/app/tutors/[id]/page.tsx` |
+| **Reframe** admin approval queue as **spam/abuse moderation only**, NOT credential check | Admin pages |
+| **Remove** the "auto-reject under 18" auto-mechanism in favour of "you must self-declare 18+ to list" tickbox (we don't verify DOB ourselves) | `src/app/api/tutor/applications/route.ts` |
+| **Remove** the document upload + admin verification block from the signup form | These become tutor-private optional uploads, not part of verification |
+| **Update** the indemnity clause in Terms to reflect new model (lower platform exposure, narrower indemnity scope) | `src/app/legal/terms/page.tsx` |
+| **Update** Privacy Policy to reflect the data we now collect (less, mostly tutor-side) | `src/app/legal/privacy/page.tsx` |
+| **Update** `/how-it-works` to match the new flow with diagrams | `src/app/how-it-works/page.tsx` |
+| Re-test all the disclaimers, footer copy, and the "What TUTUMatch is and isn't" page | All-pages pass |
+
+---
+
+## Risk profile under the new model
+
+For comparison:
+
+| Model | Legal positioning | Typical defence cost if sued | Insurance | Pty Ltd needed? |
+|---|---|---|---|---|
+| Original verified-marketplace (current code) | Platform as verifier + payment facilitator | $50k–200k | $1,000–1,400/yr (PI + PL) | Yes |
+| Parent-pays + no verification claims | Directory + consumer transaction | $20k–50k | $500–800/yr | Strongly suggested |
+| **Pure directory + confirmed-match commission (chosen)** | **Hipages / classifieds tier** | **$10k–30k** | **$300–600/yr (basic media liability)** | **Optional but cheap insurance recommended** |
+
+Realistic ongoing cost in the new model: **~$500–1,000/yr** (insurance + domain + Stripe fees + optional Pty Ltd). Achievable on a small budget.
+
+The bigger one-time Phase 2 cost (lawyer review of Terms ~$1,000–2,000) is still recommended before opening to the general public, but **not the same kind of must-have as it was for the original marketplace model** — directories can credibly launch with carefully-written self-drafted terms and a lawyer review later, once revenue justifies it.
+
+---
+
+
+
+---
+
+## Status (verified-marketplace checkpoint — pre-pivot)
+
+⚠️ Below describes the **current code** which is being pivoted away from. Treat as reference for what exists today; the **Pivot work plan** above is the forward direction.
+
+What's working end-to-end right now in the pre-pivot code:
 
 - **Landing page** — full v3 design ported, all sections (Hero with For-parents/For-tutors split, Pitch, Mechanic, How, Comparison, Trust, Guarantee, Earnings, FAQ, Final CTA, Footer + site-wide disclaimer block).
 - **School-branded landing pages** at `/schools/[slug]` and an `Other Locations` route at `/schools/other`. Browse tabs switch between areas. Same layout, only the brand colour + content change per area.
@@ -136,39 +318,40 @@ Pick Supabase over Neon because: same provider gives you Postgres + Storage (so 
 
 ### Founder / legal (off-code work)
 
-The codebase has done all it can to manage legal risk (disclaimers everywhere, tutor indemnity with explicit acceptance, age gate, WWCC enforcement, reports queue). Disclaimers + indemnities are useful but **do not eliminate liability** — they help you recover from the tutor afterwards, they don't stop a parent from suing the platform. The real protection comes from corporate structure + insurance. See the phased approach below.
+After the **pure-directory pivot** (see top of README), the legal posture is dramatically simpler than the verified-marketplace model. The protections you still want exist mainly as cheap insurance against the residual operational risk of running any platform that connects strangers — not as essential prerequisites without which you can't launch.
 
-#### Phase 1 — Closed beta (safe to run today, ~$30 outlay)
+#### Phase 1 — Soft launch in your personal network (~$30 outlay, safe to do this week)
 
-Defensible for testing the model with people in your network. No insurance, no Pty Ltd, no lawyer review yet.
+Defensible for testing the directory model with people who know you. No insurance, no Pty Ltd, no lawyer review yet. The whole point is small-scale validation.
 
 - [ ] **ABN** as sole trader (~15 min, free, https://abr.gov.au/)
-- [ ] **Domain** (~$15-20/yr — `tutumatch.com.au`, `.au`, or `.com`)
-- [ ] Set up `safety@tutumatch.com.au` and `appeals@tutumatch.com.au` routed to a real inbox you check daily
-- [ ] **Only promote within your personal network** — friends, family, school alumni. **Do not** publicly advertise, run paid ads, or take signups from strangers.
-- [ ] Keep volume small (under ~20 active tutors, under ~50 unlocks)
-- [ ] Manually verify WWCC for every tutor against the [NSW OCG public lookup](https://www.kidsguardian.nsw.gov.au/child-safe-organisations/working-with-children-check)
-- [ ] The codebase already shows `BETA` and "early access" framing prominently — keep it that way for Phase 1
+- [ ] **Domain** (~$15-20/yr — `tutumatch.com.au` if you have an ABN, otherwise `.au` is fine)
+- [ ] Set up `hello@tutumatch.com.au` and `appeals@tutumatch.com.au` routed to a real inbox you check daily (safety@ is less critical in the directory model — we're not making safety promises — but worth setting up still)
+- [ ] **Only promote within your personal network** — friends, family, school alumni. Don't publicly advertise. The directory framing protects you legally, but Phase 1 caution is still about ensuring problems surface to people who'll talk to you directly rather than sue.
+- [ ] Keep volume modest (under ~30 tutors, under ~50 matches)
+- [ ] The codebase makes clear we don't verify anything — keep the "What TUTUMatch is and isn't" page (to be built in session 1) prominent
 
-#### Phase 2 — Public launch (~$2k upfront, ~$1.3k/yr ongoing)
+#### Phase 2 — Public launch (~$300-1,000 upfront, ~$500-1,000/yr ongoing)
 
-Required before opening to strangers paying real money.
+The pure-directory model makes this **dramatically cheaper** than the original marketplace model required. Order of priority:
 
-- [ ] **Pty Ltd** company structure — ~$700 setup, ~$300/yr ongoing (use **EasyCompanies**, **Lawpath**, or an accountant). This is the single biggest protection: it shields personal assets so a lawsuit against the platform can't wipe out your savings, future wages, or family home.
-- [ ] **Public liability insurance** — ~$700-1,400/yr. Quote from **BizCover**, **CGU**, or **Insurance House**. Specify "online marketplace connecting tutors and parents". Bundle with **professional indemnity** for ~$300-600 more.
-- [ ] **Lawyer review** of Terms, Privacy, Child Safety drafts in `src/app/legal/` — ~$1-2k one-time. They'll refine the indemnity (Section 13), check ACL compliance, and confirm the limitation-of-liability cap is enforceable.
-- [ ] **Business bank account** (sole trader → company)
-- [ ] **GST registration** trigger reminder (mandatory once turnover ≥ $75k/yr)
-- [ ] **Written permission from each school** before activating their landing page — save the evidence and only then flip `School.active = true` in `/admin/schools`. Using a school's name / colours without permission risks defamation + trademark issues.
-- [ ] **OAIC data-breach response plan** documented (who notifies, in what window, what content)
+- [ ] **Media liability / classifieds insurance** — ~$300-600/yr. Quote from **BizCover** or **Insurance House**. Specify "online classifieds directory for tutoring services, no verification of advertisers". This covers the residual risks (someone sues you anyway, defending against frivolous claims, hosting-related claims). Much cheaper than the PI + PL combo needed for verified marketplaces.
+- [ ] **Optional: Pty Ltd** — ~$700 setup, ~$300/yr ongoing. Less urgent for a directory than a marketplace because the exposure is bounded, but the liability shield is cheap insurance for the cost. Set up via **EasyCompanies** or **Lawpath**. **You can defer this until revenue justifies it** — many directory founders operate as sole traders for years without issue.
+- [ ] **Lawyer review of Terms** — ~$500-1,000 one-time, less than the marketplace version because the terms are simpler (no consumer relationship with parents, narrower scope of platform service). Useful before public marketing but not blocking for friends-of-friends growth.
+- [ ] **Business bank account** (sole trader → eventually a company if you upgrade)
+- [ ] **GST registration** trigger reminder (mandatory once turnover ≥ $75k/yr; the directory model with $20 commissions means this kicks in at ~3,750 confirmed matches/yr — that's a real business at that point)
+- [ ] **Written permission from each school** before activating their landing page in `/admin/schools` — save the evidence. The directory framing doesn't change school name/logo trademark and defamation exposure.
+- [ ] **OAIC data-breach response plan** documented (lighter than the original — we collect less personal info per user in the directory model)
 
-#### Why this matters — the honest version
+#### Why the directory model lowers the threshold
 
-If a child is harmed at a lesson and parents sue, **disclaimers do not stop the lawsuit**. They help your defence; they don't prevent it. Without insurance, you pay your own legal costs (~$50k-200k for a serious case) and any verdict out of pocket. As a sole trader, that can come from personal savings + future wages + forced sale of assets. **A worst-case incident without Phase 2 protections can result in personal bankruptcy** (3 years of severe restrictions, permanent record on the National Personal Insolvency Index).
+In the original verified-marketplace model, a child-harm incident triggered an expensive lawsuit that argued "you said you'd verify and you didn't" — that's the high-cost case ($50k-$200k defence, real risk of judgment). 
 
-The tutor indemnity (already in Section 13 of the Terms) gives you a *recovery* right against the tutor if their conduct caused the loss. In practice, recent-HSC-graduate tutors typically have $0 in collectable assets, so recovery is often pyrrhic. The indemnity is one of four layers (disclaimer / indemnity / Pty Ltd / insurance); all four work together.
+In the pure-directory model, the same incident still produces a lawsuit attempt, but the defence is structurally cleaner: "We're a classifieds platform. We made no representations about this tutor's safety. The parent had the same access to the tutor's information that anyone in NSW does — the parent had the responsibility to verify WWCC directly. The harm happened in a private arrangement the parent and tutor made without our involvement."
 
-**$1.3k/yr for insurance vs realistic exposure of tens-to-hundreds of thousands** is the actual trade. Don't open the platform to public users without it.
+That defence wins most of the time, and even when it doesn't go to verdict the case settles cheaply. The realistic worst case in the directory model is **~$10k-30k in defence costs over 3-6 months** — well within what a $300-600 insurance policy covers.
+
+**Bankruptcy-level outcomes that loomed in the marketplace model are unlikely under the directory model.** That's the actual reason this pivot matters: not just lower probability of getting sued, but bounded downside even if you are.
 
 ---
 
@@ -207,49 +390,61 @@ Schools are stored in `data/schools.json` (will move to Postgres once Supabase i
 
 ## Routes
 
+State legend: ✅ Done · 🚧 Stub · 📝 Draft · ♻ Refactor in pivot · ❌ Remove in pivot · ✨ New in pivot
+
 | Path                                | What it is                                                                | State        |
 |-------------------------------------|----------------------------------------------------------------------------|--------------|
-| `/`                                 | Default landing page                                                       | ✅ Done      |
-| `/schools/[slug]`                   | School-branded browse (Killara / Masada / Other)                          | ✅ Done      |
-| `/browse`                           | All-tutors browse with filters                                            | ✅ Done (samples) |
-| `/tutors/[id]`                      | Tutor profile + refund explainer + contact CTA                            | ✅ Done (samples) |
-| `/unlock/[tutorId]`                 | $20 confirm page with refund policy                                       | ✅ UI done, payment stub |
-| `/tutor/signup`                     | Multi-section tutor application form with all checks                      | ✅ Done      |
-| `/dashboard`                        | Tutor + parent hub: status, edit, visibility toggle, conversations        | ✅ Done      |
-| `/tutor/edit`                       | Edit tutor profile (resets status to Pending review on save)              | ✅ Done      |
-| `/messages`                         | List of chat threads (parent ↔ tutor) for the current user                | ✅ Done      |
-| `/messages/[unlockId]`              | Chat thread (post-unlock, with contact info revealed)                     | ✅ Done      |
-| `/admin`                            | Admin: applications queue + approve/reject                                | ✅ Done      |
-| `/admin/applications/[id]`          | Application detail + review actions + test-unlock shortcut                | ✅ Done      |
-| `/login`                            | Email + password auth (signup tab on same page)                           | ✅ Done      |
-| `/legal/terms`                      | Terms of Service                                                          | 📝 Draft     |
-| `/legal/privacy`                    | Privacy Policy                                                            | 📝 Draft     |
-| `/legal/child-safety`               | Child Safety Policy                                                       | 📝 Draft     |
-| `/how-it-works`                     | Standalone explainer (parent + tutor flows + safety summary)              | ✅ Done      |
-| `/contact`                          | Routed contact emails: general / safety / appeals / privacy               | ✅ Done      |
-| `POST /api/auth/{signup,login,logout,me}` | Cookie-based auth                                                  | ✅ Done      |
-| `POST /api/tutor/applications`      | Submit a tutor application                                                | ✅ Done      |
-| `PUT  /api/tutor/applications`      | Update current user's application (sets status back to Pending review)    | ✅ Done      |
-| `PATCH /api/tutor/applications/visibility` | Toggle profile visibility (no re-review)                          | ✅ Done      |
-| `GET/PATCH /api/admin/applications` | List + approve/reject                                                     | ✅ Done      |
-| `/admin/schools`                    | Admin: add / edit / deactivate schools                                    | ✅ Done      |
-| `/admin/refunds`                    | Admin: refund queue + tutor suspension status + unsuspend                 | ✅ Done      |
-| `/admin/reports`                    | Admin: reports queue — resolve / dismiss with action taken                | ✅ Done      |
-| `POST /api/reports`                 | Submit a report (any signed-in user)                                      | ✅ Done      |
-| `PATCH /api/admin/reports/[id]`     | Admin resolve / dismiss + optional suspend                                | ✅ Done      |
-| `POST /api/uploads`                 | Upload a verification document (multipart, signed-in user)                | ✅ Done (local) |
-| `GET  /api/uploads/[id]`            | Fetch a doc — owner or admin only                                         | ✅ Done (local) |
-| `GET/POST /api/admin/schools`       | List + create school                                                      | ✅ Done      |
-| `PATCH/DELETE /api/admin/schools/[id]` | Update / delete school                                                 | ✅ Done      |
-| `POST /api/admin/users/[id]/unsuspend` | Admin: clear suspension                                                | ✅ Done      |
-| `POST /api/unlocks/dev-create`      | Dev-only: create a PAID Unlock without Stripe                             | ✅ Done (dev) |
-| `POST /api/unlocks/[id]/fast-forward` | Dev-only: skip the 5-day wait, trigger refund + tutor suspension          | ✅ Done (dev) |
-| `GET /api/threads`                  | Current user's chat threads                                               | ✅ Done      |
-| `GET/POST /api/threads/[unlockId]/messages` | Fetch + send messages in a thread                                 | ✅ Done      |
-| `POST /api/unlock`                  | Create unlock + Stripe PaymentIntent                                      | 🚧 Stub      |
-| `POST /api/stripe/webhook`          | Stripe webhook                                                            | 🚧 Stub      |
-| `POST /api/refund`                  | Parent or admin refund                                                    | 🚧 Stub      |
-| `GET  /api/cron/refund-flag`        | 5-day refund window flagger                                               | 🚧 Stub      |
+| `/`                                 | Default landing page                                                       | ♻ Refactor — strip verification claims, reframe Earnings/Comparison/Hero |
+| `/schools/[slug]`                   | School-branded browse (Killara / Masada / Other)                          | ♻ Refactor — remove "X verified" counter, reframe |
+| `/browse`                           | All-tutors browse with filters                                            | ♻ Refactor — same |
+| `/tutors/[id]`                      | Tutor profile page                                                        | ♻ Refactor — remove verification badges, refund explainer, contact-CTA framing |
+| `/unlock/[tutorId]`                 | $20 confirm page                                                          | ❌ Remove — replaced by free `/contact/[tutorId]` reveal page |
+| `/contact/[tutorId]`                | NEW: free intent capture + contact reveal + 48h hidden window trigger     | ✨ Build in session 2 |
+| `/tutor/signup`                     | Tutor application form                                                    | ♻ Refactor — reframe WWCC as "have it ready", remove platform-verification language |
+| `/dashboard`                        | Tutor hub                                                                 | ♻ Refactor — replace unlock stats with match stats, add self-report buttons, show pending matches |
+| `/tutor/edit`                       | Edit tutor profile                                                        | ♻ Refactor — minor copy updates |
+| `/messages`                         | Chat thread list                                                          | ❌ Remove — no platform-mediated chat in directory model |
+| `/messages/[unlockId]`              | Chat thread                                                               | ❌ Remove — same |
+| `/admin`                            | Admin: applications queue                                                 | ♻ Refactor — repurpose as spam/abuse moderation only, no credential check |
+| `/admin/applications/[id]`          | Application detail                                                        | ♻ Refactor — same |
+| `/admin/matches`                    | NEW: matches queue with pending self-reports, parent confirmations        | ✨ Build in session 3 |
+| `/admin/appeals`                    | NEW: tutor appeals queue (when parent says no but tutor disputes)         | ✨ Build in session 3 |
+| `/admin/strikes`                    | NEW: strike audit log + override controls                                 | ✨ Build in session 3 |
+| `/login`                            | Email + password auth                                                     | ✅ Keep (minor copy tweaks) |
+| `/legal/terms`                      | Terms of Service                                                          | ♻ Rewrite — narrower scope, directory framing, lighter indemnity |
+| `/legal/privacy`                    | Privacy Policy                                                            | ♻ Update — less data collected per user under new model |
+| `/legal/child-safety`               | Child Safety Policy                                                       | ♻ Reframe — "what we ask tutors to have" not "what we verify" |
+| `/how-it-works`                     | Explainer                                                                 | ♻ Rewrite — new model end-to-end |
+| `/contact`                          | Routed contact emails                                                     | ✅ Keep |
+| `/what-we-are`                      | NEW: prominent "we don't verify anything" statement page                  | ✨ Build in session 1 |
+| `POST /api/auth/{signup,login,logout,me}` | Cookie-based auth                                                  | ✅ Keep |
+| `POST /api/tutor/applications`      | Submit application                                                        | ♻ Refactor — strip indemnity acceptance (different shape), remove document review |
+| `PUT  /api/tutor/applications`      | Update application                                                        | ♻ Refactor — same |
+| `PATCH /api/tutor/applications/visibility` | Toggle profile visibility                                          | ✅ Keep |
+| `GET/PATCH /api/admin/applications` | List + approve/reject                                                     | ♻ Refactor — approve = spam-check only |
+| `/admin/schools`                    | Schools CRUD                                                              | ✅ Keep |
+| `/admin/refunds`                    | Refund queue                                                              | ❌ Remove — no parent refunds in new model |
+| `/admin/reports`                    | Reports queue                                                             | ✅ Keep |
+| `POST /api/reports`                 | Submit a report                                                           | ✅ Keep |
+| `PATCH /api/admin/reports/[id]`     | Admin resolve / dismiss + optional suspend                                | ✅ Keep |
+| `POST /api/uploads`                 | Upload a doc                                                              | ♻ Refactor — uploads become tutor-private (not for verification) |
+| `GET  /api/uploads/[id]`            | Fetch a doc                                                               | ♻ Refactor — only owner can fetch (no admin verification view) |
+| `GET/POST /api/admin/schools`       | List + create school                                                      | ✅ Keep |
+| `PATCH/DELETE /api/admin/schools/[id]` | Update / delete school                                                 | ✅ Keep |
+| `POST /api/admin/users/[id]/unsuspend` | Admin: clear suspension                                                | ♻ Refactor — applies to strike-suspended users not refund-suspended |
+| `POST /api/unlocks/dev-create`      | Dev-only: create a PAID Unlock                                            | ❌ Remove — no Unlock entity in new model |
+| `POST /api/unlocks/[id]/fast-forward` | Dev-only fast-forward                                                   | ❌ Remove — same |
+| `GET /api/threads`                  | Chat threads                                                              | ❌ Remove — no chat |
+| `GET/POST /api/threads/[unlockId]/messages` | Chat messages                                                     | ❌ Remove — no chat |
+| `POST /api/matches/request`         | NEW: parent expresses interest, triggers 48h tutor-hidden window          | ✨ Build in session 2 |
+| `POST /api/matches/[id]/self-report` | NEW: tutor self-reports match (charges $15)                              | ✨ Build in session 3 |
+| `POST /api/matches/[id]/parent-confirm` | NEW: parent confirms via email link                                  | ✨ Build in session 3 |
+| `POST /api/matches/[id]/appeal`     | NEW: tutor disputes a "no" with evidence upload                          | ✨ Build in session 3 |
+| `POST /api/stripe/webhook`          | Stripe webhook                                                            | 🚧 Stub — to be wired in session 3 |
+| `GET  /api/cron/match-checkin`      | NEW: cron to send parent confirmation prompts at 2 days / 7 / 14 / 30    | ✨ Build in session 3 |
+| `POST /api/unlock`                  | Original parent-pays unlock                                               | ❌ Remove |
+| `POST /api/refund`                  | Original refund flow                                                      | ❌ Remove |
+| `GET  /api/cron/refund-flag`        | Original 5-day refund flagger                                             | ❌ Remove |
 
 ## Tech
 
