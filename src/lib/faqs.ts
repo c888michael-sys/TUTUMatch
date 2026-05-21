@@ -3,43 +3,28 @@ export type Faq = { tag: "parents" | "tutors"; q: string; a: string };
 export const FAQS: Faq[] = [
   {
     tag: "parents",
-    q: "Why does the parent pay the $20 if it's the tutor's commission?",
-    a: "Because escrow. If the tutor paid us after they got the introduction, plenty would simply take the parent's contact details and disappear. By collecting through the parent and having the tutor discount the first lesson by $20, we make the commission unavoidable — and net cost to the parent stays at zero.",
+    q: "Is it really free for parents?",
+    a: "Yes — completely. No signup, no per-match fee, no commission. TUTUMatch is a directory. Browse, click 'I want this tutor' to see their contact details, and reach out directly. Whatever you arrange with the tutor (rate, schedule, payment) is between you two.",
   },
   {
     tag: "parents",
-    q: "What if the tutor never gives me the $20 discount?",
-    a: "Flag it in the app within 5 days of your first lesson. We refund you, charge the tutor directly, and warn them. Two strikes and they're removed from the platform.",
+    q: "How are tutors checked?",
+    a: "TUTUMatch is a directory, not a verification service. Listings are tutor-provided. Each tutor self-declares a Working With Children Check (WWCC) and ID, and the platform asks them to keep those details ready to share with you on request. Before any lesson, please verify the tutor's WWCC yourself — it takes 30 seconds and is free at the NSW Office of the Children's Guardian online lookup. We don't display a 'verified' badge, because we don't perform the check.",
   },
   {
     tag: "parents",
-    q: "What if I unlock a tutor and they don't reply?",
-    a: "Automatic refund after 5 days of silence, no questions asked. You don't have to chase us.",
+    q: "What happens after I contact a tutor?",
+    a: "You and the tutor talk directly — email, phone, whatever you prefer. TUTUMatch isn't in the middle of that conversation. Arrange rate, schedule, lesson location yourselves. If you both go ahead with a lesson, the tutor reports the match to us so commission is settled — no work for you.",
   },
   {
     tag: "parents",
-    q: "Can I unlock multiple tutors?",
-    a: "Yes. Each unlock is $20, and each gets you the $20-off-first-lesson reimbursement. Unlock as many as you want — only commit to lessons with the ones you actually like.",
+    q: "Can I contact multiple tutors?",
+    a: "Yes. Every contact reveal is free. Talk to as many as you like and pick the one that fits.",
   },
   {
     tag: "parents",
-    q: "How are tutors verified?",
-    a: "WWCC check, government ID match, manual review of HSC/ATAR documents, 18+ only. We review every application by hand before a tutor goes live.",
-  },
-  {
-    tag: "tutors",
-    q: "What stops tutors from sharing contact off-platform to dodge the $20?",
-    a: "Honestly — not much technically, beyond chat monitoring on first contact. But our Terms make it grounds for permanent removal, and we encourage parents to report it. The flat $20 is small enough that gaming it isn't worth losing your listing over.",
-  },
-  {
-    tag: "parents",
-    q: "When and how do tutors get paid?",
-    a: "Directly by the parent, however you both arrange it. Bank transfer, cash, PayID — your call. We're not in the loop after the introduction.",
-  },
-  {
-    tag: "tutors",
-    q: "GST and receipts?",
-    a: "We issue you a tax invoice for the $20 commission. Lesson income between you and the parent is yours to declare as you would any tutoring work.",
+    q: "Is the platform responsible for the quality of lessons?",
+    a: "No. We're a classifieds directory. Listings are user-provided and the lesson itself is a private arrangement between you and the tutor. We don't verify, vet, or screen tutors and we don't sit in on lessons. Treat this like you'd treat any local directory — check the tutor, ask questions, verify their WWCC.",
   },
   {
     tag: "parents",
@@ -47,8 +32,28 @@ export const FAQS: Faq[] = [
     a: "Both. Each tutor sets their own availability — most do both. Filter by mode when browsing.",
   },
   {
-    tag: "parents",
-    q: "Is the platform responsible for the quality of lessons?",
-    a: "No. We're an introduction service. We verify identity, credentials, and child-safety status. The lessons themselves are a private arrangement between you and the tutor.",
+    tag: "tutors",
+    q: "What does it really cost to list?",
+    a: "Listing is free, forever. Your first confirmed student is also free. From your second student onwards, we charge a $20 commission per confirmed match — or $15 if you self-report the match honestly within the 48-hour window. That's the only money that ever moves between you and the platform.",
+  },
+  {
+    tag: "tutors",
+    q: "What's TUTUMatch Permanent?",
+    a: "A $60 one-time upgrade that turns off per-match commission for good. Pays for itself at your 4th confirmed student. Refundable within 14 days, no questions asked.",
+  },
+  {
+    tag: "tutors",
+    q: "What stops tutors from hiding matches to dodge the commission?",
+    a: "A few things. The parent gets a 'did you have a lesson with [tutor]?' email at the 48-hour mark; if they say yes and you said no, that's a strike. Three strikes and your profile is permanently hidden. Bank-transfer screenshots from the parent are easy evidence in disputes. The $15 honesty discount makes self-reporting cheaper than getting caught.",
+  },
+  {
+    tag: "tutors",
+    q: "When and how do you and the parent settle payment?",
+    a: "Directly between you, however you arrange it — bank transfer, cash, PayID, your call. TUTUMatch isn't in the loop after the introduction.",
+  },
+  {
+    tag: "tutors",
+    q: "GST and receipts?",
+    a: "We issue you a tax invoice for each platform commission charge (or for Permanent). Your lesson income from parents is yours to declare as you would any tutoring work.",
   },
 ];

@@ -17,24 +17,35 @@ export function Comparison({ brand }: { brand: string }) {
         </div>
         <div className="row">
           <div className="cell label" data-label="Per-student cost">
-            Commission per lesson
-          </div>
-          <div className="cell" data-label="Tutoring centres">
-            <span className="m">40–60%</span> of every hour
-          </div>
-          <div className="cell us" data-label={brand}>
-            <span className="m">0%</span> after the match fee
-          </div>
-        </div>
-        <div className="row">
-          <div className="cell label" data-label="Per-student cost">
-            Match fee
+            Cost to parent (to the platform)
           </div>
           <div className="cell" data-label="Tutoring centres">
             Bundled into the centre&apos;s rate
           </div>
           <div className="cell us" data-label={brand}>
-            <span className="m">$20</span> flat, once per match
+            <span className="m">$0</span> — always free for parents
+          </div>
+        </div>
+        <div className="row">
+          <div className="cell label" data-label="Per-student cost">
+            Commission per lesson
+          </div>
+          <div className="cell" data-label="Tutoring centres">
+            <span className="m">40–60%</span> of every hour, forever
+          </div>
+          <div className="cell us" data-label={brand}>
+            <span className="m">0%</span> — we never touch your lesson
+          </div>
+        </div>
+        <div className="row">
+          <div className="cell label" data-label="Per-student cost">
+            Tutor commission per match
+          </div>
+          <div className="cell" data-label="Tutoring centres">
+            N/A (centre owns the relationship)
+          </div>
+          <div className="cell us" data-label={brand}>
+            First match <span className="m">free</span>, then <span className="m">$20</span> per confirmed student (<span className="m">$15</span> honest)
           </div>
         </div>
         <div className="row">
@@ -45,7 +56,7 @@ export function Comparison({ brand }: { brand: string }) {
             Centre assigns
           </div>
           <div className="cell us" data-label={brand}>
-            You pick
+            You pick — listings are local, ranked algorithmically
           </div>
         </div>
         <div className="row">
@@ -67,7 +78,7 @@ export function Comparison({ brand }: { brand: string }) {
             Term commitments
           </div>
           <div className="cell us" data-label={brand}>
-            None
+            None — it&apos;s a directory
           </div>
         </div>
         <div className="row">
@@ -75,10 +86,10 @@ export function Comparison({ brand }: { brand: string }) {
             10-week term, 1hr/wk @ $50
           </div>
           <div className="cell" data-label="Tutoring centres">
-            Total paid: <span className="m">≈ $500</span> · Tutor nets <span className="m">≈ $250</span>
+            Parent paid: <span className="m">≈ $500</span> · Tutor net: <span className="m">≈ $250</span>
           </div>
           <div className="cell us" data-label={brand}>
-            Total paid: <span className="m">$500</span> · Tutor nets <span className="m">$480</span>
+            Parent paid: <span className="m">$500</span> · Tutor net: <span className="m">$500</span> (first student free)
           </div>
         </div>
       </div>
