@@ -10,7 +10,6 @@ import { Mechanic } from "./Mechanic";
 import { Pitch } from "./Pitch";
 import { SchoolBar } from "./SchoolBar";
 import { StickyBar } from "./StickyBar";
-import { Trust } from "./Trust";
 import type { School } from "@/lib/schools";
 
 export function LandingPage({ school, schools }: { school: School; schools: School[] }) {
@@ -32,7 +31,6 @@ export function LandingPage({ school, schools }: { school: School; schools: Scho
       <SchoolBar current={school} schools={schools} />
       <HowMirrored />
       <Comparison brand="TUTUMatch" />
-      <Trust />
       <Guarantee />
       <Earnings brand="TUTUMatch" />
       <FAQ />

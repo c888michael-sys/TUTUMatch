@@ -56,31 +56,31 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
             <span className="dot" />
             For parents
           </div>
-          <h1>Pay the tutor, not a centre&apos;s markup.</h1>
+          <h1>Find a local tutor. No platform fees.</h1>
           <p className="subhead">
-            Tutoring centres mark lessons up 40–60%. We don&apos;t. You pay your tutor directly, at their rate.
+            Browse, see contact details, message tutors directly. The platform takes nothing from you — not a signup, not a fee, not a cut of the lesson.
           </p>
           <div className="hero-cta-row">
             <span className="hero-cta">
-              Find a tutor <ArrowIcon s={16} />
+              Browse tutors <ArrowIcon s={16} />
             </span>
             <span className="hero-data" style={{ color: "rgba(255,255,255,0.6)" }}>
-              Local tutors without markups
+              Free to browse · No account needed
             </span>
           </div>
           {showFloats && (
             <div className="hero-floats" aria-hidden="true">
               <div className="float-line">
-                <span>Centre markup →</span>
-                <span className="v">40–60% per lesson</span>
+                <span>Platform fee →</span>
+                <span className="v">$0, always</span>
               </div>
               <div className="float-line">
-                <span>Our markup →</span>
-                <span className="v">0% per lesson, forever</span>
+                <span>Tutor sets the rate →</span>
+                <span className="v">No middleman markup</span>
               </div>
               <div className="float-line">
-                <span>You front $20 →</span>
-                <span className="v">Refunded on lesson 1</span>
+                <span>Verify WWCC →</span>
+                <span className="v">Direct with NSW OCG (free)</span>
               </div>
             </div>
           )}
@@ -99,29 +99,29 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
             <span className="dot" />
             For tutors
           </div>
-          <h1>Tutor without losing half your pay.</h1>
-          <p className="subhead">Pay us $20 once per student. Keep everything else, forever.</p>
+          <h1>List free. Pay only when you get a student.</h1>
+          <p className="subhead">First match is on us. After that, $20 per student you actually take on — or $15 if you self-report honestly.</p>
           <div className="hero-cta-row">
             <span className="hero-cta">
               List for free <ArrowIcon s={16} />
             </span>
             <span className="hero-data">
-              0% commission<span className="sep">·</span>You set the rate
+              First student free<span className="sep">·</span>You set the rate
             </span>
           </div>
           {showFloats && (
             <div className="hero-floats" aria-hidden="true">
               <div className="float-line">
-                <span>$50/hr lesson →</span>
-                <span className="v">$50 in your pocket</span>
+                <span>Listing →</span>
+                <span className="v">Free, forever</span>
               </div>
               <div className="float-line">
-                <span>Per-lesson cut →</span>
-                <span className="v">0%</span>
+                <span>First confirmed student →</span>
+                <span className="v">$0</span>
               </div>
               <div className="float-line">
-                <span>Platform fee →</span>
-                <span className="v">$20, once, ever</span>
+                <span>Each student after that →</span>
+                <span className="v">$20 (or $15 honest)</span>
               </div>
             </div>
           )}
@@ -131,8 +131,8 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
       <div className="divider" aria-hidden="true" />
 
       <div className="hero-foot">
-        <span>NSW · est. 2026 · independent marketplace</span>
-        <span>Scroll for how the $20 actually works ↓</span>
+        <span>NSW · est. 2026 · independent directory</span>
+        <span>Scroll for how the match works ↓</span>
       </div>
     </section>
   );
