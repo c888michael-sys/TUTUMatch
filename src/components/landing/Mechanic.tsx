@@ -6,9 +6,9 @@ export function Mechanic() {
     <section className="section-pad" id="how-20-works">
       <SectionHead
         eyebrow="For tutors"
-        heading="What you pay."
+        heading="How it works."
         brandWords={2}
-        lede="Parents never pay TUTUMatch a cent — this part is about the tutor side. The only money the platform ever takes is your commission: $20 per confirmed student, charged only once a real student comes through. Your first match is on us."
+        lede="Three steps. List yourself for free, a parent picks you, and you pay a single $20 commission for that student — only ever when a real student comes through. Your first one is on us."
       />
 
       <div className="mechanic-grid">
@@ -17,10 +17,10 @@ export function Mechanic() {
             <UnlockIcon />
           </div>
           <div className="step-n">Step 01</div>
-          <h3>A parent picks you</h3>
+          <h3>Put your profile up</h3>
           <p>
-            They click &ldquo;I want this tutor&rdquo; and get your contact details — free for them. Your listing
-            pauses for 48 hours so you can talk without competing enquiries. You&apos;ve paid nothing.
+            List your subjects, rate, availability and the area you tutor in. It&apos;s free — no listing fee and
+            no subscription, ever.
           </p>
         </div>
         <div className="step reveal d2">
@@ -28,10 +28,10 @@ export function Mechanic() {
             <HandshakeIcon />
           </div>
           <div className="step-n">Step 02</div>
-          <h3>You teach the lesson</h3>
+          <h3>A parent picks you</h3>
           <p>
-            You and the parent agree the rate, schedule and place directly. You keep 100% of what you charge —
-            TUTUMatch never takes a cut of a lesson.
+            They get your contact details and reach out directly. You agree the rate, schedule and place between
+            yourselves — TUTUMatch stays out of it.
           </p>
         </div>
         <div className="step reveal d3">
@@ -39,10 +39,10 @@ export function Mechanic() {
             <DiscountIcon />
           </div>
           <div className="step-n">Step 03</div>
-          <h3>You pay $20 — once per confirmed student</h3>
+          <h3>Teach the lesson — pay a one-time $20</h3>
           <p>
-            Your first matched student is free. From the second onwards, a flat $20 when the match is confirmed.
-            No subscription, no per-lesson cut, ever.
+            You keep 100% of what you charge. For that student, TUTUMatch takes a single $20 commission — once,
+            not per lesson. Your first matched student is free.
           </p>
         </div>
       </div>
@@ -50,8 +50,8 @@ export function Mechanic() {
       <div className="honesty reveal">
         <div className="tag">Why it works this way</div>
         <p>
-          Charging you a flat fee <b>only when a student actually commits</b> keeps the directory free for parents
-          and risk-free for you — no upfront cost, no subscription. <b>You only pay once you&apos;ve been paid.</b>
+          You only ever pay <b>once you&apos;ve actually got a student</b> — no upfront cost, no subscription, no
+          cut of your lessons. If a parent never picks you, TUTUMatch never charges you a cent.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export function Mechanic() {
         </div>
         <div className="row">
           <span>Each student after that</span>
-          <span>$20.00</span>
+          <span>$20.00 once</span>
         </div>
         <div className="row total">
           <span>TUTUMatch&apos;s cut of your lesson fees</span>

@@ -66,6 +66,15 @@ export default function TermsPage() {
           percentage of any lesson fee. Tutors set their own hourly rate and are paid directly by the parent, by
           whatever method they agree on.
         </p>
+        <p>
+          Tutors may optionally purchase <strong>TUTUMatch Permanent</strong>: a one-time AU$60 payment that
+          exempts the tutor from all future per-match commission. TUTUMatch Permanent is tied to the individual
+          tutor account on which it is purchased. It is <strong>not transferable</strong> — a tutor may not sell,
+          assign, gift, or otherwise hand over their account, and may not substitute a different person as the
+          account holder, in order to pass the Permanent benefit to someone else. TUTUMatch may revoke Permanent
+          status, and the account, without refund where it reasonably determines the account has changed hands or
+          is operated by someone other than the tutor who purchased it.
+        </p>
 
         <h2>3. Confirmed matches and disputes</h2>
         <p>

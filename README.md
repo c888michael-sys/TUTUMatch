@@ -58,7 +58,7 @@ This is the single-paragraph value prop. Hero, landing page, signup form intro, 
 - **Parent pays $0** to the platform — ever, in any flow
 - **Tutor pays $20** when a parent confirms a match (or **$15** if the tutor self-reports honestly before the parent confirmation prompt arrives)
 - **First confirmed match is free** for every new tutor — commission starts on the second match onwards. Headline marketing hook.
-- **TUTUMatch Permanent**: optional $60 one-time upgrade. Tutor never pays per-match commission again. 14-day no-questions refund on the purchase. Forfeited on 3rd-strike permanent suspension.
+- **TUTUMatch Permanent**: optional $60 one-time upgrade. Tutor never pays per-match commission again. 14-day no-questions refund on the purchase. Forfeited on 3rd-strike permanent suspension. **Non-transferable** — tied to the individual tutor account; it cannot be sold, assigned, or passed to another person, and is revoked (no refund) if the account changes hands. The Terms of Service must state this.
 - Future possibility (not for now): bump base commission to **$25 ($20 with honesty)** for *new* tutors only, after the model proves out. Permanent stays at $60.
 
 ### The match flow, end to end
@@ -141,7 +141,7 @@ These are the numbers the build uses. If they change, the change goes through th
 | **First confirmed match per tutor** | $0 | The free-first-match sweetener. Tracked on the tutor's record (`matchesCompletedCount === 0`). |
 | **Standard commission per confirmed match** | $20 AUD | Charged via Stripe Connect to tutor's saved card. |
 | **Honesty-discount commission** | $15 AUD | Applies when tutor self-reports the match before the parent-confirmation prompt fires (i.e., within the 48-hour window). |
-| **TUTUMatch Permanent (one-time)** | $60 AUD | Tutor pays once, never pays per-match commission again. 14-day no-questions refund. Forfeited on 3rd-strike permanent suspension. |
+| **TUTUMatch Permanent (one-time)** | $60 AUD | Tutor pays once, never pays per-match commission again. 14-day no-questions refund. Forfeited on 3rd-strike permanent suspension. Non-transferable — tied to the individual tutor account; revoked with no refund if the account changes hands. |
 | **Permanent break-even** | 4th student | At standard $20 × 3 = $60, so the 4th confirmed match onwards is pure savings. Mention this in marketing copy. |
 | **Future bump (not now)** | $25 / $20 honesty | For *new* tutors only, after model is validated. Permanent stays $60 (or rises in lockstep — decide at activation). |
 
