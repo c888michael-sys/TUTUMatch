@@ -11,12 +11,12 @@ export function Comparison({ brand }: { brand: string }) {
       />
       <div className="compare reveal">
         <div className="row head">
-          <div className="cell label">Per-student cost</div>
+          <div className="cell label">How it compares</div>
           <div className="cell">Tutoring centres</div>
           <div className="cell us">{brand}</div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             Cost to parent (to the platform)
           </div>
           <div className="cell" data-label="Tutoring centres">
@@ -27,7 +27,7 @@ export function Comparison({ brand }: { brand: string }) {
           </div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             Commission per lesson
           </div>
           <div className="cell" data-label="Tutoring centres">
@@ -38,7 +38,7 @@ export function Comparison({ brand }: { brand: string }) {
           </div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             Tutor commission per match
           </div>
           <div className="cell" data-label="Tutoring centres">
@@ -49,7 +49,7 @@ export function Comparison({ brand }: { brand: string }) {
           </div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             Who picks the tutor
           </div>
           <div className="cell" data-label="Tutoring centres">
@@ -60,7 +60,7 @@ export function Comparison({ brand }: { brand: string }) {
           </div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             Who sets the rate
           </div>
           <div className="cell" data-label="Tutoring centres">
@@ -71,7 +71,7 @@ export function Comparison({ brand }: { brand: string }) {
           </div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             Lock-in
           </div>
           <div className="cell" data-label="Tutoring centres">
@@ -82,7 +82,7 @@ export function Comparison({ brand }: { brand: string }) {
           </div>
         </div>
         <div className="row">
-          <div className="cell label" data-label="Per-student cost">
+          <div className="cell label">
             10-week term, 1hr/wk @ $50
           </div>
           <div className="cell" data-label="Tutoring centres">

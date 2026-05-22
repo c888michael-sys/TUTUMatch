@@ -3345,6 +3345,8 @@ footer {
     color: var(--muted);
     margin-bottom: 6px;
   }
+  /* The label cell is the row's own topic — no column-prefix needed on mobile. */
+  .compare .cell.label::before { display: none; }
 
   .guarantee-card { grid-template-columns: 1fr; gap: 24px; padding: 36px; }
   .earn-grid { grid-template-columns: 1fr; }
