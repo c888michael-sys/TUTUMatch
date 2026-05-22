@@ -33,3 +33,7 @@ prisma/migrations/dev.db*
 
 # Local JSON-store data (users + applications). Never commit user data.
 data/
+
+# Local dev artifacts (puppeteer screenshots, throwaway scripts)
+shot.js
+shots/
