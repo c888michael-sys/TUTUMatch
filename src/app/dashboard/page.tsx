@@ -190,8 +190,8 @@ export default async function DashboardPage({
           <div style={{ marginTop: 32 }}>
             <h2>Pending matches — action required</h2>
             <p className="muted small">
-              A parent has selected you. Self-report within 48 hours to claim the $15 honesty rate
-              and keep your listing visible.
+              A parent has selected you. Report whether it led to a lesson within 48 hours — reporting promptly
+              earns the honesty discount on your commission and puts your listing straight back into browse.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {pendingMatches.map((m) => (
@@ -204,7 +204,7 @@ export default async function DashboardPage({
                     Hidden until: {new Date(m.tutorHiddenUntil).toLocaleString("en-AU")}
                     {m.isFreeFirstMatch && " · First match — no commission!"}
                   </div>
-                  <SelfReportButton matchId={m.id} />
+                  <SelfReportButton matchId={m.id} isFreeFirstMatch={m.isFreeFirstMatch} />
                 </div>
               ))}
             </div>

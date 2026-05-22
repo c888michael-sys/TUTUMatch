@@ -8,8 +8,8 @@ export function Pitch() {
           <span className="num">$20</span> once a tutor gets a student. <span className="num">$0</span> from parents.
         </p>
         <p className="pitch-note">
-          A flat $20 per matched student, paid by the tutor — the first student free, $15 if self-reported
-          honestly. No per-lesson cut, no monthly fee, no upcharge on the tutor&apos;s rate.
+          A flat $20 per matched student, paid by the tutor — and the first student is free. No per-lesson cut,
+          no monthly fee, no upcharge on the tutor&apos;s rate.
         </p>
       </div>
     </section>

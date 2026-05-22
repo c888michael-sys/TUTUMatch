@@ -47,9 +47,11 @@ This drops the legal risk profile from "verified marketplace facilitator" down t
 
 > **List free. Pay only when you get a student. First match is on us.**
 >
-> After that, $20 per student you actually take on — or $15 if you self-report honestly. Or skip per-match fees with **TUTUMatch Permanent**: $60 once, list forever, no more commissions (pays for itself at your 4th student).
+> After that, $20 per student you actually take on. Or skip per-match fees with **TUTUMatch Permanent**: $60 once, list forever, no more commissions (pays for itself at your 4th student).
 
 This is the single-paragraph value prop. Hero, landing page, signup form intro, and tutor dashboard all use this language verbatim or close to it. **Do not** use "free listing first time" — that's ambiguous about what happens later. The above framing is unambiguous: free to list permanently, pay per outcome.
+
+> **Do not put the $15 honesty rate in public/marketing copy** (landing page, Hero, FAQ, how-it-works). Product decision (2026-05-21): the advertised commission is a flat **$20**; the $15 self-report discount is surfaced **in-product only** — at the point a tutor goes to self-report a match — so it lands as a pleasant discount rather than an advertised number. The mechanic itself is unchanged (see Pricing, Match flow, API contracts).
 
 ### Money flow (the key change from pre-pivot)
 
@@ -123,7 +125,7 @@ This gives the safety benefit (tutors have WWCCs, parents can verify) without th
 
 This is a real positioning advantage and should be on the landing page front and centre:
 
-> **List free. Your first matched student costs you nothing. From your second student onwards, TUTUMatch charges a flat $20 commission per match — refundable as a $15 rate if you self-report honestly. No subscription. No per-lesson cut. Only pay when a real student commits.**
+> **List free. Your first matched student costs you nothing. From your second student onwards, TUTUMatch charges a flat $20 commission per confirmed match. No subscription. No per-lesson cut. Only pay when a real student commits.**
 
 This is the genuine differentiator vs. tutoring centres (40-60% per lesson, forever) and pay-to-list directories (upfront cost with no guaranteed return).
 

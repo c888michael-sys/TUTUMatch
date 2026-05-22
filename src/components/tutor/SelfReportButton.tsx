@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function SelfReportButton({ matchId }: { matchId: string }) {
+export function SelfReportButton({
+  matchId,
+  isFreeFirstMatch,
+}: {
+  matchId: string;
+  isFreeFirstMatch?: boolean;
+}) {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "loading" | "done">("idle");
   const [result, setResult] = useState<string>("");
@@ -27,9 +33,9 @@ export function SelfReportButton({ matchId }: { matchId: string }) {
       const charged = data.chargedCents ?? 0;
       setResult(
         data.isFreeFirstMatch
-          ? "Match confirmed — first match is free. Your listing is back in browse."
+          ? "Match confirmed — your first match is free. Your listing is back in browse."
           : charged === 1500
-          ? "Match confirmed — $15 honesty rate applied. Your listing is back in browse."
+          ? "Match confirmed — $15 charged, your $5 honesty discount applied. Your listing is back in browse."
           : "Match confirmed. Your listing is back in browse."
       );
     } else {
@@ -46,7 +52,9 @@ export function SelfReportButton({ matchId }: { matchId: string }) {
   return (
     <div>
       <p className="muted small" style={{ marginBottom: 8 }}>
-        Did you book a lesson with this parent?
+        {isFreeFirstMatch
+          ? "Did you book a lesson with this parent? Your first match is free — reporting just confirms it and puts your listing back in browse."
+          : "Did you book a lesson with this parent? Report it now and you get the honesty discount — $15 instead of the $20 we charge once the parent confirms it themselves."}
       </p>
       {error && <div className="reject-banner" style={{ marginBottom: 8, fontSize: 13 }}>{error}</div>}
       <div style={{ display: "flex", gap: 10 }}>
@@ -55,7 +63,7 @@ export function SelfReportButton({ matchId }: { matchId: string }) {
           onClick={() => report("YES")}
           disabled={state === "loading"}
         >
-          Yes — I had a lesson ($15 honesty rate)
+          Yes — I had a lesson
         </button>
         <button
           className="btn ghost"

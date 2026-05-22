@@ -34,7 +34,7 @@ export const FAQS: Faq[] = [
   {
     tag: "tutors",
     q: "What does it really cost to list?",
-    a: "Listing is free, forever. Your first confirmed student is also free. From your second student onwards, we charge a $20 commission per confirmed match — or $15 if you self-report the match honestly within the 48-hour window. That's the only money that ever moves between you and the platform.",
+    a: "Listing is free, forever. Your first confirmed student is also free. From your second student onwards, we charge a flat $20 commission per confirmed match. That's the only money that ever moves between you and the platform.",
   },
   {
     tag: "tutors",
@@ -44,7 +44,7 @@ export const FAQS: Faq[] = [
   {
     tag: "tutors",
     q: "What stops tutors from hiding matches to dodge the commission?",
-    a: "A few things. The parent gets a 'did you have a lesson with [tutor]?' email at the 48-hour mark; if they say yes and you said no, that's a strike. Three strikes and your profile is permanently hidden. Bank-transfer screenshots from the parent are easy evidence in disputes. The $15 honesty discount makes self-reporting cheaper than getting caught.",
+    a: "A few things. The parent gets a 'did you have a lesson with [tutor]?' email at the 48-hour mark; if they say yes and you said no, that's a strike. Three strikes and your profile is permanently hidden. And bank-transfer screenshots from the parent are easy evidence in any dispute.",
   },
   {
     tag: "tutors",

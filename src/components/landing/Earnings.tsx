@@ -7,7 +7,7 @@ export function Earnings({ brand }: { brand: string }) {
         eyebrow="For tutors"
         heading="The maths, for tutors."
         brandWords={2}
-        lede="Same hour, same student, same effort. List free. First student is on us. After that, $20 per confirmed match — or $15 if you self-report honestly. That's it."
+        lede="Same hour, same student, same effort. List free. First student is on us. After that, $20 per confirmed match. That's it."
       />
       <div className="earn-grid">
         <div className="earn-card reveal d1">
@@ -30,7 +30,7 @@ export function Earnings({ brand }: { brand: string }) {
           </div>
           <p className="copy">
             A $50/hr lesson lands you $50 — forever. Your first confirmed student costs nothing. From your second
-            onwards, $20 commission per match (or $15 if you self-report). Or skip per-match fees with{" "}
+            onwards, $20 commission per match. Or skip per-match fees with{" "}
             <strong>Permanent</strong> — $60 once, pays for itself at your 4th student.
           </p>
           <div className="term">

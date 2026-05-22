@@ -45,7 +45,7 @@ export function Comparison({ brand }: { brand: string }) {
             N/A (centre owns the relationship)
           </div>
           <div className="cell us" data-label={brand}>
-            First match <span className="m">free</span>, then <span className="m">$20</span> per confirmed student (<span className="m">$15</span> honest)
+            First match <span className="m">free</span>, then <span className="m">$20</span> per confirmed student
           </div>
         </div>
         <div className="row">

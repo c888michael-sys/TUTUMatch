@@ -41,8 +41,8 @@ export function Mechanic() {
           <div className="step-n">Step 03</div>
           <h3>You pay $20 — once per confirmed student</h3>
           <p>
-            Your first matched student is free. From the second onwards, a flat $20 when the match is confirmed —
-            or $15 if you self-report it honestly. No subscription, no per-lesson cut, ever.
+            Your first matched student is free. From the second onwards, a flat $20 when the match is confirmed.
+            No subscription, no per-lesson cut, ever.
           </p>
         </div>
       </div>
@@ -67,10 +67,6 @@ export function Mechanic() {
         <div className="row">
           <span>Each student after that</span>
           <span>$20.00</span>
-        </div>
-        <div className="row">
-          <span>…or, self-reported honestly</span>
-          <span className="neg">$15.00</span>
         </div>
         <div className="row total">
           <span>TUTUMatch&apos;s cut of your lesson fees</span>

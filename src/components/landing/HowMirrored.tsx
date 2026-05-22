@@ -37,8 +37,7 @@ export function HowMirrored() {
             <span className="num">04</span>
             <span className="body">
               <b>Confirm the match.</b> Booked a lesson? Self-report it. Your first student is free; after that
-              it&apos;s <span className="m">$20</span> — or <span className="m">$15</span> if you self-report
-              honestly.
+              it&apos;s a flat <span className="m">$20</span> per confirmed student.
             </span>
           </div>
           <div className="how-step">

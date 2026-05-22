@@ -100,7 +100,7 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
             For tutors
           </div>
           <h1>List free. Pay only when you get a student.</h1>
-          <p className="subhead">First match is on us. After that, $20 per student you actually take on — or $15 if you self-report honestly.</p>
+          <p className="subhead">First match is on us. After that, $20 per student you actually take on. No per-lesson cut, ever.</p>
           <div className="hero-cta-row">
             <span className="hero-cta">
               List for free <ArrowIcon s={16} />
@@ -121,7 +121,7 @@ export function Hero({ showFloats = true }: { showFloats?: boolean }) {
               </div>
               <div className="float-line">
                 <span>Each student after that →</span>
-                <span className="v">$20 (or $15 honest)</span>
+                <span className="v">$20</span>
               </div>
             </div>
           )}
