@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findMatchById, findApplicationById, patchMatch, patchApplication } from "@/lib/db";
 import { commissionCents, isFirstFreeMatch } from "@/lib/strike";
+import { chargeTutorCommission } from "@/lib/stripe";
 import { getSession } from "@/lib/session";
 import { sendTutorSelfReportResultEmail } from "@/lib/email";
 
@@ -52,8 +53,16 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const free = isFirstFreeMatch(app);
   const cents = free ? 0 : commissionCents(app, true); // $15 honesty rate
 
-  // TODO (session 3 Stripe): charge tutor via Stripe Connect
-  console.log("[stripe:stub] Charge tutor", app.userId, cents, "cents (self-report, match", match.id + ")");
+  let stripeChargeId: string | undefined;
+  if (cents > 0) {
+    const charge = await chargeTutorCommission(
+      app,
+      cents,
+      `TUTUMatch commission — self-reported match ${match.id}`
+    );
+    if (charge.ok) stripeChargeId = charge.chargeId;
+    else console.warn(`[stripe] commission not charged for match ${match.id}: ${charge.reason}`);
+  }
 
   await patchMatch(params.id, {
     tutorSelfReport: "YES",
@@ -61,6 +70,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     status: "RESOLVED_TUTOR_CONFIRMED",
     resolvedAt: now,
     amountChargedCents: cents,
+    stripeChargeId,
   });
   await patchApplication(app.id, {
     hiddenUntil: undefined,

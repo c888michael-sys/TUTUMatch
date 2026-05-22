@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findMatchById, findApplicationById, patchMatch, patchApplication, hashToken } from "@/lib/db";
 import { applyStrike, commissionCents, isFirstFreeMatch } from "@/lib/strike";
+import { chargeTutorCommission } from "@/lib/stripe";
 import { sendTutorStrikeEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -57,8 +58,16 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const free = isFirstFreeMatch(app);
   const cents = free ? 0 : commissionCents(app, false); // $20 (no honesty discount)
 
-  // TODO (session 3 Stripe): charge tutor via Stripe Connect
-  console.log("[stripe:stub] Charge tutor", app.userId, cents, "cents (parent-confirm YES, match", match.id + ")");
+  let stripeChargeId: string | undefined;
+  if (cents > 0) {
+    const charge = await chargeTutorCommission(
+      app,
+      cents,
+      `TUTUMatch commission — parent-confirmed match ${match.id}`
+    );
+    if (charge.ok) stripeChargeId = charge.chargeId;
+    else console.warn(`[stripe] commission not charged for match ${match.id}: ${charge.reason}`);
+  }
 
   await patchMatch(params.id, {
     parentConfirmation: "YES",
@@ -66,6 +75,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     status: "RESOLVED_PARENT_CONFIRMED",
     resolvedAt: now,
     amountChargedCents: cents,
+    stripeChargeId,
   });
   await patchApplication(app.id, {
     hiddenUntil: undefined,

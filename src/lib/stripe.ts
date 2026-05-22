@@ -16,6 +16,12 @@ export const stripeEnabled = secretKey.startsWith("sk_") && !secretKey.includes(
 
 export const stripe: Stripe | null = stripeEnabled ? new Stripe(secretKey) : null;
 
+// Commission charges are SIMULATED unless a real key is set AND STRIPE_SIMULATE
+// is explicitly "false". Simulation makes no Stripe API call — the charge is
+// logged and reported as succeeded — so the match flow is fully testable
+// without real charges or a card on file.
+export const stripeSimulated = !(stripeEnabled && process.env.STRIPE_SIMULATE === "false");
+
 // Ensure the tutor has a Stripe Customer; returns the customer id (or null if
 // Stripe isn't configured). Persists a newly created customer onto the record.
 export async function ensureStripeCustomer(app: TutorApplication): Promise<string | null> {
@@ -42,6 +48,14 @@ export async function chargeTutorCommission(
   amountCents: number,
   description: string
 ): Promise<ChargeResult> {
+  if (stripeSimulated) {
+    const simId = `sim_${Math.random().toString(36).slice(2, 12)}`;
+    console.log(
+      `[stripe:sim] Would charge ${app.firstName} (tutor ${app.userId}) ` +
+        `${(amountCents / 100).toFixed(2)} AUD — ${description}. Simulated charge ${simId}.`
+    );
+    return { ok: true, chargeId: simId };
+  }
   if (!stripe) return { ok: false, reason: "stripe_disabled" };
   if (!app.stripeCustomerId || !app.stripeDefaultPaymentMethodId) {
     return { ok: false, reason: "no_card" };
