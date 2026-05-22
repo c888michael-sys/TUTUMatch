@@ -272,11 +272,7 @@ export function SignupForm({
         setTopError("Submission failed — please try again.");
         return;
       }
-      if (data.autoRejected) {
-        router.replace("/dashboard?rejected=auto");
-      } else {
-        router.replace(isEdit ? "/dashboard?updated=1" : "/dashboard?submitted=1");
-      }
+      router.replace(isEdit ? "/dashboard?updated=1" : "/dashboard?submitted=1");
       router.refresh();
     } finally {
       setBusy(false);
@@ -297,13 +293,13 @@ export function SignupForm({
             maxLength={1}
           />
         </Field>
-        <Field label="Full last name (private)" error={errors.fullLastName} hint="Not shown publicly. Used for verification only.">
+        <Field label="Full last name (private)" error={errors.fullLastName} hint="Not shown publicly — only your first name and last initial appear on your listing.">
           <input value={fullLastName} onChange={(e) => setFullLastName(e.target.value)} required maxLength={80} />
         </Field>
         <Field
           label="Date of birth"
           error={errors.dateOfBirth}
-          hint="Tutors must be 18 or older. Applications from under-18s are automatically rejected on submission."
+          hint="You must be 18 or older to list as a tutor."
         >
           <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required />
         </Field>
@@ -315,8 +311,8 @@ export function SignupForm({
           error={errors.publicBio}
           hint={
             bioFlags.length
-              ? `⚠ Contact info detected (${bioFlags.join(", ")}). Remove before submitting — your bio will be rejected if any of phone numbers, emails, or social handles are detected.`
-              : "20–800 characters. Don't include phone numbers, emails, or social handles — they're auto-blocked."
+              ? `⚠ Contact info detected (${bioFlags.join(", ")}). A bio with phone numbers, emails or social handles goes to manual review before it appears — best to remove it.`
+              : "20–800 characters. Leave out phone numbers, emails, or social handles — a listing that includes them goes to manual review first."
           }
           full
         >

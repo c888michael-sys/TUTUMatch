@@ -4,15 +4,22 @@ import {
   findApplicationByUserId,
   newId,
   upsertApplication,
+  type ApplicationStatus,
   type TutorApplication,
 } from "@/lib/db";
-import { ageInYears, scanForContactInfo, tutorApplicationSchema } from "@/lib/tutor-form";
+import { tutorApplicationSchema } from "@/lib/tutor-form";
+import { scanContent } from "@/lib/content-scanner";
 import { TERMS_VERSION } from "@/lib/legal";
 
-const UNDER_18_REJECTION_NOTE = (age: number, dob: string) =>
-  `Automatically rejected: tutors must be 18 or older. Applicant DOB ${dob} (age ${age}). This decision is enforced by the platform on submission — admin override is possible but should require additional ID verification.`;
-
 export const runtime = "nodejs";
+
+// A clean listing is auto-approved and goes live immediately; a flagged one
+// waits for spam/abuse review. Tutors self-declare being 18+ on the signup
+// form — TUTUMatch does not verify dates of birth. (Phone-OTP gating is added
+// in a later step, once an OTP provider is configured.)
+function statusFromScan(flags: string[]): ApplicationStatus {
+  return flags.length > 0 ? "PENDING_REVIEW" : "APPROVED";
+}
 
 export async function POST(req: Request) {
   const session = getSession();
@@ -35,31 +42,23 @@ export async function POST(req: Request) {
     );
   }
   const v = parsed.data;
-
-  const bioFlags = scanForContactInfo(v.publicBio);
-  if (bioFlags.length > 0) {
-    return NextResponse.json(
-      {
-        error: "validation",
-        fieldErrors: { publicBio: [`Bio contains disallowed content (${bioFlags.join(", ")}). Remove it before submitting.`] },
-      },
-      { status: 400 }
-    );
-  }
-
-  const age = ageInYears(v.dateOfBirth);
-  const autoRejected = age < 18;
   const now = new Date().toISOString();
+
+  // Content scan — flagged listings go to spam/abuse review; clean ones are
+  // auto-approved. A flag no longer blocks submission.
+  const bioFlags = scanContent(v.publicBio);
+  const status = statusFromScan(bioFlags);
 
   const app: TutorApplication = {
     id: newId("app"),
     userId: session.userId,
-    status: autoRejected ? "REJECTED" : "PENDING_REVIEW",
-    visibility: !autoRejected,
+    status,
+    visibility: true,
     submittedAt: now,
-    reviewedAt: autoRejected ? now : undefined,
-    reviewerEmail: autoRejected ? "auto" : undefined,
-    reviewerNotes: autoRejected ? UNDER_18_REJECTION_NOTE(age, v.dateOfBirth) : undefined,
+    reviewedAt: status === "APPROVED" ? now : undefined,
+    reviewerEmail: status === "APPROVED" ? "auto" : undefined,
+    reviewerNotes:
+      status === "APPROVED" ? "Auto-approved — content scan found no flags." : undefined,
 
     firstName: v.firstName,
     lastInitial: v.lastInitial.toUpperCase(),
@@ -96,18 +95,13 @@ export async function POST(req: Request) {
   };
   await upsertApplication(app);
 
-  return NextResponse.json({
-    ok: true,
-    applicationId: app.id,
-    status: app.status,
-    autoRejected,
-  });
+  return NextResponse.json({ ok: true, applicationId: app.id, status: app.status });
 }
 
 // PUT — update the current user's existing application. Validates with the
-// same schema as create, then resets status back to PENDING_REVIEW so an
-// admin re-reviews the change. We preserve id / userId / submittedAt /
-// visibility so the existing listing identity sticks around.
+// same schema, re-runs the content scan, and re-derives status: a clean edit
+// goes straight back live, a flagged edit returns to review. id / userId /
+// submittedAt are preserved so the listing identity sticks.
 export async function PUT(req: Request) {
   const session = getSession();
   if (!session) {
@@ -129,30 +123,19 @@ export async function PUT(req: Request) {
     );
   }
   const v = parsed.data;
-
-  const bioFlags = scanForContactInfo(v.publicBio);
-  if (bioFlags.length > 0) {
-    return NextResponse.json(
-      {
-        error: "validation",
-        fieldErrors: { publicBio: [`Bio contains disallowed content (${bioFlags.join(", ")}). Remove it before saving.`] },
-      },
-      { status: 400 }
-    );
-  }
-
-  const age = ageInYears(v.dateOfBirth);
-  const autoRejected = age < 18;
   const now = new Date().toISOString();
+
+  const bioFlags = scanContent(v.publicBio);
+  const status = statusFromScan(bioFlags);
 
   const updated: TutorApplication = {
     ...existing,
-    status: autoRejected ? "REJECTED" : "PENDING_REVIEW",
-    visibility: autoRejected ? false : existing.visibility,
-    // Reset review trail. If auto-rejected, stamp the system as reviewer.
-    reviewedAt: autoRejected ? now : undefined,
-    reviewerEmail: autoRejected ? "auto" : undefined,
-    reviewerNotes: autoRejected ? UNDER_18_REJECTION_NOTE(age, v.dateOfBirth) : undefined,
+    status,
+    visibility: existing.visibility,
+    reviewedAt: status === "APPROVED" ? now : undefined,
+    reviewerEmail: status === "APPROVED" ? "auto" : undefined,
+    reviewerNotes:
+      status === "APPROVED" ? "Auto-approved — content scan found no flags." : undefined,
 
     firstName: v.firstName,
     lastInitial: v.lastInitial.toUpperCase(),
@@ -183,18 +166,11 @@ export async function PUT(req: Request) {
     idDocumentUploadId: v.idDocumentUploadId,
     wwccDocumentUploadId: v.wwccDocumentUploadId,
     hscDocumentUploadId: v.hscDocumentUploadId,
-    // Re-record acceptance on every edit. If we bump TERMS_VERSION between
-    // submits, the new acceptance is captured here.
     termsAcceptedVersion: TERMS_VERSION,
     termsAcceptedAt: now,
     bioFlags,
   };
   await upsertApplication(updated);
 
-  return NextResponse.json({
-    ok: true,
-    applicationId: updated.id,
-    status: updated.status,
-    autoRejected,
-  });
+  return NextResponse.json({ ok: true, applicationId: updated.id, status: updated.status });
 }
