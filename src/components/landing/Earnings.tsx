@@ -7,7 +7,7 @@ export function Earnings({ brand }: { brand: string }) {
         eyebrow="For tutors"
         heading="The maths, for tutors."
         brandWords={2}
-        lede="Same hour, same student, same effort. List free. First student is on us. After that, $20 per confirmed match. That's it."
+        lede="An example — same hour, same student, same effort. At a centre you're paid a slice of what the parent pays; on TUTUMatch you set your own rate and keep all of it."
       />
       <div className="earn-grid">
         <div className="earn-card reveal d1">
@@ -16,8 +16,8 @@ export function Earnings({ brand }: { brand: string }) {
             $30–$50<span className="unit">/hr in pocket</span>
           </div>
           <p className="copy">
-            Centres typically pay tutors $30–$50/hr while charging parents more. The gap stays with the centre — every
-            lesson, for the entire student relationship, forever.
+            Centres typically pay tutors $30–$50/hr while charging parents more. The gap stays with the centre —
+            every lesson, for the entire student relationship, forever.
           </p>
           <div className="term">
             10-week term @ 1hr/wk → net <span className="m">≈ $300–$500</span>
@@ -26,19 +26,22 @@ export function Earnings({ brand }: { brand: string }) {
         <div className="earn-card us reveal d2">
           <div className="label">On {brand}</div>
           <div className="big">
-            $50<span className="unit">/hr in pocket</span>
+            $60–$80<span className="unit">/hr in pocket</span>
           </div>
           <p className="copy">
-            A $50/hr lesson lands you $50 — forever. Your first confirmed student costs nothing. From your second
-            onwards, $20 commission per match. Or skip per-match fees with{" "}
-            <strong>Permanent</strong> — $60 once, pays for itself at your 4th student.
+            You set your own rate and keep every dollar of it — no centre skimming the gap. Tutors here typically
+            charge $60–$80/hr. Your first confirmed student is free; after that a one-time $20 per student, or
+            skip per-match fees with <strong>Permanent</strong>.
           </p>
           <div className="term">
-            10-week term @ 1hr/wk → net <span className="m">$500</span> (first student) ·{" "}
-            <span className="m">$480</span> (each student after, $20 commission)
+            10-week term @ 1hr/wk → net <span className="m">≈ $600–$800</span>
           </div>
         </div>
       </div>
+      <p className="muted small" style={{ textAlign: "center", marginTop: 18 }}>
+        Illustrative example — actual rates vary by subject, year level, experience and area. On {brand} you
+        always set your own rate.
+      </p>
     </section>
   );
 }
