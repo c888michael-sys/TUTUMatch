@@ -41,9 +41,11 @@ export default async function AdminPage() {
     <>
       <TopNav />
       <main className="page-shell admin-shell">
-        <h1>Admin · Tutor applications</h1>
+        <h1>Admin · Tutor listings</h1>
         <p>
-          {apps.length} application{apps.length === 1 ? "" : "s"} total · {pending.length} pending review.
+          {apps.length} listing{apps.length === 1 ? "" : "s"} total · {pending.length} flagged for review.
+          Clean listings are auto-approved and go live immediately — this queue is for{" "}
+          <strong>spam and abuse moderation</strong>, not credential checks.
         </p>
         <p className="admin-tools-row">
           <Link className="btn ghost sm" href="/admin/schools">Manage schools</Link>

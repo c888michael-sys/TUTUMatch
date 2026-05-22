@@ -69,7 +69,7 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
 
         {app.bioFlags && app.bioFlags.length > 0 && (
           <div className="warning-banner">
-            ⚠ Bio scanner flagged: {app.bioFlags.join(", ")}. Review the bio before approving.
+            ⚠ Content scanner flagged: {app.bioFlags.join(", ")}. Review the bio for spam or abuse before approving.
           </div>
         )}
 
@@ -174,16 +174,17 @@ export default async function ApplicationDetail({ params }: { params: { id: stri
             </p>
           </DetailBlock>
 
-          <DetailBlock title="Verification documents" full>
+          <DetailBlock title="Tutor-provided documents (optional)" full>
             <div className="admin-docs">
               <AdminDoc label="Government ID" uploadId={app.idDocumentUploadId} fallbackNote={app.idDocumentNote} />
               <AdminDoc label="WWCC document" uploadId={app.wwccDocumentUploadId} />
               <AdminDoc label="HSC Record of Achievement" uploadId={app.hscDocumentUploadId} fallbackNote={app.hscDocumentNote} />
             </div>
             <p className="muted small">
-              Documents are stored encrypted-at-rest on the host filesystem (local dev) and are only accessible to
-              the uploading tutor and admin accounts. Real-launch storage should be S3 / Supabase Storage with
-              short-lived signed URLs.
+              These are optional documents the tutor chose to upload — TUTUMatch does not verify them, and a
+              listing is never approved or rejected on their basis. Stored encrypted-at-rest (local dev: host
+              filesystem), accessible only to the tutor and admins. Real-launch storage should be S3 / Supabase
+              with short-lived signed URLs.
             </p>
           </DetailBlock>
         </div>
