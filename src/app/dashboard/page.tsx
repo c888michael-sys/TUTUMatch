@@ -183,6 +183,18 @@ export default async function DashboardPage({
                 }
               />
             </div>
+
+            <div className="dashboard-app-section">
+              <h3>Your WWCC details</h3>
+              <p className="muted small">
+                A parent may ask for these so they can verify your Working With Children Check themselves with
+                the NSW Office of the Children&apos;s Guardian. They are never shown on your public listing.
+              </p>
+              <div className="dashboard-app-meta">
+                <div><strong>WWCC number:</strong> {app.wwccNumber}</div>
+                <div><strong>Name on the WWCC:</strong> {app.wwccFullName}</div>
+              </div>
+            </div>
           </div>
         )}
 

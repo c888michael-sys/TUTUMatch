@@ -621,8 +621,8 @@ export function SignupForm({
         </div>
       </Section>
 
-      <Section title="8 · Verification" sub="Required by NSW law for anyone working with children. Manual review takes ~48 hours.">
-        <Field label="WWCC number" error={errors.wwccNumber} hint="The number from your Working With Children Check.">
+      <Section title="8 · Your Working With Children Check" sub="We ask for your WWCC details so you have them ready to give any parent who asks. TUTUMatch does not verify them — parents check a WWCC themselves with the NSW Office of the Children's Guardian.">
+        <Field label="WWCC number" error={errors.wwccNumber} hint="From your Working With Children Check. Parents may ask you for this directly.">
           <input value={wwccNumber} onChange={(e) => setWwccNumber(e.target.value)} required />
         </Field>
         <Field label="Full name on the WWCC" error={errors.wwccFullName}>
@@ -631,11 +631,12 @@ export function SignupForm({
 
         <div className="full-row">
           <div className="repeat-head">
-            <span>Document uploads</span>
+            <span>Documents (optional)</span>
           </div>
           <p className="form-help">
-            Upload a clear photo or scan of each document. PDF / JPG / PNG / HEIC / WEBP, max 8 MB each. Files are
-            only visible to you and TUTUMatch admins, never shown to parents or other tutors.
+            Optional — uploading these is not required to list, and TUTUMatch does not verify them. They are
+            private to you and TUTUMatch (never shown to parents or other tutors); keeping them on file just
+            makes them easy to produce if ever needed. PDF / JPG / PNG / HEIC / WEBP, max 8 MB each.
           </p>
           <DocumentUploader
             kind="id_document"
@@ -663,11 +664,11 @@ export function SignupForm({
           />
         </div>
 
-        <Field label="Government ID — note (optional fallback)" error={errors.idDocumentNote} hint="If you can't upload right now, write where the admin can request the scan." full>
-          <input value={idDocumentNote} onChange={(e) => setIdDocumentNote(e.target.value)} placeholder="e.g. 'email on request'" />
+        <Field label="Government ID — note (optional)" error={errors.idDocumentNote} hint="Optional. If you'd rather not upload, you can note that it's available on request." full>
+          <input value={idDocumentNote} onChange={(e) => setIdDocumentNote(e.target.value)} placeholder="e.g. 'available on request'" />
         </Field>
-        <Field label="HSC document — note (optional fallback)" error={errors.hscDocumentNote} hint="Same — write how admin can get the scan if upload isn't possible." full>
-          <input value={hscDocumentNote} onChange={(e) => setHscDocumentNote(e.target.value)} placeholder="e.g. 'email on request'" />
+        <Field label="HSC document — note (optional)" error={errors.hscDocumentNote} hint="Optional, same as above." full>
+          <input value={hscDocumentNote} onChange={(e) => setHscDocumentNote(e.target.value)} placeholder="e.g. 'available on request'" />
         </Field>
       </Section>
 
