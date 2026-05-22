@@ -31,7 +31,7 @@ export default function PrivacyPage() {
 
       <h2>How we use it</h2>
       <ul>
-        <li>To verify tutor identity, age, working-with-children clearance, and academic claims.</li>
+        <li>To publish each tutor&apos;s listing and keep on record the WWCC, ID, and academic details a tutor self-declares. We do not verify these — see our Terms.</li>
         <li>To connect parents with tutors.</li>
         <li>To run match confirmation, tutor commission, and dispute resolution.</li>
         <li>To meet legal obligations (tax, child-safety, complaints).</li>
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
 
       <h2>How we store it</h2>
       <p>
-        Verification documents (ID, WWCC, HSC) are stored encrypted at rest in object storage with admin-only access
+        Tutor-provided documents (ID, WWCC, HSC), where a tutor supplies them, are stored encrypted at rest in object storage with admin-only access
         via signed URLs. Payment data is handled exclusively by Stripe. All data is hosted in Australian regions
         where possible.
       </p>

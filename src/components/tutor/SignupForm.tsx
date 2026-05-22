@@ -512,8 +512,8 @@ export function SignupForm({
             present.
           </p>
           <p>
-            TUTUMatch verifies tutor identity and HSC results, but{" "}
-            <strong>we do not choose lesson locations</strong> and are not responsible for what happens at any
+            TUTUMatch is a directory — we don&apos;t verify tutors, and{" "}
+            <strong>we do not choose lesson locations</strong> or take responsibility for what happens at any
             individual lesson. Choosing a safe meeting place is your responsibility. Pick somewhere public.
           </p>
         </div>
