@@ -132,6 +132,10 @@ export type TutorApplication = {
   noHonestyDiscount?: boolean;
   permanentListing?: boolean;
   permanentListingPurchasedAt?: string;
+  // Stripe — the tutor's Customer id and the card saved for commission charges.
+  // Set when the tutor adds a payment method; required before they can be charged.
+  stripeCustomerId?: string;
+  stripeDefaultPaymentMethodId?: string;
   // When set and in the future, the tutor's listing is hidden from public
   // browse — either during the 48h window of an open match, or a strike period.
   hiddenUntil?: string;
