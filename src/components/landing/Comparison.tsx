@@ -7,7 +7,7 @@ export function Comparison({ brand }: { brand: string }) {
         eyebrow="Compare"
         heading="What you'd pay elsewhere."
         brandWords={1}
-        lede="No spin. Same hour, same student — see exactly where your money goes."
+        lede="No spin — tutoring centres vs. a directory, for the same hour with the same student. The table covers both sides: what it costs a parent, and what it costs a tutor."
       />
       <div className="compare reveal">
         <div className="row head">
